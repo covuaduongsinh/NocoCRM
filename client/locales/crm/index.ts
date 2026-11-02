@@ -207,9 +207,11 @@ const wording = {
   assistantLoading: ['Loading the AI configuration…', '正在加载 AI 配置…'],
   loading: ['Loading…', '正在加载…'],
   empty: ['A fresh start', '从这里开始'],
+  // Under "No data yet", for a list empty without filters (list-feedback.tsx);
+  // filters that leave nothing say "No results" instead.
   emptyDescription: [
-    'No matching records yet. Add your first record or adjust the filters.',
-    '暂无符合条件的记录。创建第一条记录，或调整筛选条件。',
+    'No records yet. Add the first one with the button in the top right.',
+    '还没有记录。用右上角的按钮添加第一条。',
   ],
   create: ['Create', '新建'],
   update: ['Update', '修改'],

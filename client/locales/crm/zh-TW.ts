@@ -137,7 +137,7 @@ export const crmZhTW: CrmWording = {
   assistantLoading: '正在載入 AI 設定…',
   loading: '正在載入…',
   empty: '從這裡開始',
-  emptyDescription: '目前沒有符合條件的記錄。建立第一筆記錄，或調整篩選條件。',
+  emptyDescription: '還沒有記錄。用右上角的按鈕新增第一筆。',
   create: '新增',
   update: '修改',
   edit: '編輯',

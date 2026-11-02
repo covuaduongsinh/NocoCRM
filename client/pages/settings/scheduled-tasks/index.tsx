@@ -35,7 +35,15 @@ import {
 } from '#components/ui/tooltip';
 
 import { SortableHead } from '../../../components/crm/sortable-table.js';
-import { LoadFailure, TableSkeleton, TruncatedText } from '../common/shared.js';
+import { TruncatedText } from '../common/shared.js';
+import {
+  CrmListFeedback,
+  ListFeedbackActions,
+} from '../../../components/crm/list-feedback.js';
+import {
+  listStateShowsData,
+  queryListState,
+} from '../../../components/crm/list-state.js';
 import { useAdminText, useDateTime, useFailureText } from '../common/hooks.js';
 import {
   useSchedulesKey,
@@ -133,17 +141,15 @@ export default function ScheduledTasksPage(): ReactElement {
     void queryClient.invalidateQueries({ queryKey: schedulesKey });
   };
 
+  // The schedules' read as the list feedback reads it (list-state.ts):
+  // loading, refused or failed it says so in place of the table, and a
+  // refresh that failed keeps the schedules with a line over them.
+  const state = queryListState(query, rows.length, false);
   let content: ReactElement;
-  if (query.error && !query.data) {
-    content = (
-      <LoadFailure
-        error={query.error}
-        what={text('schedules.what')}
-        onRetry={refresh}
-      />
-    );
+  if (!listStateShowsData(state) && state !== 'empty') {
+    content = <CrmListFeedback state={state} />;
   } else if (!query.data) {
-    content = <TableSkeleton columns={6} />;
+    content = <CrmListFeedback state='loading' />;
   } else if (rows.length === 0) {
     content = (
       <Empty className='min-h-48 border border-dashed'>
@@ -159,69 +165,71 @@ export default function ScheduledTasksPage(): ReactElement {
   } else {
     const capped = query.data.meta.total > rows.length;
     content = (
-      <div className='flex flex-col gap-2'>
-        {capped ? (
-          <p className='text-sm text-muted-foreground'>
-            {text('schedules.cap', { count: rows.length })}
-          </p>
-        ) : null}
-        <div className='overflow-x-auto rounded-lg border border-border bg-card shadow-xs'>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {head('title', text('schedules.columns.task'))}
-                <TableHead>{text('schedules.columns.schedule')}</TableHead>
-                <TableHead>{text('schedules.columns.status')}</TableHead>
-                {head('lastRun', text('schedules.columns.lastRun'))}
-                {head('nextRun', text('schedules.columns.nextRun'))}
-                {head('runs', text('schedules.columns.runs'), 'text-right')}
-                <TableHead className='text-right'>
-                  {text('schedules.columns.on')}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((schedule) => (
-                <TableRow key={schedule.id}>
-                  <TableCell className='max-w-80'>
-                    <Link
-                      to={{
-                        pathname: encodeURIComponent(schedule.id),
-                        search: location.search,
-                      }}
-                      className='block font-medium underline-offset-4 hover:underline'
-                    >
-                      <TruncatedText>{schedule.title}</TruncatedText>
-                    </Link>
-                  </TableCell>
-                  <TableCell className='whitespace-nowrap'>
-                    <code className='font-mono text-xs'>{schedule.cron}</code>
-                    <span className='text-muted-foreground'>
-                      {' · '}
-                      {schedule.timezone}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <ScheduleStatusBadge schedule={schedule} />
-                  </TableCell>
-                  <TableCell className='whitespace-nowrap text-muted-foreground'>
-                    {formatDate(schedule.lastRunAt)}
-                  </TableCell>
-                  <TableCell className='whitespace-nowrap text-muted-foreground'>
-                    {formatDate(schedule.nextRunAt)}
-                  </TableCell>
-                  <TableCell className='text-right tabular-nums'>
-                    {schedule.runCount.toLocaleString(language)}
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    <ScheduleSwitch schedule={schedule} />
-                  </TableCell>
+      <CrmListFeedback state={state}>
+        <div className='flex flex-col gap-2'>
+          {capped ? (
+            <p className='text-sm text-muted-foreground'>
+              {text('schedules.cap', { count: rows.length })}
+            </p>
+          ) : null}
+          <div className='overflow-x-auto rounded-lg border border-border bg-card shadow-xs'>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {head('title', text('schedules.columns.task'))}
+                  <TableHead>{text('schedules.columns.schedule')}</TableHead>
+                  <TableHead>{text('schedules.columns.status')}</TableHead>
+                  {head('lastRun', text('schedules.columns.lastRun'))}
+                  {head('nextRun', text('schedules.columns.nextRun'))}
+                  {head('runs', text('schedules.columns.runs'), 'text-right')}
+                  <TableHead className='text-right'>
+                    {text('schedules.columns.on')}
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {rows.map((schedule) => (
+                  <TableRow key={schedule.id}>
+                    <TableCell className='max-w-80'>
+                      <Link
+                        to={{
+                          pathname: encodeURIComponent(schedule.id),
+                          search: location.search,
+                        }}
+                        className='block font-medium underline-offset-4 hover:underline'
+                      >
+                        <TruncatedText>{schedule.title}</TruncatedText>
+                      </Link>
+                    </TableCell>
+                    <TableCell className='whitespace-nowrap'>
+                      <code className='font-mono text-xs'>{schedule.cron}</code>
+                      <span className='text-muted-foreground'>
+                        {' · '}
+                        {schedule.timezone}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <ScheduleStatusBadge schedule={schedule} />
+                    </TableCell>
+                    <TableCell className='whitespace-nowrap text-muted-foreground'>
+                      {formatDate(schedule.lastRunAt)}
+                    </TableCell>
+                    <TableCell className='whitespace-nowrap text-muted-foreground'>
+                      {formatDate(schedule.nextRunAt)}
+                    </TableCell>
+                    <TableCell className='text-right tabular-nums'>
+                      {schedule.runCount.toLocaleString(language)}
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      <ScheduleSwitch schedule={schedule} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      </div>
+      </CrmListFeedback>
     );
   }
 
@@ -231,22 +239,29 @@ export default function ScheduledTasksPage(): ReactElement {
         title={text('schedules.title')}
         description={text('schedules.description')}
         actions={
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Button
-                  variant='outline'
-                  size='icon'
-                  aria-label={text('common.refresh')}
-                  disabled={refreshing}
-                  onClick={refresh}
-                />
-              }
-            >
-              <RefreshCwIcon className={refreshing ? 'animate-spin' : ''} />
-            </TooltipTrigger>
-            <TooltipContent>{text('common.refresh')}</TooltipContent>
-          </Tooltip>
+          <>
+            <ListFeedbackActions
+              state={state}
+              onRetry={refresh}
+              busy={refreshing}
+            />
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant='outline'
+                    size='icon'
+                    aria-label={text('common.refresh')}
+                    disabled={refreshing}
+                    onClick={refresh}
+                  />
+                }
+              >
+                <RefreshCwIcon className={refreshing ? 'animate-spin' : ''} />
+              </TooltipTrigger>
+              <TooltipContent>{text('common.refresh')}</TooltipContent>
+            </Tooltip>
+          </>
         }
       />
       {content}

@@ -65,10 +65,17 @@ import {
 
 import { SortableHead } from '../../../components/crm/sortable-table.js';
 import {
+  CrmListFeedback,
+  ListFeedbackActions,
+} from '../../../components/crm/list-feedback.js';
+import {
+  listStateShowsData,
+  queryListState,
+} from '../../../components/crm/list-state.js';
+import {
   ConfirmAction,
   CopyField,
   LoadFailure,
-  TableSkeleton,
   TruncatedText,
 } from '../common/shared.js';
 import {
@@ -218,20 +225,25 @@ export default function ApiKeysPage(): ReactElement {
   );
   const newLink = { pathname: 'new', search: location.search };
 
+  // The keys' read as the list feedback reads it (list-state.ts): loading,
+  // refused or failed it says so in place of the table, and a refresh that
+  // failed keeps the keys with a line over them. What the page may offer
+  // (scopeOptions) is not the list, so its failure keeps its own notice.
+  const state = queryListState(keys, rows.length, false);
   let content: ReactElement;
-  if ((keys.error && !keys.data) || (options.error && !options.data)) {
+  if (options.error && !options.data) {
     content = (
       <LoadFailure
-        error={keys.error ?? options.error}
+        error={options.error}
         what={text('keys.what')}
-        onRetry={() => {
-          refresh();
-          void options.refetch();
-        }}
+        onRetry={() => void options.refetch()}
       />
     );
-  } else if (!keys.data || !options.data) {
-    content = <TableSkeleton columns={5} />;
+  } else if (
+    !options.data ||
+    (!listStateShowsData(state) && state !== 'empty')
+  ) {
+    content = <CrmListFeedback state={options.data ? state : 'loading'} />;
   } else if (rows.length === 0) {
     content = (
       <Empty className='min-h-48 border border-dashed'>
@@ -256,125 +268,129 @@ export default function ApiKeysPage(): ReactElement {
     );
   } else {
     content = (
-      <div className='overflow-x-auto rounded-lg border border-border bg-card shadow-xs'>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {head('name', text('keys.columns.name'))}
-              <TableHead>{text('keys.columns.access')}</TableHead>
-              {head('created', text('keys.columns.created'))}
-              {head('expires', text('keys.columns.expires'))}
-              {head('lastUsed', text('keys.columns.lastUsed'))}
-              <TableHead>
-                <span className='sr-only'>{text('common.actions')}</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.map((key) => {
-              const groups = key.scope
-                ? Object.keys(key.scope.groups).length
-                : 0;
-              const expired =
-                key.expiresAt !== null && Date.parse(key.expiresAt) <= now;
-              return (
-                <TableRow key={key.id}>
-                  <TableCell className='max-w-64'>
-                    <TruncatedText className='font-medium'>
-                      {name(key)}
-                    </TruncatedText>
-                    {key.description ? (
-                      <TruncatedText className='text-muted-foreground'>
-                        {key.description}
+      <CrmListFeedback state={state}>
+        <div className='overflow-x-auto rounded-lg border border-border bg-card shadow-xs'>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {head('name', text('keys.columns.name'))}
+                <TableHead>{text('keys.columns.access')}</TableHead>
+                {head('created', text('keys.columns.created'))}
+                {head('expires', text('keys.columns.expires'))}
+                {head('lastUsed', text('keys.columns.lastUsed'))}
+                <TableHead>
+                  <span className='sr-only'>{text('common.actions')}</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((key) => {
+                const groups = key.scope
+                  ? Object.keys(key.scope.groups).length
+                  : 0;
+                const expired =
+                  key.expiresAt !== null && Date.parse(key.expiresAt) <= now;
+                return (
+                  <TableRow key={key.id}>
+                    <TableCell className='max-w-64'>
+                      <TruncatedText className='font-medium'>
+                        {name(key)}
                       </TruncatedText>
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={key.scope ? 'info' : 'muted'}>
-                      {key.scope
-                        ? text('keys.limitedCount', { count: groups })
-                        : text('keys.full')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className='whitespace-nowrap text-muted-foreground'>
-                    {formatDate(key.createdAt)}
-                  </TableCell>
-                  <TableCell className='whitespace-nowrap text-muted-foreground'>
-                    <span className='inline-flex items-center gap-2'>
-                      {key.expiresAt
-                        ? formatDate(key.expiresAt)
-                        : text('keys.neverExpires')}
-                      {expired ? (
-                        <Badge variant='warning'>{text('keys.expired')}</Badge>
+                      {key.description ? (
+                        <TruncatedText className='text-muted-foreground'>
+                          {key.description}
+                        </TruncatedText>
                       ) : null}
-                    </span>
-                  </TableCell>
-                  <TableCell className='whitespace-nowrap text-muted-foreground'>
-                    {key.lastUsedAt
-                      ? formatDate(key.lastUsedAt)
-                      : text('keys.neverUsed')}
-                  </TableCell>
-                  <TableCell className='w-0 text-right'>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={
-                          <Button
-                            variant='ghost'
-                            size='icon-sm'
-                            aria-label={text('common.actionsFor', {
-                              name: name(key),
-                            })}
-                          />
-                        }
-                      >
-                        <MoreHorizontalIcon />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align='end'
-                        className='w-auto min-w-40'
-                      >
-                        <DropdownMenuGroup>
-                          {mayCreate ? (
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={key.scope ? 'info' : 'muted'}>
+                        {key.scope
+                          ? text('keys.limitedCount', { count: groups })
+                          : text('keys.full')}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className='whitespace-nowrap text-muted-foreground'>
+                      {formatDate(key.createdAt)}
+                    </TableCell>
+                    <TableCell className='whitespace-nowrap text-muted-foreground'>
+                      <span className='inline-flex items-center gap-2'>
+                        {key.expiresAt
+                          ? formatDate(key.expiresAt)
+                          : text('keys.neverExpires')}
+                        {expired ? (
+                          <Badge variant='warning'>
+                            {text('keys.expired')}
+                          </Badge>
+                        ) : null}
+                      </span>
+                    </TableCell>
+                    <TableCell className='whitespace-nowrap text-muted-foreground'>
+                      {key.lastUsedAt
+                        ? formatDate(key.lastUsedAt)
+                        : text('keys.neverUsed')}
+                    </TableCell>
+                    <TableCell className='w-0 text-right'>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant='ghost'
+                              size='icon-sm'
+                              aria-label={text('common.actionsFor', {
+                                name: name(key),
+                              })}
+                            />
+                          }
+                        >
+                          <MoreHorizontalIcon />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align='end'
+                          className='w-auto min-w-40'
+                        >
+                          <DropdownMenuGroup>
+                            {mayCreate ? (
+                              <DropdownMenuItem
+                                variant='destructive'
+                                onClick={() =>
+                                  setConfirmation({
+                                    open: true,
+                                    kind: 'rotate',
+                                    key,
+                                  })
+                                }
+                              >
+                                <RotateCwIcon />
+                                {text('keys.rotate')}
+                              </DropdownMenuItem>
+                            ) : null}
+                          </DropdownMenuGroup>
+                          {mayCreate ? <DropdownMenuSeparator /> : null}
+                          <DropdownMenuGroup>
                             <DropdownMenuItem
                               variant='destructive'
                               onClick={() =>
                                 setConfirmation({
                                   open: true,
-                                  kind: 'rotate',
+                                  kind: 'delete',
                                   key,
                                 })
                               }
                             >
-                              <RotateCwIcon />
-                              {text('keys.rotate')}
+                              <Trash2Icon />
+                              {text('keys.delete')}
                             </DropdownMenuItem>
-                          ) : null}
-                        </DropdownMenuGroup>
-                        {mayCreate ? <DropdownMenuSeparator /> : null}
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem
-                            variant='destructive'
-                            onClick={() =>
-                              setConfirmation({
-                                open: true,
-                                kind: 'delete',
-                                key,
-                              })
-                            }
-                          >
-                            <Trash2Icon />
-                            {text('keys.delete')}
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </div>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      </CrmListFeedback>
     );
   }
 
@@ -388,6 +404,11 @@ export default function ApiKeysPage(): ReactElement {
           description={text('keys.description')}
           actions={
             <>
+              <ListFeedbackActions
+                state={state}
+                onRetry={refresh}
+                busy={refreshing}
+              />
               {mayCreate && rows.length > 0 ? (
                 <Button nativeButton={false} render={<Link to={newLink} />}>
                   <PlusIcon data-icon='inline-start' />

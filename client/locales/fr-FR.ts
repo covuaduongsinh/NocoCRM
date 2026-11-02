@@ -17,6 +17,20 @@ const frFR: AppResource = {
   'auth.connectionFailed': 'Connexion impossible',
   'auth.connectionFailedDescription':
     'La connexion en temps réel n’a pas pu être établie. Réessayez pour accéder à l’application, ou déconnectez-vous.',
+  listFeedback: {
+    loading: 'Chargement',
+    empty: 'Aucune donnée pour l’instant',
+    noResults: 'Aucun résultat',
+    forbidden: 'Accès refusé',
+    unauthenticated: 'Session expirée',
+    failed: 'Impossible de charger la liste',
+    refreshFailed:
+      'Échec de l’actualisation ; affichage des données précédentes',
+    retry: 'Réessayer',
+    retrying: 'Nouvelle tentative…',
+    clear: 'Effacer les filtres',
+    signIn: 'Se connecter',
+  },
   formFeedback: {
     field: 'Cette valeur a été refusée. Vérifiez-la et réessayez.',
     invalid: 'Vérifiez les champs signalés et réessayez.',

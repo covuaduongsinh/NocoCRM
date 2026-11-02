@@ -57,9 +57,24 @@ vi.mock('../../client/components/crm/api.js', async (importOriginal) => {
 
 const { TaskList } = await import('../../client/components/crm/task-list.js');
 
-function Page({ status }: { status: string }): ReactElement {
+function Page({
+  status,
+  filtered = false,
+  onClear = () => undefined,
+}: {
+  status: string;
+  filtered?: boolean;
+  onClear?: () => void;
+}): ReactElement {
   const params = new URLSearchParams({ search: '' });
-  return <TaskList params={params} status={status} empty={<p>empty</p>} />;
+  return (
+    <TaskList
+      params={params}
+      status={status}
+      filtered={filtered}
+      onClear={onClear}
+    />
+  );
 }
 
 const task = (
@@ -89,14 +104,17 @@ const page = (data: Record<string, unknown>[]) => ({
   },
 });
 
-function renderList(status = ''): void {
+function renderList(
+  status = '',
+  filters: { filtered?: boolean; onClear?: () => void } = {},
+): void {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
   render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
-        <Page status={status} />
+        <Page status={status} {...filters} />
       </MemoryRouter>
     </QueryClientProvider>,
   );
@@ -125,6 +143,42 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('the task list', () => {
+  // A failed read is said so, with a retry, never drawn as an empty list
+  // (components/crm/list-feedback.tsx).
+  it('says a failed read failed and reads again on Retry', async () => {
+    let fail = true;
+    state.api.mockImplementation((path: string) =>
+      fail
+        ? Promise.reject(new Error('offline'))
+        : Promise.resolve(
+            path.startsWith('tasks?')
+              ? page([task('open-1', '我的待办', 'open')])
+              : { data: {} },
+          ),
+    );
+    renderList();
+    expect(await screen.findByText('Unable to load list')).toBeTruthy();
+    expect(screen.queryByText('No data yet')).toBeNull();
+    fail = false;
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(await screen.findByText('我的待办')).toBeTruthy();
+  });
+
+  it('tells nothing yet from no results, and clears the filters', async () => {
+    state.api.mockImplementation(() => Promise.resolve(page([])));
+    renderList();
+    expect(await screen.findByText('No data yet')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Clear filters' })).toBeNull();
+    cleanup();
+    const onClear = vi.fn();
+    renderList('', { filtered: true, onClear });
+    expect(await screen.findByText('No results')).toBeTruthy();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Clear filters' }),
+    );
+    expect(onClear).toHaveBeenCalledOnce();
+  });
+
   it('lists what is to do, then what is closed folded away', async () => {
     renderList();
     expect(await screen.findByText('我的待办')).toBeTruthy();

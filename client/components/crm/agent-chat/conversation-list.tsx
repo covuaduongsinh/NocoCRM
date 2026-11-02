@@ -1,5 +1,4 @@
 import { Button } from '#components/ui/button';
-import { Skeleton } from '#components/ui/skeleton';
 import {
   AgentAvatar,
   appUIMessageText,
@@ -18,7 +17,8 @@ import { NavLink } from 'react-router';
 import { relativeTime, toText, useCrmApi, useCrmText } from '../api.js';
 import { markdownLine } from '../line-breaks.js';
 import { AutoLoadMore } from '../auto-load.js';
-import { ErrorNotice } from '../common.js';
+import { CrmListFeedback, ListFeedbackActions } from '../list-feedback.js';
+import { listStateShowsData, queryListState } from '../list-state.js';
 import { isNews } from './news.js';
 import { listedConversations, useAssistantName } from './ask.js';
 
@@ -55,6 +55,26 @@ export function ConversationList({
     return () => clearInterval(timer);
   }, []);
   const items = listedConversations(query.data?.pages);
+  // The conversations' read as the list feedback reads it (list-state.ts):
+  // loading, refused or failed it says so in place of the list, with a
+  // retry or sign-in under it, and a refresh that failed keeps the list with
+  // a line over it. A page further down that failed is not the list
+  // failing; the empty list keeps its own words.
+  const state = queryListState(
+    { ...query, error: query.isFetchNextPageError ? undefined : query.error },
+    items.length,
+    false,
+  );
+  const feedback = (
+    <div className='flex flex-col items-center gap-2 p-1'>
+      <CrmListFeedback state={state} />
+      <ListFeedbackActions
+        state={state}
+        onRetry={() => void query.refetch()}
+        busy={query.isFetching}
+      />
+    </div>
+  );
   const suffix = archived ? '?archived=1' : '';
   const toggle = (
     <Button
@@ -74,99 +94,88 @@ export function ConversationList({
       className='flex min-h-0 flex-1 flex-col outline-none'
     >
       <div className='min-h-0 flex-1 overflow-y-auto'>
-        {query.isLoading ? (
-          <div className='flex flex-col gap-2 p-1' role='status'>
-            <span className='sr-only'>{text('loading')}</span>
-            {[0, 1, 2, 3].map((row) => (
-              <Skeleton key={row} className='h-14 w-full rounded-lg' />
-            ))}
-          </div>
-        ) : query.error ? (
-          <div className='flex flex-col items-start gap-2 p-1'>
-            <ErrorNotice error={query.error} />
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => void query.refetch()}
-            >
-              {text('agentChat.retry')}
-            </Button>
-          </div>
-        ) : !items.length ? (
+        {!listStateShowsData(state) && state !== 'empty' ? (
+          feedback
+        ) : state === 'empty' ? (
           <div className='flex flex-col items-center gap-2 px-4 py-10 text-center'>
             <p className='text-sm text-muted-foreground'>
               {text(archived ? 'agentChat.noArchived' : 'agentChat.empty')}
             </p>
           </div>
         ) : (
-          <ul className='flex flex-col gap-0.5 p-2'>
-            {items.map((conversation) => {
-              const title = conversation.title || text('agentChat.untitled');
-              const unread = !conversation.read;
-              const current = conversation.id === openId;
-              const agent = assistantName;
-              return (
-                <li key={conversation.id}>
-                  <RowTarget
-                    to={`/agent-chat/${encodeURIComponent(conversation.id)}${suffix}`}
-                    onOpen={onOpen ? () => onOpen(conversation.id) : undefined}
-                    current={current}
-                    className={`flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-left transition-colors ${
-                      current ? 'bg-accent' : 'hover:bg-hover'
-                    }`}
-                  >
-                    <AgentAvatar
-                      name={agent}
-                      className='shrink-0 rounded-full'
-                    />
-                    <span className='grid min-w-0 flex-1 gap-0.5'>
-                      <span className='flex min-w-0 items-baseline gap-2'>
-                        <span
-                          className={`min-w-0 flex-1 truncate text-sm ${unread ? 'font-semibold' : 'font-medium'}`}
-                          title={title}
-                        >
-                          {title}
+          <>
+            {state === 'refresh-failed' ? feedback : null}
+            <ul className='flex flex-col gap-0.5 p-2'>
+              {items.map((conversation) => {
+                const title = conversation.title || text('agentChat.untitled');
+                const unread = !conversation.read;
+                const current = conversation.id === openId;
+                const agent = assistantName;
+                return (
+                  <li key={conversation.id}>
+                    <RowTarget
+                      to={`/agent-chat/${encodeURIComponent(conversation.id)}${suffix}`}
+                      onOpen={
+                        onOpen ? () => onOpen(conversation.id) : undefined
+                      }
+                      current={current}
+                      className={`flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-left transition-colors ${
+                        current ? 'bg-accent' : 'hover:bg-hover'
+                      }`}
+                    >
+                      <AgentAvatar
+                        name={agent}
+                        className='shrink-0 rounded-full'
+                      />
+                      <span className='grid min-w-0 flex-1 gap-0.5'>
+                        <span className='flex min-w-0 items-baseline gap-2'>
+                          <span
+                            className={`min-w-0 flex-1 truncate text-sm ${unread ? 'font-semibold' : 'font-medium'}`}
+                            title={title}
+                          >
+                            {title}
+                          </span>
+                          <span className='shrink-0 text-xs text-muted-foreground tabular-nums'>
+                            {relativeTime(
+                              conversation.lastMessageAt,
+                              language,
+                              now,
+                              text('justNow'),
+                            )}
+                          </span>
                         </span>
-                        <span className='shrink-0 text-xs text-muted-foreground tabular-nums'>
-                          {relativeTime(
-                            conversation.lastMessageAt,
-                            language,
-                            now,
-                            text('justNow'),
-                          )}
-                        </span>
-                      </span>
-                      {/* A reply not yet read: the preview in the body's
+                        {/* A reply not yet read: the preview in the body's
                           colour and a dot in the AI's at the row's end, under
                           the time. */}
-                      <span
-                        className={`flex min-w-0 items-center gap-1.5 text-xs ${unread ? 'text-foreground' : 'text-muted-foreground'}`}
-                      >
-                        <span className='min-w-0 flex-1 truncate'>
-                          <LastMessage
-                            id={conversation.id}
-                            // Read again when a message arrives, when a run
-                            // starts or ends (a reply streamed into its
-                            // message keeps the message's time), and when the
-                            // conversation changes.
-                            at={`${conversation.lastMessageAt}|${conversation.updatedAt}|${conversation.execution?.status ?? ''}`}
-                            agent={agent}
-                          />
-                        </span>
-                        {unread ? (
-                          <span className='size-2 shrink-0 rounded-full bg-primary'>
-                            <span className='sr-only'>
-                              {text('agentChat.unread')}
-                            </span>
+                        <span
+                          className={`flex min-w-0 items-center gap-1.5 text-xs ${unread ? 'text-foreground' : 'text-muted-foreground'}`}
+                        >
+                          <span className='min-w-0 flex-1 truncate'>
+                            <LastMessage
+                              id={conversation.id}
+                              // Read again when a message arrives, when a run
+                              // starts or ends (a reply streamed into its
+                              // message keeps the message's time), and when the
+                              // conversation changes.
+                              at={`${conversation.lastMessageAt}|${conversation.updatedAt}|${conversation.execution?.status ?? ''}`}
+                              agent={agent}
+                            />
                           </span>
-                        ) : null}
+                          {unread ? (
+                            <span className='size-2 shrink-0 rounded-full bg-primary'>
+                              <span className='sr-only'>
+                                {text('agentChat.unread')}
+                              </span>
+                            </span>
+                          ) : null}
+                        </span>
                       </span>
-                    </span>
-                  </RowTarget>
-                </li>
-              );
-            })}
-          </ul>
+                    </RowTarget>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
         )}
         <AutoLoadMore
           hasMore={Boolean(query.hasNextPage)}

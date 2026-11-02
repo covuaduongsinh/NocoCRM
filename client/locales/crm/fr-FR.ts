@@ -139,7 +139,7 @@ export const crmFrFR: CrmWording = {
   loading: 'Chargement…',
   empty: 'Tout commence ici',
   emptyDescription:
-    "Aucune fiche correspondante pour l'instant. Ajoutez votre première fiche ou modifiez les filtres.",
+    'Aucune fiche pour l’instant. Ajoutez la première avec le bouton en haut à droite.',
   create: 'Créer',
   update: 'Mettre à jour',
   edit: 'Modifier',

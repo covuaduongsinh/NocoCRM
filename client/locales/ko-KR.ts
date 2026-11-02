@@ -17,6 +17,19 @@ const koKR: AppResource = {
   'auth.connectionFailed': '연결할 수 없습니다',
   'auth.connectionFailedDescription':
     '실시간 연결을 준비할 수 없습니다. 다시 시도해 애플리케이션에 들어가거나 로그아웃하세요.',
+  listFeedback: {
+    loading: '불러오는 중',
+    empty: '아직 데이터가 없습니다',
+    noResults: '결과 없음',
+    forbidden: '접근 권한 없음',
+    unauthenticated: '세션이 만료되었습니다',
+    failed: '목록을 불러오지 못했습니다',
+    refreshFailed: '새로 고치지 못해 이전 데이터를 표시합니다',
+    retry: '다시 시도',
+    retrying: '다시 시도하는 중…',
+    clear: '필터 지우기',
+    signIn: '로그인',
+  },
   formFeedback: {
     field: '이 값이 거부되었습니다. 확인한 후 다시 시도하세요.',
     invalid: '표시된 항목을 확인한 후 다시 시도하세요.',

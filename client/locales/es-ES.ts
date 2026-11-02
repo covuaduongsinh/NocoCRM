@@ -17,6 +17,20 @@ const esES: AppResource = {
   'auth.connectionFailed': 'No se pudo conectar',
   'auth.connectionFailedDescription':
     'No se pudo preparar la conexión en tiempo real. Vuelve a intentarlo para entrar en la aplicación o cierra la sesión.',
+  listFeedback: {
+    loading: 'Cargando',
+    empty: 'Aún no hay datos',
+    noResults: 'Sin resultados',
+    forbidden: 'Acceso denegado',
+    unauthenticated: 'La sesión ha caducado',
+    failed: 'No se ha podido cargar la lista',
+    refreshFailed:
+      'No se ha podido actualizar; se muestran los datos anteriores',
+    retry: 'Reintentar',
+    retrying: 'Reintentando…',
+    clear: 'Borrar filtros',
+    signIn: 'Iniciar sesión',
+  },
   formFeedback: {
     field: 'Este valor no se ha aceptado. Revísalo e inténtalo de nuevo.',
     invalid: 'Revisa los campos marcados e inténtalo de nuevo.',

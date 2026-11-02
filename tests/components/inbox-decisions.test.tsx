@@ -57,6 +57,9 @@ vi.mock('@nocobase/app-client', async (importOriginal) => {
     useApiClient: () => client,
     useService: (token: unknown) =>
       token === actual.realtimeClientToken ? realtime : client,
+    // The inbox plugin (2.0.0-beta.1) waits for its realtime topics before
+    // reading; the fake realtime above is always ready.
+    useRealtimeReadiness: () => true,
   };
 });
 vi.mock('../../client/components/crm/lead-evaluation.js', () => ({

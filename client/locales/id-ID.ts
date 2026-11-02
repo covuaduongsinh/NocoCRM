@@ -17,6 +17,19 @@ const idID: AppResource = {
   'auth.connectionFailed': 'Tidak dapat terhubung',
   'auth.connectionFailedDescription':
     'Koneksi waktu nyata tidak dapat disiapkan. Coba lagi untuk masuk ke aplikasi, atau keluar.',
+  listFeedback: {
+    loading: 'Memuat',
+    empty: 'Belum ada data',
+    noResults: 'Tidak ada hasil',
+    forbidden: 'Akses ditolak',
+    unauthenticated: 'Sesi telah berakhir',
+    failed: 'Tidak dapat memuat daftar',
+    refreshFailed: 'Gagal memuat ulang; menampilkan data sebelumnya',
+    retry: 'Coba lagi',
+    retrying: 'Mencoba lagi…',
+    clear: 'Hapus filter',
+    signIn: 'Masuk',
+  },
   formFeedback: {
     field: 'Nilai ini ditolak. Periksa lalu coba lagi.',
     invalid: 'Periksa kolom yang ditandai lalu coba lagi.',

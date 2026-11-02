@@ -17,6 +17,19 @@ const jaJP: AppResource = {
   'auth.connectionFailed': '接続できません',
   'auth.connectionFailedDescription':
     'リアルタイム接続を準備できませんでした。再試行してアプリに入るか、ログアウトしてください。',
+  listFeedback: {
+    loading: '読み込み中',
+    empty: 'データがありません',
+    noResults: '結果がありません',
+    forbidden: 'アクセス権がありません',
+    unauthenticated: 'セッションの有効期限が切れました',
+    failed: '一覧を読み込めませんでした',
+    refreshFailed: '更新に失敗しました。以前のデータを表示しています',
+    retry: '再試行',
+    retrying: '再試行しています…',
+    clear: 'フィルターをクリア',
+    signIn: 'サインイン',
+  },
   formFeedback: {
     field:
       'この値は受け付けられませんでした。確認してからもう一度お試しください。',

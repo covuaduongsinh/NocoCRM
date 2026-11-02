@@ -38,6 +38,8 @@ import {
 } from './api.js';
 import { AutoLoadMore } from './auto-load.js';
 import { ErrorNotice, RecordLink } from './common.js';
+import { CrmListFeedback, ListFeedbackActions } from './list-feedback.js';
+import { queryListState, type ListState } from './list-state.js';
 import { RecordOutcomeDialog } from './outcome.js';
 import { DEFAULT_TIME_ZONE } from '../../../server/providers/crm/zone-time.js';
 
@@ -65,6 +67,10 @@ function useTaskPages(
   ai: Record<string, 'running' | 'pending'>;
   total: number;
   loading: boolean;
+  // The read as the list feedback reads it (list-state.ts), and its retry.
+  state: ListState;
+  retry: () => void;
+  fetching: boolean;
   more: (() => void) | undefined;
   fetchingMore: boolean;
 } {
@@ -101,6 +107,13 @@ function useTaskPages(
     ),
     total: pages[0]?.meta.total ?? 0,
     loading: query.isLoading,
+    state: queryListState(
+      query,
+      pages.reduce((n, p) => n + p.data.length, 0),
+      false,
+    ),
+    retry: () => void query.refetch(),
+    fetching: query.isFetching,
     more: query.hasNextPage ? () => void query.fetchNextPage() : undefined,
     fetchingMore: query.isFetchingNextPage,
   };
@@ -127,19 +140,58 @@ function useTaskSets(
 export function TaskList({
   params,
   status,
-  empty,
+  filtered,
+  onClear,
 }: {
   // The list's filters (search, owner, scope); status and paging are the
   // list's own.
   params: URLSearchParams;
   // A status picked in the filters, or '' for every task.
   status: string;
-  empty: ReactNode;
+  // Whether the reader narrowed the list, and how to undo it: nothing left
+  // then is "no results", with Clear filters.
+  filtered: boolean;
+  onClear: () => void;
 }): ReactElement {
   const { text } = useCrmText();
   const { open, done } = useTaskSets(params, status);
-  if (open.loading || (!status && done.loading)) return <></>;
-  if (!open.total && (status || !done.total)) return <>{empty}</>;
+  // The list's two reads as one (list-state.ts): a refusal or a failure of
+  // either says so in place of the table, with its retry; so does either
+  // still loading.
+  const reads = status ? [open] : [open, done];
+  const blocking = (
+    ['unauthenticated', 'forbidden', 'failed', 'loading'] as const
+  ).find((state) => reads.some((read) => read.state === state));
+  if (blocking) {
+    return (
+      <div className='flex flex-col items-center gap-2'>
+        <div className='w-full'>
+          <CrmListFeedback state={blocking} />
+        </div>
+        <ListFeedbackActions
+          state={blocking}
+          onRetry={() => {
+            // Every read that did not answer is read again.
+            for (const read of reads)
+              if (read.state !== 'ready' && read.state !== 'empty')
+                read.retry();
+          }}
+          busy={reads.some((read) => read.fetching)}
+        />
+      </div>
+    );
+  }
+  if (!open.total && (status || !done.total)) {
+    const state = filtered ? 'no-results' : 'empty';
+    return (
+      <div className='flex flex-col items-center gap-2'>
+        <div className='w-full'>
+          <CrmListFeedback state={state} empty={text('emptyDescription')} />
+        </div>
+        <ListFeedbackActions state={state} onClear={onClear} />
+      </div>
+    );
+  }
   return (
     <TaskTable
       pages={open}

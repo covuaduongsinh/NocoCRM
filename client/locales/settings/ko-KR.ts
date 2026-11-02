@@ -49,9 +49,6 @@ const settings: LocaleResource<typeof settingsEnUS> = {
     records: '선택한 레코드 ({{count}})',
     retained: '기존 설정 유지',
     search: '비즈니스 객체 또는 키 검색',
-    empty: '기본 데이터 범위가 없습니다',
-    emptyHint: '규칙을 만들어 비즈니스 객체의 기본 접근 권한을 설정하세요.',
-    readOnlyEmpty: '관리자에게 기본 데이터 접근 권한을 설정하도록 요청하세요.',
     noResources:
       '사용 가능한 모든 비즈니스 객체에 이미 기본 규칙이 있거나, 등록된 설정 가능 객체가 없습니다.',
     unsupported:
@@ -84,8 +81,6 @@ const settings: LocaleResource<typeof settingsEnUS> = {
     '사용자 정보, 계정 보안, 역할 할당을 관리합니다. 각 권한을 개별적으로 검토하세요.',
   businessOperationsHint:
     '이 역할이 수행할 수 있는 작업과 각 작업이 사용할 수 있는 데이터를 선택하세요.',
-  pageAccessHint:
-    '이 역할이 열 수 있는 비즈니스 페이지를 선택하세요. 사용자 관리와 비즈니스 설정을 포함한 모든 시스템 설정은 설정 권한에서 제어합니다. 데이터와 비즈니스 작업에는 별도의 권한이 필요합니다.',
   roleAssignment: '역할 할당',
   accountSecurity: '계정 보안',
   userInformation: '사용자 정보',
@@ -246,10 +241,6 @@ const settings: LocaleResource<typeof settingsEnUS> = {
   roleFilter: '역할별 필터',
   allRoles: '모든 역할',
   editUserFor: '{{name}} 편집',
-  usersReadOnlyEmpty:
-    '관리자에게 사용자를 추가하거나, 사용자를 만들고 역할을 할당하는 데 필요한 권한을 부여하도록 요청하세요.',
-  rolesReadOnlyEmpty:
-    '관리자에게 역할을 만들거나 역할을 만들 수 있는 권한을 부여하도록 요청하세요.',
   selectRoles: '역할 선택',
   searchRoles: '역할 검색',
   noRolesFound: '역할을 찾을 수 없습니다.',

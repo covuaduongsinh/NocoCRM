@@ -138,7 +138,7 @@ export const crmJaJP: CrmWording = {
   loading: '読み込み中…',
   empty: 'ここから始めましょう',
   emptyDescription:
-    '条件に一致するレコードはまだありません。最初のレコードを追加するか、フィルターを調整してください。',
+    'まだレコードがありません。右上のボタンから最初のレコードを追加できます。',
   create: '作成',
   update: '更新',
   edit: '編集',
