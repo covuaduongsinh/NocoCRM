@@ -18,6 +18,7 @@ import {
   useDecisions,
 } from './inbox-decisions-data.js';
 import { DecisionDetail, DecisionList } from './inbox-decisions-view.js';
+import { queryListState } from './list-state.js';
 
 // The AI's suggestions as a category of the inbox (inbox-decisions-data.ts
 // says what they are).
@@ -103,8 +104,9 @@ function useDecisionsCollection({
       items={items}
       selectedId={selectedId}
       onSelect={onSelect}
-      error={query.error}
-      loading={query.isLoading}
+      state={queryListState(query, items.length, false)}
+      onRetry={() => void query.refetch()}
+      busy={query.isFetching}
     />
   );
   return {

@@ -138,7 +138,7 @@ export const crmKoKR: CrmWording = {
   loading: '불러오는 중…',
   empty: '새로운 시작',
   emptyDescription:
-    '아직 일치하는 레코드가 없습니다. 첫 레코드를 추가하거나 필터를 조정하세요.',
+    '아직 레코드가 없습니다. 오른쪽 위 버튼으로 첫 레코드를 추가하세요.',
   create: '만들기',
   update: '업데이트',
   edit: '편집',

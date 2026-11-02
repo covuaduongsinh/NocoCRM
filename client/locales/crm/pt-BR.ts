@@ -139,7 +139,7 @@ export const crmPtBR: CrmWording = {
   loading: 'Carregando…',
   empty: 'Um novo começo',
   emptyDescription:
-    'Ainda não há registros correspondentes. Adicione seu primeiro registro ou ajuste os filtros.',
+    'Ainda não há registros. Adicione o primeiro com o botão no canto superior direito.',
   create: 'Criar',
   update: 'Atualizar',
   edit: 'Editar',

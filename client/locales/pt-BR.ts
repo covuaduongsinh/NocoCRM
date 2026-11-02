@@ -17,6 +17,19 @@ const ptBR: AppResource = {
   'auth.connectionFailed': 'Não foi possível conectar',
   'auth.connectionFailedDescription':
     'Não foi possível preparar a conexão em tempo real. Tente novamente para entrar no aplicativo ou saia.',
+  listFeedback: {
+    loading: 'Carregando',
+    empty: 'Ainda não há dados',
+    noResults: 'Nenhum resultado',
+    forbidden: 'Acesso negado',
+    unauthenticated: 'A sessão expirou',
+    failed: 'Não foi possível carregar a lista',
+    refreshFailed: 'Falha ao atualizar; exibindo os dados anteriores',
+    retry: 'Tentar novamente',
+    retrying: 'Tentando novamente…',
+    clear: 'Limpar filtros',
+    signIn: 'Entrar',
+  },
   formFeedback: {
     field: 'Este valor foi recusado. Verifique-o e tente novamente.',
     invalid: 'Verifique os campos destacados e tente novamente.',

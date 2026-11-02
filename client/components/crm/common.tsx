@@ -15,7 +15,7 @@ import {
 import { Link } from 'react-router';
 import { useRecordDrawer, useRecordLink } from './record-drawer.js';
 import { Markdown } from './markdown.js';
-import { Inbox, type LucideIcon } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '../ui/card.js';
 import { Badge } from '../ui/badge.js';
 import { Alert, AlertDescription } from '../ui/alert.js';
@@ -158,21 +158,6 @@ export function ErrorNotice({
         ) : null}
       </AlertDescription>
     </Alert>
-  );
-}
-export function Empty({ action }: { action?: ReactNode }): ReactElement {
-  const { text } = useCrmText();
-  return (
-    <div className='flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-6 py-14 text-center'>
-      <div className='rounded-xl bg-muted p-3'>
-        <Inbox className='size-6 text-muted-foreground' />
-      </div>
-      <h3 className='font-medium'>{text('empty')}</h3>
-      <p className='max-w-sm text-sm text-muted-foreground'>
-        {text('emptyDescription')}
-      </p>
-      {action}
-    </div>
   );
 }
 // A status's colour says where the record stands: done, under way, waiting,

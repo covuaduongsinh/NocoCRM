@@ -35,10 +35,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#components/ui/dropdown-menu';
-import { Skeleton } from '#components/ui/skeleton';
 import { Spinner } from '#components/ui/spinner';
 
-import { ConfirmAction, LoadFailure } from '../common/shared.js';
+import { ConfirmAction } from '../common/shared.js';
+import {
+  CrmListFeedback,
+  ListFeedbackActions,
+} from '../../../components/crm/list-feedback.js';
+import {
+  listStateShowsData,
+  queryListState,
+} from '../../../components/crm/list-state.js';
 import { useAdminText, useDateTime, useFailureText } from '../common/hooks.js';
 import { useUsersClient, useUsersKey } from './data.js';
 import { InviteResults } from './invite.js';
@@ -91,105 +98,105 @@ export function Invitations(): ReactElement | null {
       });
   }
 
+  // The invitations' read as the list feedback reads it (list-state.ts):
+  // loading, refused or failed it says so in the card, with a retry under
+  // it, and a refresh that failed keeps them with a line over them.
+  const state = queryListState(query, query.data?.length ?? 0, false);
   let body: ReactElement;
-  if (query.error && !query.data) {
+  if (!listStateShowsData(state)) {
     body = (
-      <LoadFailure
-        error={query.error}
-        what={text('invitations.what')}
-        onRetry={() => void query.refetch()}
-      />
-    );
-  } else if (!query.data) {
-    body = (
-      <div
-        role='status'
-        aria-label={text('common.loading')}
-        className='flex flex-col gap-2'
-      >
-        <Skeleton className='h-10 w-full' />
-        <Skeleton className='h-10 w-full' />
+      <div className='flex flex-col items-center gap-2'>
+        <CrmListFeedback state={state} />
+        <ListFeedbackActions
+          state={state}
+          onRetry={() => void query.refetch()}
+          busy={query.isFetching}
+        />
       </div>
     );
   } else {
     body = (
-      <ul className='divide-y'>
-        {query.data.map((invitation) => (
-          <li
-            key={invitation.id}
-            className='flex items-center gap-3 py-2.5 text-sm'
-          >
-            <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
-              <span className='flex flex-wrap items-center gap-2'>
-                <span className='font-medium break-all'>
-                  {invitation.email}
-                </span>
-                <Badge
-                  variant={invitation.status === 'expired' ? 'warning' : 'info'}
-                >
-                  {text(
-                    invitation.status === 'expired'
-                      ? 'invitations.expired'
-                      : 'invitations.pending',
-                  )}
-                </Badge>
-              </span>
-              <span className='text-muted-foreground'>
-                {text('invitations.invitedBy', {
-                  name: invitation.invitedBy.name,
-                  date: formatDate(invitation.expiresAt),
-                })}
-                {invitation.summary.length > 0
-                  ? ` · ${invitation.summary.join(', ')}`
-                  : ''}
-              </span>
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button
-                    variant='ghost'
-                    size='icon-sm'
-                    aria-label={text('common.actionsFor', {
-                      name: invitation.email,
-                    })}
-                    disabled={resending === invitation.id}
-                  />
-                }
-              >
-                {resending === invitation.id ? (
-                  <Spinner />
-                ) : (
-                  <MoreHorizontalIcon />
-                )}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-auto min-w-40'>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => resend(invitation)}>
-                    <MailIcon />
-                    {text('invitations.resend')}
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    variant='destructive'
-                    onClick={() => setRevoking({ open: true, invitation })}
+      <CrmListFeedback state={state}>
+        <ul className='divide-y'>
+          {(query.data ?? []).map((invitation) => (
+            <li
+              key={invitation.id}
+              className='flex items-center gap-3 py-2.5 text-sm'
+            >
+              <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+                <span className='flex flex-wrap items-center gap-2'>
+                  <span className='font-medium break-all'>
+                    {invitation.email}
+                  </span>
+                  <Badge
+                    variant={
+                      invitation.status === 'expired' ? 'warning' : 'info'
+                    }
                   >
-                    <Trash2Icon />
-                    {text('invitations.revoke')}
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </li>
-        ))}
-      </ul>
+                    {text(
+                      invitation.status === 'expired'
+                        ? 'invitations.expired'
+                        : 'invitations.pending',
+                    )}
+                  </Badge>
+                </span>
+                <span className='text-muted-foreground'>
+                  {text('invitations.invitedBy', {
+                    name: invitation.invitedBy.name,
+                    date: formatDate(invitation.expiresAt),
+                  })}
+                  {invitation.summary.length > 0
+                    ? ` · ${invitation.summary.join(', ')}`
+                    : ''}
+                </span>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant='ghost'
+                      size='icon-sm'
+                      aria-label={text('common.actionsFor', {
+                        name: invitation.email,
+                      })}
+                      disabled={resending === invitation.id}
+                    />
+                  }
+                >
+                  {resending === invitation.id ? (
+                    <Spinner />
+                  ) : (
+                    <MoreHorizontalIcon />
+                  )}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='w-auto min-w-40'>
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => resend(invitation)}>
+                      <MailIcon />
+                      {text('invitations.resend')}
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      variant='destructive'
+                      onClick={() => setRevoking({ open: true, invitation })}
+                    >
+                      <Trash2Icon />
+                      {text('invitations.revoke')}
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </li>
+          ))}
+        </ul>
+      </CrmListFeedback>
     );
   }
 
   // Nothing pending: no card at all.
-  if (query.data && query.data.length === 0) return null;
+  if (state === 'empty') return null;
   const email = revoking.invitation?.email ?? '';
   return (
     <Card>

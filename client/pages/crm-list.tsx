@@ -83,7 +83,6 @@ import {
   CrmFrame,
   ErrorNotice,
   Loading,
-  Empty,
   RecordLink,
   Status,
   Value,
@@ -98,6 +97,14 @@ import {
 } from '../components/crm/lead-capture.js';
 import { downloadCsv } from '../components/crm/csv.js';
 import { SortableHead } from '../components/crm/sortable-table.js';
+import {
+  CrmListFeedback,
+  ListFeedbackActions,
+} from '../components/crm/list-feedback.js';
+import {
+  listStateShowsData,
+  queryListState,
+} from '../components/crm/list-state.js';
 import { AutoLoadMore } from '../components/crm/auto-load.js';
 import { TaskList } from '../components/crm/task-list.js';
 
@@ -522,6 +529,22 @@ function EntityList({
     },
     enabled: Boolean(definition) && view === 'calendar',
   });
+  // The list and the calendar as the template's list feedback reads them
+  // (components/crm/list-feedback.tsx): a statistic chip, or another choice
+  // of whose records than the page opens on, narrows them as a filter does.
+  const defaultScope: Scope =
+    entity === 'tasks' || entity === 'approvals' ? 'involved' : 'all';
+  const narrowed = filtering || Boolean(activeMetric) || whose !== defaultScope;
+  const listState = queryListState(
+    query,
+    query.data?.data.length ?? 0,
+    narrowed,
+  );
+  const calendarState = queryListState(
+    calendar,
+    calendar.data?.length ?? 0,
+    narrowed,
+  );
   const filtered = calendar.data ?? [];
   const calendarTimeZone = meta?.settings.timeZone ?? DEFAULT_TIME_ZONE;
   // The month's tasks by the day they start on in the business time
@@ -693,6 +716,21 @@ function EntityList({
       setter(value);
       setPage(1);
     };
+  // Clear filters, offered when they leave nothing: every condition back to
+  // what the page opens on, the sorting kept.
+  const clearFilters = (): void => {
+    setSearch('');
+    setStatus(defaultStatus);
+    setOwnerId('');
+    setSource('');
+    setEmployed('');
+    setTopic('');
+    setApproverId('');
+    setParticipantId('');
+    setScope(defaultScope);
+    setMetric(null);
+    setPage(1);
+  };
   if (metadataError)
     return (
       <CrmFrame title={text(`entities.${toText(entity)}`)}>
@@ -712,6 +750,12 @@ function EntityList({
       ? [['calendar', CalendarDays] as [string, typeof LayoutList]]
       : []),
   ];
+  const feedbackQuery =
+    view === 'calendar'
+      ? { state: calendarState, query: calendar }
+      : view === 'list' && entity !== 'tasks'
+        ? { state: listState, query }
+        : undefined;
   const toolbar = (
     <>
       {/* The calendar's month, left of the view switch: its own stepper
@@ -784,6 +828,16 @@ function EntityList({
             ))}
           </TabsList>
         </Tabs>
+      )}
+      {/* Retry a list or month that failed, or clear filters that leave
+          nothing; the task list and the board's columns offer their own. */}
+      {feedbackQuery && (
+        <ListFeedbackActions
+          state={feedbackQuery.state}
+          onClear={clearFilters}
+          onRetry={() => void feedbackQuery.query.refetch()}
+          busy={feedbackQuery.query.isFetching}
+        />
       )}
       {/* Filtering this list, not the global search (⌘K): the keyword
           among the other conditions, brought up by `/` as well. */}
@@ -879,7 +933,7 @@ function EntityList({
       // No list page carries the generic assistant button: the global entry
       // and the record pages' own shortcuts cover it.
     >
-      <ErrorNotice error={query.error ?? error} />
+      <ErrorNotice error={error} />
       {activeMetric && (
         <div className='flex items-center gap-2 text-sm'>
           <span className='text-muted-foreground'>{text('showing')}</span>
@@ -1053,163 +1107,166 @@ function EntityList({
           <TaskList
             params={params}
             status={status}
-            empty={<Empty action={newButton} />}
+            filtered={narrowed}
+            onClear={clearFilters}
           />
         </DrawerHost>
-      ) : query.isLoading ? (
-        <Loading />
       ) : view === 'list' ? (
-        !query.data?.data.length ? (
-          <Empty action={newButton} />
-        ) : (
-          <>
-            {/* A list's table in the template's frame, as the task list's is;
+        // Its rows, or in their place the list's feedback (loading, nothing
+        // yet, no results, denied, failed), the create button staying in the
+        // header.
+        <CrmListFeedback state={listState} empty={text('emptyDescription')}>
+          {query.data && (
+            <>
+              {/* A list's table in the template's frame, as the task list's is;
                 the records its rows link to open in a drawer over it. */}
-            <DrawerHost>
-              <div className='overflow-hidden rounded-lg border'>
-                <Table>
-                  {/* A quiet header: small muted words on the hover grey. */}
-                  <TableHeader>
-                    <TableRow className='border-border hover:bg-transparent'>
-                      {columns.map((key) => {
-                        const title =
-                          key === 'name' && entity === 'leads'
-                            ? text('leadTitle')
-                            : text(fieldLabelKey(entity, toText(key)));
-                        return (
-                          <SortableHead
-                            className={HEAD}
-                            key={key}
-                            title={title}
-                            direction={sort?.key === key && sort.direction}
-                            onClick={() => sortBy(key)}
-                          />
-                        );
-                      })}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {query.data.data.map((record) => (
-                      <Fragment key={record.id}>
-                        {/* Ruled as the card is framed. */}
-                        {/* Its empty space opens the record too. */}
-                        <TableRow
-                          className='cursor-pointer border-border'
-                          onClick={openOnRowClick(
-                            `/${entity}/${toText(record.id)}`,
-                            (path) => void navigate(path),
-                          )}
-                        >
-                          {columns.map((key) => (
-                            <TableCell
-                              // Every value, the name included, is cut with an
-                              // ellipsis, so a cell never runs over the next one,
-                              // which on a phone put two columns' text on top of
-                              // each other.
-                              className='max-w-72 truncate'
+              <DrawerHost>
+                <div className='overflow-hidden rounded-lg border'>
+                  <Table>
+                    {/* A quiet header: small muted words on the hover grey. */}
+                    <TableHeader>
+                      <TableRow className='border-border hover:bg-transparent'>
+                        {columns.map((key) => {
+                          const title =
+                            key === 'name' && entity === 'leads'
+                              ? text('leadTitle')
+                              : text(fieldLabelKey(entity, toText(key)));
+                          return (
+                            <SortableHead
+                              className={HEAD}
                               key={key}
-                            >
-                              {key === 'name' ? (
-                                <span className='flex min-w-0 flex-col items-start gap-1'>
-                                  {/* The row's own record: its page, outside
+                              title={title}
+                              direction={sort?.key === key && sort.direction}
+                              onClick={() => sortBy(key)}
+                            />
+                          );
+                        })}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {query.data.data.map((record) => (
+                        <Fragment key={record.id}>
+                          {/* Ruled as the card is framed. */}
+                          {/* Its empty space opens the record too. */}
+                          <TableRow
+                            className='cursor-pointer border-border'
+                            onClick={openOnRowClick(
+                              `/${entity}/${toText(record.id)}`,
+                              (path) => void navigate(path),
+                            )}
+                          >
+                            {columns.map((key) => (
+                              <TableCell
+                                // Every value, the name included, is cut with an
+                                // ellipsis, so a cell never runs over the next one,
+                                // which on a phone put two columns' text on top of
+                                // each other.
+                                className='max-w-72 truncate'
+                                key={key}
+                              >
+                                {key === 'name' ? (
+                                  <span className='flex min-w-0 flex-col items-start gap-1'>
+                                    {/* The row's own record: its page, outside
                                     the drawer the records it links to open
                                     in. */}
-                                  <RecordDrawerContext.Provider
-                                    value={undefined}
-                                  >
-                                    <RecordLink
-                                      entity={entity}
-                                      record={{
-                                        id: record.id,
-                                        // A contact's company is its own column
-                                        // here, so the link is the bare name.
-                                        name:
-                                          entity === 'contacts'
-                                            ? toText(record.name)
-                                            : recordTitle(
-                                                entity,
-                                                record,
-                                                lookup,
-                                              ),
-                                      }}
-                                    />
-                                  </RecordDrawerContext.Provider>
-                                  {/* Under the name: the AI at work on the
+                                    <RecordDrawerContext.Provider
+                                      value={undefined}
+                                    >
+                                      <RecordLink
+                                        entity={entity}
+                                        record={{
+                                          id: record.id,
+                                          // A contact's company is its own column
+                                          // here, so the link is the bare name.
+                                          name:
+                                            entity === 'contacts'
+                                              ? toText(record.name)
+                                              : recordTitle(
+                                                  entity,
+                                                  record,
+                                                  lookup,
+                                                ),
+                                        }}
+                                      />
+                                    </RecordDrawerContext.Provider>
+                                    {/* Under the name: the AI at work on the
                                   row, or its suggestion waiting, as on
                                   the board. */}
-                                  <AiRowMark
-                                    state={
-                                      query.data.meta.ai?.[toText(record.id)]
-                                    }
-                                    review={entity === 'approvals'}
-                                  />
-                                </span>
-                              ) : entity === 'approvals' && key === 'topic' ? (
-                                record[key] ? (
-                                  <KindTag value={record[key]} />
+                                    <AiRowMark
+                                      state={
+                                        query.data.meta.ai?.[toText(record.id)]
+                                      }
+                                      review={entity === 'approvals'}
+                                    />
+                                  </span>
+                                ) : entity === 'approvals' &&
+                                  key === 'topic' ? (
+                                  record[key] ? (
+                                    <KindTag value={record[key]} />
+                                  ) : (
+                                    '—'
+                                  )
+                                ) : key === 'status' &&
+                                  entity === 'approvals' &&
+                                  record.status === 'pending' &&
+                                  record.approverId === meta?.userId ? (
+                                  // The reader's own queue, marked as on the page.
+                                  <span className='flex flex-wrap items-center gap-2'>
+                                    <Status value={record.status} />
+                                    <Badge>{text('yourDecision')}</Badge>
+                                  </span>
                                 ) : (
-                                  '—'
-                                )
-                              ) : key === 'status' &&
-                                entity === 'approvals' &&
-                                record.status === 'pending' &&
-                                record.approverId === meta?.userId ? (
-                                // The reader's own queue, marked as on the page.
-                                <span className='flex flex-wrap items-center gap-2'>
-                                  <Status value={record.status} />
-                                  <Badge>{text('yourDecision')}</Badge>
-                                </span>
-                              ) : (
-                                <Value
-                                  record={record}
-                                  field={
-                                    definition.fields.find(
-                                      (f) => f.key === key,
-                                    ) ?? {
-                                      key,
+                                  <Value
+                                    record={record}
+                                    field={
+                                      definition.fields.find(
+                                        (f) => f.key === key,
+                                      ) ?? {
+                                        key,
+                                      }
                                     }
-                                  }
-                                  lookup={lookup}
-                                />
-                              )}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      </Fragment>
-                    ))}
-                  </TableBody>
-                </Table>
+                                    lookup={lookup}
+                                  />
+                                )}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        </Fragment>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </DrawerHost>
+              <div className='flex items-center justify-between text-sm text-muted-foreground'>
+                <span>
+                  {text('page', {
+                    page,
+                    pages: Math.max(
+                      1,
+                      Math.ceil(query.data.meta.total / PAGE_SIZE),
+                    ),
+                  })}
+                </span>
+                <div className='flex gap-2'>
+                  <Button
+                    variant='outline'
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    {text('previous')}
+                  </Button>
+                  <Button
+                    variant='outline'
+                    disabled={page * PAGE_SIZE >= query.data.meta.total}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    {text('next')}
+                  </Button>
+                </div>
               </div>
-            </DrawerHost>
-            <div className='flex items-center justify-between text-sm text-muted-foreground'>
-              <span>
-                {text('page', {
-                  page,
-                  pages: Math.max(
-                    1,
-                    Math.ceil(query.data.meta.total / PAGE_SIZE),
-                  ),
-                })}
-              </span>
-              <div className='flex gap-2'>
-                <Button
-                  variant='outline'
-                  disabled={page === 1}
-                  onClick={() => setPage(page - 1)}
-                >
-                  {text('previous')}
-                </Button>
-                <Button
-                  variant='outline'
-                  disabled={page * PAGE_SIZE >= query.data.meta.total}
-                  onClick={() => setPage(page + 1)}
-                >
-                  {text('next')}
-                </Button>
-              </div>
-            </div>
-          </>
-        )
+            </>
+          )}
+        </CrmListFeedback>
       ) : view === 'board' ? (
         // Moved sideways by its bar, which always shows (scroll-shown), or
         // by holding its empty space and dragging (useDragPan), as a mouse
@@ -1354,8 +1411,17 @@ function EntityList({
             ))}
           </div>
         </DrawerHost>
+      ) : calendarState !== 'empty' &&
+        calendarState !== 'no-results' &&
+        !listStateShowsData(calendarState) ? (
+        // A month not read yet, or refused: its feedback in place of the
+        // grid. An empty month is still a month, so it keeps its grid.
+        <CrmListFeedback state={calendarState} />
       ) : (
         <section className='space-y-4'>
+          {calendarState === 'refresh-failed' && (
+            <CrmListFeedback state={calendarState} />
+          )}
           {/* The month grid needs about 110px a day, which a phone or a tablet
               beside the sidebar does not have: below 1024px the month is a
               grid of dates, and the tasks of the date picked show under
@@ -1770,6 +1836,10 @@ function BoardColumn({
     Record<string, 'running' | 'pending'>
   >((all, p) => ({ ...all, ...p.meta.ai }), {});
   const total = query.data?.pages[0]?.meta.total ?? 0;
+  // The column's own read: loading, refused or failed it says so in place of
+  // its cards, with a retry under the line; an empty column stays empty,
+  // as a stage nothing has reached is part of the board.
+  const state = queryListState(query, items.length, false);
   const titles = (query.data?.pages ?? []).reduce<Record<string, string>>(
     (all, p) => ({ ...all, ...p.meta.titles }),
     {},
@@ -1829,9 +1899,20 @@ function BoardColumn({
           card's ring from being clipped at the edges, and lets the last card
           scroll above the assistant's dock (pb-24). */}
       <div className='-m-1 min-h-0 flex-1 space-y-2 overflow-y-auto p-1 pb-24'>
-        {items.map((record) =>
-          renderCard(record, titles, ai[toText(record.id)]),
+        {state !== 'empty' && state !== 'ready' && (
+          <div className='flex flex-col items-center gap-2'>
+            <CrmListFeedback state={state} />
+            <ListFeedbackActions
+              state={state}
+              onRetry={() => void query.refetch()}
+              busy={query.isFetching}
+            />
+          </div>
         )}
+        {listStateShowsData(state) &&
+          items.map((record) =>
+            renderCard(record, titles, ai[toText(record.id)]),
+          )}
         <AutoLoadMore
           hasMore={Boolean(query.hasNextPage)}
           loading={query.isFetchingNextPage}

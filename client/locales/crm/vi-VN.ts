@@ -139,7 +139,7 @@ export const crmViVN: CrmWording = {
   loading: 'Đang tải…',
   empty: 'Bắt đầu từ đây',
   emptyDescription:
-    'Chưa có bản ghi phù hợp. Hãy thêm bản ghi đầu tiên hoặc điều chỉnh bộ lọc.',
+    'Chưa có bản ghi nào. Thêm bản ghi đầu tiên bằng nút ở góc trên bên phải.',
   create: 'Tạo',
   update: 'Cập nhật',
   edit: 'Sửa',

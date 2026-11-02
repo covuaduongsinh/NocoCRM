@@ -30,6 +30,14 @@ import {
 
 import { AutoLoadMore } from '../../../components/crm/auto-load.js';
 import { LoadFailure } from '../common/shared.js';
+import {
+  CrmListFeedback,
+  ListFeedbackActions,
+} from '../../../components/crm/list-feedback.js';
+import {
+  listStateShowsData,
+  queryListState,
+} from '../../../components/crm/list-state.js';
 import { useAdminText, useDateTime } from '../common/hooks.js';
 import { ScheduleSwitch } from './index.js';
 import { ScheduleStatusBadge } from './status.js';
@@ -175,27 +183,22 @@ function RunHistory({
   const runs = history.data?.pages.flatMap((page) => page.data) ?? [];
   const refreshing = history.isFetching && !history.isFetchingNextPage;
 
+  // The runs' read as the list feedback reads it (list-state.ts). A page
+  // further down that failed is not the list failing: the runs read so far
+  // stay, with its own retry under them.
+  const state = queryListState(
+    {
+      ...history,
+      error: history.isFetchNextPageError ? undefined : history.error,
+    },
+    runs.length,
+    false,
+  );
   let body: ReactElement;
-  if (history.error && !history.data) {
-    body = (
-      <LoadFailure
-        error={history.error}
-        what={text('schedules.history')}
-        onRetry={() => void history.refetch()}
-      />
-    );
+  if (!listStateShowsData(state) && state !== 'empty') {
+    body = <CrmListFeedback state={state} />;
   } else if (!history.data) {
-    body = (
-      <div
-        role='status'
-        aria-label={text('common.loading')}
-        className='flex flex-col gap-2'
-      >
-        {Array.from({ length: 4 }, (_, index) => (
-          <Skeleton key={index} className='h-10 w-full' />
-        ))}
-      </div>
-    );
+    body = <CrmListFeedback state='loading' />;
   } else if (runs.length === 0) {
     body = (
       <Empty className='min-h-40 border border-dashed p-6 md:p-6'>
@@ -209,7 +212,7 @@ function RunHistory({
     );
   } else {
     body = (
-      <>
+      <CrmListFeedback state={state}>
         <ul className='divide-y rounded-lg border border-border'>
           {runs.map((run) => (
             <li key={run.id} className='flex flex-col gap-1 px-3 py-2 text-sm'>
@@ -234,7 +237,7 @@ function RunHistory({
             </li>
           ))}
         </ul>
-        {history.error && history.data ? (
+        {history.isFetchNextPageError ? (
           <LoadFailure
             error={history.error}
             what={text('schedules.history')}
@@ -247,7 +250,7 @@ function RunHistory({
             onLoad={() => void history.fetchNextPage()}
           />
         )}
-      </>
+      </CrmListFeedback>
     );
   }
 
@@ -255,26 +258,33 @@ function RunHistory({
     <section className='flex flex-col gap-3'>
       <div className='flex items-center justify-between gap-2'>
         <h2 className='text-base font-medium'>{text('schedules.history')}</h2>
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                variant='outline'
-                size='icon-sm'
-                aria-label={text('common.refresh')}
-                disabled={refreshing}
-                onClick={() =>
-                  void queryClient.invalidateQueries({
-                    queryKey: [...schedulesKey, scheduleId],
-                  })
-                }
-              />
-            }
-          >
-            <RefreshCwIcon className={refreshing ? 'animate-spin' : ''} />
-          </TooltipTrigger>
-          <TooltipContent>{text('common.refresh')}</TooltipContent>
-        </Tooltip>
+        <div className='flex items-center gap-2'>
+          <ListFeedbackActions
+            state={state}
+            onRetry={() => void history.refetch()}
+            busy={refreshing}
+          />
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant='outline'
+                  size='icon-sm'
+                  aria-label={text('common.refresh')}
+                  disabled={refreshing}
+                  onClick={() =>
+                    void queryClient.invalidateQueries({
+                      queryKey: [...schedulesKey, scheduleId],
+                    })
+                  }
+                />
+              }
+            >
+              <RefreshCwIcon className={refreshing ? 'animate-spin' : ''} />
+            </TooltipTrigger>
+            <TooltipContent>{text('common.refresh')}</TooltipContent>
+          </Tooltip>
+        </div>
       </div>
       {body}
     </section>

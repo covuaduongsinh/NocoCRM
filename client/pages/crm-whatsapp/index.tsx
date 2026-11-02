@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#components/ui/select';
-import { Skeleton } from '#components/ui/skeleton';
 import { Spinner } from '#components/ui/spinner';
 import { Tabs, TabsList, TabsTrigger } from '#components/ui/tabs';
 import { useToaster } from '@nocobase/app-client';
@@ -51,7 +50,14 @@ import {
   type WhatsAppNumberLabel,
 } from '../../components/crm/whatsapp/api.js';
 import { MessageSummary } from '../../components/crm/whatsapp/messages.js';
-import { WhatsAppFailure } from '../../components/crm/whatsapp/failure.js';
+import {
+  CrmListFeedback,
+  ListFeedbackActions,
+} from '../../components/crm/list-feedback.js';
+import {
+  listStateShowsData,
+  queryListState,
+} from '../../components/crm/list-state.js';
 
 // The WhatsApp page (/whatsapp): the company numbers' conversations with
 // customers, an inbox of two panes as the Mail workspace is — the list on
@@ -270,32 +276,28 @@ function ConversationList({
     staleTime: 5000,
   });
   const rows = query.data?.pages.flatMap((page) => page.data) ?? [];
-  if (query.error && !query.data)
+  // The conversations' read as the list feedback reads it (list-state.ts):
+  // loading, refused or failed it says so in place of the list, with a
+  // retry or sign-in under it; a poll that failed keeps the conversations
+  // with a line over them. A page further down that failed is not the list
+  // failing, and the empty list keeps its own words (EmptyView).
+  const state = queryListState(
+    { ...query, error: query.isFetchNextPageError ? undefined : query.error },
+    rows.length,
+    false,
+  );
+  if (!listStateShowsData(state) && state !== 'empty')
     return (
-      <div className='p-3'>
-        <WhatsAppFailure
-          error={query.error}
-          what='list'
+      <div className='flex flex-col items-center gap-2 p-3'>
+        <CrmListFeedback state={state} />
+        <ListFeedbackActions
+          state={state}
           onRetry={() => void query.refetch()}
+          busy={query.isFetching}
         />
       </div>
     );
-  if (!query.data)
-    return (
-      <div
-        role='status'
-        aria-label={toText(text('loading'))}
-        className='flex flex-col gap-1 p-2'
-      >
-        {Array.from({ length: 6 }, (_, index) => (
-          <div key={index} className='flex flex-col gap-2 rounded-md p-2'>
-            <Skeleton className='h-4 w-2/3' />
-            <Skeleton className='h-3 w-full' />
-          </div>
-        ))}
-      </div>
-    );
-  if (!rows.length) return <EmptyView view={view} />;
+  if (state === 'empty') return <EmptyView view={view} />;
   // In the CRM's time zone, as the conversation reads (useBusinessZone).
   const timeOf = (at: string | null): string => {
     if (!at) return '';
@@ -318,6 +320,16 @@ function ConversationList({
         <span className='sr-only' role='status'>
           {text('loading')}
         </span>
+      ) : null}
+      {state === 'refresh-failed' ? (
+        <div className='flex flex-col items-center gap-2 px-2 pt-2'>
+          <CrmListFeedback state={state} />
+          <ListFeedbackActions
+            state={state}
+            onRetry={() => void query.refetch()}
+            busy={query.isFetching}
+          />
+        </div>
       ) : null}
       <ul className='flex flex-col p-2'>
         {rows.map((row) => {

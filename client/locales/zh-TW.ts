@@ -16,6 +16,19 @@ const zhTW: AppResource = {
   'auth.connectionFailed': '連線失敗',
   'auth.connectionFailedDescription':
     '即時連線暫時無法準備就緒。請重試後進入應用程式，或登出。',
+  listFeedback: {
+    loading: '載入中',
+    empty: '尚無資料',
+    noResults: '無結果',
+    forbidden: '無權存取',
+    unauthenticated: '工作階段已過期',
+    failed: '清單載入失敗',
+    refreshFailed: '重新整理失敗，仍顯示舊資料',
+    retry: '重試',
+    retrying: '正在重試…',
+    clear: '清除篩選',
+    signIn: '登入',
+  },
   formFeedback: {
     field: '此欄位的值未通過驗證，請檢查並修改後重試。',
     invalid: '請檢查標示的欄位後重試。',

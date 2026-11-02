@@ -140,7 +140,7 @@ export const crmDeDE: CrmWording = {
   loading: 'Wird geladen…',
   empty: 'Ein frischer Anfang',
   emptyDescription:
-    'Noch keine passenden Datensätze. Fügen Sie Ihren ersten Datensatz hinzu oder passen Sie die Filter an.',
+    'Noch keine Datensätze. Fügen Sie den ersten über die Schaltfläche oben rechts hinzu.',
   create: 'Erstellen',
   update: 'Aktualisieren',
   edit: 'Bearbeiten',

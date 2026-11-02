@@ -17,6 +17,20 @@ const deDE: AppResource = {
   'auth.connectionFailed': 'Verbindung nicht möglich',
   'auth.connectionFailedDescription':
     'Die Echtzeitverbindung konnte nicht hergestellt werden. Versuchen Sie es erneut, um die Anwendung zu öffnen, oder melden Sie sich ab.',
+  listFeedback: {
+    loading: 'Wird geladen',
+    empty: 'Noch keine Daten',
+    noResults: 'Keine Ergebnisse',
+    forbidden: 'Zugriff verweigert',
+    unauthenticated: 'Sitzung abgelaufen',
+    failed: 'Liste konnte nicht geladen werden',
+    refreshFailed:
+      'Aktualisierung fehlgeschlagen; frühere Daten werden angezeigt',
+    retry: 'Erneut versuchen',
+    retrying: 'Wird erneut versucht…',
+    clear: 'Filter zurücksetzen',
+    signIn: 'Anmelden',
+  },
   formFeedback: {
     field:
       'Dieser Wert wurde abgelehnt. Prüfen Sie ihn und versuchen Sie es erneut.',

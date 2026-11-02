@@ -139,7 +139,7 @@ export const crmIdID: CrmWording = {
   loading: 'Memuat…',
   empty: 'Awal yang baru',
   emptyDescription:
-    'Belum ada data yang cocok. Tambahkan data pertama Anda atau sesuaikan filter.',
+    'Belum ada data. Tambahkan yang pertama dengan tombol di kanan atas.',
   create: 'Buat',
   update: 'Perbarui',
   edit: 'Edit',

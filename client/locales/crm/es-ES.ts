@@ -139,7 +139,7 @@ export const crmEsES: CrmWording = {
   loading: 'Cargando…',
   empty: 'Todo listo para empezar',
   emptyDescription:
-    'Aún no hay registros que coincidan. Añade tu primer registro o ajusta los filtros.',
+    'Aún no hay registros. Añade el primero con el botón de arriba a la derecha.',
   create: 'Crear',
   update: 'Actualizar',
   edit: 'Editar',

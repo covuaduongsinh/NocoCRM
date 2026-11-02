@@ -5,6 +5,8 @@ import { Link } from 'react-router';
 import { Badge } from '../ui/badge.js';
 import { Button } from '../ui/button.js';
 import { ErrorNotice, Loading } from './common.js';
+import { CrmListFeedback, ListFeedbackActions } from './list-feedback.js';
+import { listStateShowsData, type ListState } from './list-state.js';
 import { ENTITY_ICONS } from './entity-icons.js';
 import { VerdictBadge } from './lead-evaluation.js';
 import { relativeTime, toText, useCrmText, type Entity } from './api.js';
@@ -34,14 +36,17 @@ export function DecisionList({
   items,
   selectedId,
   onSelect,
-  error,
-  loading,
+  state,
+  onRetry,
+  busy,
 }: {
   items: DecisionItem[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  error: unknown;
-  loading: boolean;
+  /** The suggestions' read, as the list feedback reads it (list-state.ts). */
+  state: ListState;
+  onRetry: () => void;
+  busy: boolean;
 }): ReactElement {
   const { text, language } = useCrmText();
   const { nameOf, kindOf } = useWording();
@@ -175,12 +180,25 @@ export function DecisionList({
   };
   return (
     <section className='space-y-1'>
-      {loading ? (
-        <Loading />
-      ) : error ? (
-        <ErrorNotice error={error} />
+      {/* Not read yet, refused or failed: the list's feedback, with a retry
+          under it, rather than "nothing waiting", which would be untrue. */}
+      {!listStateShowsData(state) && state !== 'empty' ? (
+        <div className='flex flex-col items-center gap-2'>
+          <CrmListFeedback state={state} />
+          <ListFeedbackActions state={state} onRetry={onRetry} busy={busy} />
+        </div>
       ) : (
         <>
+          {state === 'refresh-failed' && (
+            <div className='space-y-2 pb-2'>
+              <CrmListFeedback state={state} />
+              <ListFeedbackActions
+                state={state}
+                onRetry={onRetry}
+                busy={busy}
+              />
+            </div>
+          )}
           {waiting.length ? (
             <ul className='space-y-0.5'>{waiting.map(row)}</ul>
           ) : (

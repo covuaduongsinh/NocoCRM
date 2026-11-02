@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Upgrade the application template to 1.0.0-beta.86 (NocoBase app-server 4):
+  every list says when it is loading, finds nothing, is refused or fails to
+  load, with Retry or Clear filters in its header, so a failed read no
+  longer looks like an empty list; the password reset mail has its own
+  sender (`auth.email`, the `AUTH_EMAIL_*` variables).
 - Upgrade the application template to 1.0.0-beta.84: user and role settings
   send an operation key, so a repeated save writes once, and show submission
   errors beside their fields.

@@ -3151,9 +3151,11 @@ describe('CRM API security and domain rules', () => {
         leadId: lead.id,
         dueAt,
       });
-    const earlier = await save('Tie earlier', '2026-11-02T02:00:00Z');
-    const first = await save('Tie first created', '2026-11-03T02:00:00Z');
-    const second = await save('Tie second created', '2026-11-03T02:00:00Z');
+    // Far from today, so the later tests' counts of today's tasks, which
+    // share this database, never include them.
+    const earlier = await save('Tie earlier', '2099-11-02T02:00:00Z');
+    const first = await save('Tie first created', '2099-11-03T02:00:00Z');
+    const second = await save('Tie second created', '2099-11-03T02:00:00Z');
     // Created a minute apart, whatever the clock's resolution.
     for (const [record, minutesAgo] of [
       [earlier, 3],

@@ -17,6 +17,19 @@ const viVN: AppResource = {
   'auth.connectionFailed': 'Không thể kết nối',
   'auth.connectionFailedDescription':
     'Không thể chuẩn bị kết nối thời gian thực. Hãy thử lại để vào ứng dụng hoặc đăng xuất.',
+  listFeedback: {
+    loading: 'Đang tải',
+    empty: 'Chưa có dữ liệu',
+    noResults: 'Không có kết quả',
+    forbidden: 'Không có quyền truy cập',
+    unauthenticated: 'Phiên đã hết hạn',
+    failed: 'Không thể tải danh sách',
+    refreshFailed: 'Làm mới thất bại; đang hiển thị dữ liệu cũ',
+    retry: 'Thử lại',
+    retrying: 'Đang thử lại…',
+    clear: 'Xóa bộ lọc',
+    signIn: 'Đăng nhập',
+  },
   formFeedback: {
     field: 'Giá trị này đã bị từ chối. Hãy kiểm tra và thử lại.',
     invalid: 'Hãy kiểm tra các trường được đánh dấu rồi thử lại.',
