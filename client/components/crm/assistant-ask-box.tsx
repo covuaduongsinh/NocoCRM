@@ -82,15 +82,21 @@ export function AssistantAskBox({
             className='mt-4 flex flex-wrap justify-center gap-2'
           >
             {questions.map((question) => (
-              <li key={question.key}>
+              <li key={question.key} className='max-w-full'>
                 <Button
                   variant='outline'
                   size='sm'
                   disabled={disabled || draft.files.uploading}
-                  className='rounded-full font-normal'
+                  // A question longer than a phone's width wraps inside its
+                  // chip rather than running past the page: the icon stays
+                  // on its first line and the corners round as a card's
+                  // (still a pill on one line).
+                  className='h-auto min-h-8 max-w-full items-start rounded-2xl px-3 py-1.5 text-left font-normal whitespace-normal'
                   onClick={() => draft.send(question.text)}
                 >
-                  <Sparkles className='text-primary' />
+                  <span className='flex h-[1lh] shrink-0 items-center'>
+                    <Sparkles className='text-primary' />
+                  </span>
                   {question.text}
                 </Button>
               </li>

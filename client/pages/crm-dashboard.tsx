@@ -203,10 +203,10 @@ export default function DashboardPage(): ReactElement {
           <>
             {section(
               'risks',
-              // One row per card in even columns: three across when they
-              // fit, then two, then one.
+              // Even columns: three across when they fit, then two; on a
+              // phone two as well, each card stacked (AttentionCard).
               <div className='@container'>
-                <div className='grid gap-3 @xl:grid-cols-2 @3xl:grid-cols-3'>
+                <div className='grid grid-cols-2 gap-3 @3xl:grid-cols-3'>
                   {attentionCards.map((card) => (
                     <AttentionCard
                       key={card.key}
@@ -246,8 +246,10 @@ export default function DashboardPage(): ReactElement {
 // One thing that may need attention: its icon on a purple tile, its title
 // with the rule under it, and the count on the right, all aligned to the
 // card's top, so cards whose rule takes two lines line up with their
-// neighbours. Something waiting draws its count in the text colour, a zero
-// stays grey. A click opens the list behind the count.
+// neighbours; where two cards share a phone's width, the icon and the count
+// make its first line and the title and the rule go under them. Something
+// waiting draws its count in the text colour, a zero stays grey. A click
+// opens the list behind the count.
 function AttentionCard({
   title,
   note,
@@ -266,21 +268,21 @@ function AttentionCard({
     <button
       type='button'
       onClick={onClick}
-      className='group flex min-w-0 items-start gap-3 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-xs transition-[translate,box-shadow,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:bg-hover hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none'
+      className='group grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] content-start items-start gap-x-3 gap-y-0 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-xs transition-[translate,box-shadow,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:bg-hover hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none'
     >
-      <span className='grid size-9 shrink-0 place-items-center rounded-lg bg-primary/5 text-primary ring-1 ring-transparent transition-[background-color,box-shadow] duration-200 ease-out group-hover:bg-primary/10 group-hover:ring-border motion-reduce:transition-none'>
+      <span className='col-start-1 row-start-1 grid size-9 shrink-0 place-items-center rounded-lg bg-primary/5 text-primary ring-1 ring-transparent transition-[background-color,box-shadow] duration-200 ease-out group-hover:bg-primary/10 group-hover:ring-border motion-reduce:transition-none @xl:row-span-2'>
         <Icon className='size-4' aria-hidden />
       </span>
-      <span className='min-w-0 flex-1'>
-        <span className='block truncate text-sm font-medium'>{title}</span>
-        {note && (
-          <span className='line-clamp-2 text-xs text-muted-foreground'>
-            {note}
-          </span>
-        )}
+      <span className='col-span-3 row-start-2 mt-2 min-w-0 text-sm font-medium @xl:col-span-1 @xl:col-start-2 @xl:row-start-1 @xl:mt-0 @xl:truncate'>
+        {title}
       </span>
+      {note && (
+        <span className='col-span-3 row-start-3 line-clamp-2 text-xs text-muted-foreground @xl:col-span-1 @xl:col-start-2 @xl:row-start-2'>
+          {note}
+        </span>
+      )}
       <span
-        className={`shrink-0 text-2xl leading-9 font-semibold tabular-nums ${
+        className={`col-start-3 row-start-1 shrink-0 text-2xl leading-9 @xl:row-span-2 font-semibold tabular-nums ${
           waiting ? 'text-foreground' : 'text-muted-foreground/70'
         }`}
       >

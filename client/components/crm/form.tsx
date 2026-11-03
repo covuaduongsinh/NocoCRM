@@ -1031,11 +1031,12 @@ export function RecordForm({
       {/* Three fields a row, two or one where the form is narrow: sized by
           the form's own width, which beside the lead capture's panels is
           less than the dialog's. Long text, lists and files take the whole
-          row. */}
+          row. One column is held to the form's width (grid-cols-1), so a
+          long line in it, as More's list of fields, cannot widen it. */}
       {/* Its fields show their focus as the record pages' inline fields
           do. */}
       <div className={`@container ${LIGHT_FOCUS}`}>
-        <div className='grid gap-x-4 gap-y-3 @xl:grid-cols-2 @2xl:grid-cols-3'>
+        <div className='grid grid-cols-1 gap-x-4 gap-y-3 @xl:grid-cols-2 @2xl:grid-cols-3'>
           {fields.map((field) => {
             if (tucked(field)) return null;
             // An opportunity's amount and currency are one thing: one
@@ -1175,18 +1176,24 @@ export function RecordForm({
                 type='button'
                 variant='ghost'
                 size='sm'
-                className='-ml-2.5 text-muted-foreground'
+                // The fields it names end in an ellipsis where the form is
+                // narrower than their list.
+                className='-ml-2.5 max-w-[calc(100%+0.625rem)] text-muted-foreground'
                 onClick={() => setShowMore((shown) => !shown)}
               >
                 {showMore ? <ChevronUp /> : <ChevronDown />}
-                {showMore
-                  ? text('fewerFields')
-                  : text('moreFields', {
-                      fields: fields
-                        .filter(tucked)
-                        .map((f) => text(fieldLabelKey(entity, toText(f.key))))
-                        .join(language.startsWith('zh') ? '、' : ', '),
-                    })}
+                <span className='truncate'>
+                  {showMore
+                    ? text('fewerFields')
+                    : text('moreFields', {
+                        fields: fields
+                          .filter(tucked)
+                          .map((f) =>
+                            text(fieldLabelKey(entity, toText(f.key))),
+                          )
+                          .join(language.startsWith('zh') ? '、' : ', '),
+                      })}
+                </span>
               </Button>
             </div>
           )}
