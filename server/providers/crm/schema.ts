@@ -224,9 +224,10 @@ export const definitions: Record<Entity, EntityDefinition> = {
     statuses: ['new', 'working', 'nurturing', 'converted', 'invalid'],
     columns: [
       'name',
-      'company',
-      'jobTitle',
-      'country',
+      'customerType',
+      'studentName',
+      'chessLevel',
+      'phone',
       'status',
       'source',
       'ownerId',
@@ -333,10 +334,10 @@ export const definitions: Record<Entity, EntityDefinition> = {
     statuses: [],
     columns: [
       'name',
-      'companyId',
-      'jobTitle',
-      'email',
+      'customerType',
       'phone',
+      'email',
+      'companyId',
       'employed',
       'ownerId',
     ],
@@ -360,7 +361,9 @@ export const definitions: Record<Entity, EntityDefinition> = {
     // The amount column is formatted in its currency, so no currency column.
     columns: [
       'name',
-      'companyId',
+      'pipelineType',
+      'studentName',
+      'chessLevel',
       'stage',
       'businessType',
       'amount',

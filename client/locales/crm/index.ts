@@ -3108,6 +3108,11 @@ const wording = {
   fields: {
     id: ['Record ID', '记录 ID'],
     name: ['Name', '名称'],
+    customerType: ['Customer type', '客户类型'],
+    studentName: ['Student name', '学员姓名'],
+    studentBirthYear: ['Birth year', '出生年份'],
+    chessLevel: ['Chess level', '棋力水平'],
+    pipelineType: ['Pipeline type', '商机管道类型'],
     leadName: ['Name', '姓名'],
     companyDescription: ['Introduction', '公司介绍'],
     taskName: ['Title', '标题'],
@@ -3228,6 +3233,24 @@ const wording = {
     companyType: ['Company type', '公司类型'],
   },
   options: {
+    individual: ['Individual / Parent', '个人 / 家长'],
+    organization: ['School / Organization', '学校 / 机构'],
+    beginner: ['Beginner', '启蒙 / 零基础'],
+    elementary: ['Elementary', '初级 / 掌握基础'],
+    intermediate: ['Intermediate', '中级 / 进阶提高'],
+    advanced: ['Advanced', '高级 / 参赛优胜'],
+    master: ['Master', '大师 / 梯队'],
+    tuition: ['Tuition / Course', '学费 / 培训课程'],
+    merchandise: ['Books & Equipment', '图书器材销售'],
+    b2b_school: ['School Partnership', '校园合作培训'],
+    chessCourse: ['Chess Course', '国际象棋培训课程'],
+    chessBook: ['Chess Book', '国际象棋教材图书'],
+    chessEquipment: ['Chess Equipment', '棋具 / 电子棋钟'],
+    chessTournament: ['Tournament / Event', '赛事活动'],
+    b2bSchool: ['School Training', '校本课程合作'],
+    zalo: ['Zalo', 'Zalo'],
+    facebook: ['Facebook', 'Facebook'],
+    walkIn: ['Walk-in', '到店 / 线下咨询'],
     manufacturing: ['Manufacturing', '制造业'],
     technology: ['Technology / software', '科技 / 软件'],
     telecommunications: ['Telecommunications', '通信'],
@@ -3549,7 +3572,7 @@ const wording = {
 } as const;
 type Translated<T> = T extends readonly [string, string]
   ? string
-  : { [K in keyof T]: Translated<T[K]> };
+  : { [K in keyof T]?: Translated<T[K]> };
 function translate<T>(value: T, index: 0 | 1): Translated<T> {
   if (Array.isArray(value)) return value[index] as Translated<T>;
   return Object.fromEntries(

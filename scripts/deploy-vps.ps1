@@ -34,7 +34,7 @@ Write-Host "Target Release: $releaseName" -ForegroundColor Green
 # 3. Upload bundle to VPS
 Write-Host "[3/5] Uploading bundle ($releaseName)..." -ForegroundColor Yellow
 ssh -i $SshKey -o StrictHostKeyChecking=no "$SshUser@$VpsIp" "mkdir -p /srv/nococrm-dsc/releases/$releaseName"
-scp -i $SshKey -o StrictHostKeyChecking=no $tarPath "$SshUser@$VpsIp:/srv/nococrm-dsc/releases/$releaseName/dist.tar.gz"
+scp -i $SshKey -o StrictHostKeyChecking=no $tarPath "${SshUser}@${VpsIp}:/srv/nococrm-dsc/releases/$releaseName/dist.tar.gz"
 
 # 4. Extract bundle and update symlink
 Write-Host "[4/5] Extracting on VPS and updating current symlink..." -ForegroundColor Yellow
