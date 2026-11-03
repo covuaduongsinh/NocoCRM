@@ -205,7 +205,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test --pass-with-no-tests",
-    "check:packages": "node scripts/check-packages.mjs"
+    "check:packages": "node scripts/check-packages.mjs",
+    "deploy:vps": "pwsh -File scripts/deploy-vps.ps1"
   },
   "packageManager": "pnpm@11.7.0"
 }

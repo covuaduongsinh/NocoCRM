@@ -56,6 +56,9 @@ export interface EntityDefinition {
   columns: string[];
 }
 export const sources: string[] = [
+  'zalo',
+  'facebook',
+  'walkIn',
   'website',
   'marketing',
   'exhibition',
@@ -119,6 +122,7 @@ export const pauseReasons: string[] = [
 // Currencies an opportunity can be priced in; the settings page can extend
 // the list. Three-letter ISO codes, which the money formatter understands.
 export const currencies: string[] = [
+  'VND',
   'USD',
   'CNY',
   'EUR',
@@ -128,6 +132,26 @@ export const currencies: string[] = [
   'SGD',
   'AUD',
   'CAD',
+];
+export const chessLevels: string[] = [
+  'beginner',
+  'elementary',
+  'intermediate',
+  'advanced',
+  'master',
+];
+export const chessBusinessTypes: string[] = [
+  'chessCourse',
+  'chessBook',
+  'chessEquipment',
+  'chessTournament',
+  'b2bSchool',
+  'newBusiness',
+  'expansion',
+  'crossSell',
+  'renewal',
+  'tender',
+  'other',
 ];
 export const stages: string[] = [
   'contact',
@@ -210,6 +234,10 @@ export const definitions: Record<Entity, EntityDefinition> = {
     ],
     fields: [
       field('name', 'text', true),
+      field('customerType', 'select', false, ['individual', 'organization']),
+      field('studentName', 'text', false),
+      field('studentBirthYear', 'text', false),
+      field('chessLevel', 'select', false, chessLevels),
       field('company'),
       ...person,
       // As a contact's, and carried to the contact a conversion creates;
@@ -314,7 +342,8 @@ export const definitions: Record<Entity, EntityDefinition> = {
     ],
     fields: [
       field('name', 'text', true),
-      company,
+      field('customerType', 'select', false, ['individual', 'organization']),
+      { ...company, required: false },
       ...person,
       owner,
       { ...source, required: false },
@@ -340,21 +369,17 @@ export const definitions: Record<Entity, EntityDefinition> = {
     ],
     fields: [
       field('name', 'text', true),
-      company,
+      field('pipelineType', 'select', false, ['tuition', 'merchandise', 'b2b_school']),
+      field('studentName', 'text', false),
+      field('chessLevel', 'select', false, chessLevels),
+      { ...company, required: false },
       owner,
       field('stage', 'select', true, stages),
       field('amount', 'number'),
       field('currency', 'select', true, currencies),
       field('expectedCloseAt', 'date'),
       source,
-      field('businessType', 'select', false, [
-        'newBusiness',
-        'expansion',
-        'crossSell',
-        'renewal',
-        'tender',
-        'other',
-      ]),
+      field('businessType', 'select', false, chessBusinessTypes),
       field('contacts', 'contacts'),
       field('description', 'textarea'),
       field('lostReason', 'select', false, lostReasons),
