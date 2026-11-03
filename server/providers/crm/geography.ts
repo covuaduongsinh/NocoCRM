@@ -1,4 +1,5 @@
 import iso from 'iso-3166-2';
+import { regionNames } from '../../locales/crm-geography/index.js';
 
 // ISO 3166-2 ships English subdivision names only; the CRM is bilingual, so
 // China's 34 subdivisions carry a Chinese label. Other countries fall back to
@@ -176,11 +177,24 @@ export function searchPlaces(
     en: new Intl.DisplayNames(['en'], { type: 'region' }),
     'zh-CN': new Intl.DisplayNames(['zh-CN'], { type: 'region' }),
   };
+  // The CRM's own name for a region first (Taiwan, China), else the
+  // runtime's.
   const names = (code: string, language: 'en' | 'zh-CN'): string => {
+    const own = regionNames[code];
+    if (own) return own[language === 'zh-CN' ? 0 : 1];
     try {
       return displays[language].of(code) ?? code;
     } catch {
       return code;
+    }
+  };
+  // What a country is found by: its names in both languages, the runtime's
+  // as well where the CRM names it otherwise ("台湾" still finds 中国台湾).
+  const runtime = (code: string, language: 'en' | 'zh-CN'): string => {
+    try {
+      return displays[language].of(code) ?? '';
+    } catch {
+      return '';
     }
   };
   const ranked: { rank: number; match: PlaceMatch }[] = [];
@@ -195,6 +209,8 @@ export function searchPlaces(
     const countryRank = rank([
       names(country, 'en'),
       names(country, 'zh-CN'),
+      runtime(country, 'en'),
+      runtime(country, 'zh-CN'),
       country,
     ]);
     if (countryRank >= 0)
@@ -219,8 +235,12 @@ export function searchPlaces(
       });
     }
   }
+  // One match a name: China's province Taiwan reads "Taiwan, China" as the
+  // country Taiwan does, which ranks first and stands for both.
+  const seen = new Set<string>();
   return ranked
     .sort((left, right) => left.rank - right.rank)
-    .slice(0, limit)
-    .map((entry) => entry.match);
+    .map((entry) => entry.match)
+    .filter((match) => !seen.has(match.label) && seen.add(match.label))
+    .slice(0, limit);
 }

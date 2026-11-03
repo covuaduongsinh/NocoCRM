@@ -153,6 +153,12 @@ export const crmZhTW: CrmWording = {
   no: '否',
   choose: '請選擇…',
   selectCountryFirst: '請先選擇國家 / 地區',
+  noChoiceMatch: '沒有相符的選項',
+  regionNames: {
+    TW: '中國台灣',
+    HK: '中國香港',
+    MO: '中國澳門',
+  },
   moreActions: '更多…',
   expand: '展開詳情',
   mail: {

@@ -155,6 +155,12 @@ export const crmEsES: CrmWording = {
   no: 'No',
   choose: 'Seleccionar…',
   selectCountryFirst: 'Selecciona primero un país',
+  noChoiceMatch: 'Sin coincidencias',
+  regionNames: {
+    TW: 'Taiwán, China',
+    HK: 'Hong Kong, China',
+    MO: 'Macao, China',
+  },
   moreActions: 'Más…',
   expand: 'Mostrar detalles',
   mail: {

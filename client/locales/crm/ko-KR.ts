@@ -154,6 +154,12 @@ export const crmKoKR: CrmWording = {
   no: '아니요',
   choose: '선택…',
   selectCountryFirst: '먼저 국가를 선택하세요',
+  noChoiceMatch: '일치하는 항목이 없습니다',
+  regionNames: {
+    TW: '중국 대만',
+    HK: '중국 홍콩',
+    MO: '중국 마카오',
+  },
   moreActions: '더 보기…',
   expand: '세부 정보 표시',
   mail: {

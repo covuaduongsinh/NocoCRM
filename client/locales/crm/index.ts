@@ -231,6 +231,15 @@ const wording = {
   no: ['No', '否'],
   choose: ['Select…', '请选择…'],
   selectCountryFirst: ['Select a country first', '请先选择国家 / 地区'],
+  // A pick's list filtered to nothing (a country, a province).
+  noChoiceMatch: ['No match', '没有匹配的选项'],
+  // Countries and regions named by the CRM rather than the browser's
+  // own names (Intl.DisplayNames), by ISO 3166-1 code.
+  regionNames: {
+    TW: ['Taiwan, China', '中国台湾'],
+    HK: ['Hong Kong, China', '中国香港'],
+    MO: ['Macao, China', '中国澳门'],
+  },
   // The lead timeline's menu of asks to the AI.
   moreActions: ['More…', '更多…'],
   expand: ['Show details', '展开详情'],

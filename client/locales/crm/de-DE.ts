@@ -156,6 +156,12 @@ export const crmDeDE: CrmWording = {
   no: 'Nein',
   choose: 'Auswählen…',
   selectCountryFirst: 'Wählen Sie zuerst ein Land aus',
+  noChoiceMatch: 'Keine Treffer',
+  regionNames: {
+    TW: 'Taiwan, China',
+    HK: 'Hongkong, China',
+    MO: 'Macau, China',
+  },
   moreActions: 'Mehr…',
   expand: 'Details anzeigen',
   mail: {

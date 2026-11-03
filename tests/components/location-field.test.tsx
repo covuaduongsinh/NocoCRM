@@ -19,7 +19,11 @@ vi.mock('../../client/components/crm/api.js', async (importOriginal) => ({
   useRefresh: () => () => Promise.resolve(),
   useCrmText: () => ({
     text: (key: string, values?: Record<string, unknown>) =>
-      values?.field ? `${key}:${String(values.field)}` : key,
+      key.startsWith('regionNames.')
+        ? String(values?.defaultValue ?? '')
+        : values?.field
+          ? `${key}:${String(values.field)}`
+          : key,
     language: state.language,
   }),
   useCrmQuery: (path: string, enabled = true) =>

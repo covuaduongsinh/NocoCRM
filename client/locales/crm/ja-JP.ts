@@ -154,6 +154,12 @@ export const crmJaJP: CrmWording = {
   no: 'いいえ',
   choose: '選択…',
   selectCountryFirst: '先に国・地域を選択してください',
+  noChoiceMatch: '一致する項目がありません',
+  regionNames: {
+    TW: '中国台湾',
+    HK: '中国香港',
+    MO: '中国マカオ',
+  },
   moreActions: 'その他…',
   expand: '詳細を表示',
   mail: {

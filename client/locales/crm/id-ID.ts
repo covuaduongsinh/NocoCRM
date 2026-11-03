@@ -155,6 +155,12 @@ export const crmIdID: CrmWording = {
   no: 'Tidak',
   choose: 'Pilih…',
   selectCountryFirst: 'Pilih negara terlebih dahulu',
+  noChoiceMatch: 'Tidak ada yang cocok',
+  regionNames: {
+    TW: 'Taiwan, Tiongkok',
+    HK: 'Hong Kong, Tiongkok',
+    MO: 'Makau, Tiongkok',
+  },
   moreActions: 'Lainnya…',
   expand: 'Tampilkan detail',
   mail: {

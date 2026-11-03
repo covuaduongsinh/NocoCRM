@@ -192,6 +192,10 @@ export function InlineField({
       else {
         await api(`${toText(entity)}/${toText(record.id)}`, 'PATCH', {
           [field.key]: next,
+          // A province only means something under its own country.
+          ...(field.type === 'country' && 'state' in record
+            ? { state: null }
+            : {}),
         });
         await refresh();
       }

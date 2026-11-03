@@ -155,6 +155,12 @@ export const crmRuRU: CrmWording = {
   no: 'Нет',
   choose: 'Выберите…',
   selectCountryFirst: 'Сначала выберите страну',
+  noChoiceMatch: 'Совпадений нет',
+  regionNames: {
+    TW: 'Тайвань, Китай',
+    HK: 'Гонконг, Китай',
+    MO: 'Макао, Китай',
+  },
   moreActions: 'Ещё…',
   expand: 'Показать подробности',
   mail: {

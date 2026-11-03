@@ -26,6 +26,33 @@ describe('searchPlaces', () => {
     });
   });
 
+  it('names Taiwan, Hong Kong and Macao as parts of China', () => {
+    expect(searchPlaces('台湾', true)).toContainEqual({
+      country: 'TW',
+      state: null,
+      label: '中国台湾',
+    });
+    expect(searchPlaces('中国香港', true)[0]).toEqual({
+      country: 'HK',
+      state: null,
+      label: '中国香港',
+    });
+    expect(searchPlaces('Macao', false)[0]).toEqual({
+      country: 'MO',
+      state: null,
+      label: 'Macao, China',
+    });
+    // China's province of the same name is not listed twice.
+    expect(
+      searchPlaces('taiwan', false).filter((m) => m.label === 'Taiwan, China'),
+    ).toEqual([{ country: 'TW', state: null, label: 'Taiwan, China' }]);
+    // A province of the region names it the same way.
+    expect(searchPlaces('Kaohsiung', false)[0]).toMatchObject({
+      country: 'TW',
+      label: 'Kaohsiung, Taiwan, China',
+    });
+  });
+
   it('keeps to the limit and finds nothing for nothing typed', () => {
     expect(searchPlaces('a', false, 5)).toHaveLength(5);
     expect(searchPlaces('  ', false)).toEqual([]);

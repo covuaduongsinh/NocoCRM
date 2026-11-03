@@ -155,6 +155,12 @@ export const crmViVN: CrmWording = {
   no: 'Không',
   choose: 'Chọn…',
   selectCountryFirst: 'Hãy chọn quốc gia trước',
+  noChoiceMatch: 'Không có mục nào phù hợp',
+  regionNames: {
+    TW: 'Đài Loan, Trung Quốc',
+    HK: 'Hồng Kông, Trung Quốc',
+    MO: 'Ma Cao, Trung Quốc',
+  },
   moreActions: 'Thêm…',
   expand: 'Hiện chi tiết',
   mail: {
