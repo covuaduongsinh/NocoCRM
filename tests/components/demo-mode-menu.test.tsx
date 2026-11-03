@@ -14,7 +14,6 @@ import { HeaderActions } from '../../client/layouts/components/header-actions.js
 vi.mock('../../client/components/crm/assistant-header-button.js', () => ({
   AssistantHeaderButton: () => null,
 }));
-vi.mock('../../client/theme/index.js', () => ({ ThemeSettings: () => null }));
 vi.mock('../../client/layouts/components/user-menu.js', () => ({
   UserMenu: () => null,
 }));

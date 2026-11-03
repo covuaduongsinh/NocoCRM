@@ -4,9 +4,6 @@ import { beforeEach, expect, it, vi } from 'vitest';
 import { HeaderActions } from '../../client/layouts/components/header-actions.js';
 import { AssistantHeaderButton } from '../../client/components/crm/assistant-header-button.js';
 
-vi.mock('../../client/theme/index.js', () => ({
-  ThemeSettings: () => null,
-}));
 vi.mock('../../client/layouts/components/user-menu.js', () => ({
   UserMenu: () => null,
 }));

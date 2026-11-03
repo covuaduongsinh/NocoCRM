@@ -33,6 +33,9 @@ vi.mock('@nocobase/app-client', async (importOriginal) => ({
 vi.mock('../../client/layouts/components/language-switcher.js', () => ({
   LanguageSwitcher: () => null,
 }));
+vi.mock('../../client/layouts/components/appearance-menu.js', () => ({
+  AppearanceMenu: () => null,
+}));
 beforeEach(() => {
   state.signOut.mockReset();
   state.refresh.mockReset();

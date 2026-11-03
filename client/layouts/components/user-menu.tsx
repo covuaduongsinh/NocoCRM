@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '#components/ui/dropdown-menu';
 
+import { AppearanceMenu } from './appearance-menu.js';
 import { LanguageSwitcher } from './language-switcher.js';
 
 export function UserMenu(): ReactElement {
@@ -74,6 +75,9 @@ export function UserMenu(): ReactElement {
         </div>
         <DropdownMenuSeparator />
         <LanguageSwitcher />
+        {/* Application change: the colour mode and theme, from the header's
+            palette button until 2026-11-03 (appearance-menu.tsx). */}
+        <AppearanceMenu />
         <DropdownMenuSeparator />
         <DropdownMenuItem
           disabled={isLoggingOut}

@@ -122,18 +122,19 @@ export function AppLayout({ routes }: AppLayoutProps): ReactElement {
           </AppSidebar>
           {/* Application change: crm-page-main lets the assistant panel push header and page aside (styles.css). */}
           <div className='crm-page-main flex min-w-0 flex-1 flex-col'>
-            <LayoutHeader className='sticky top-0 z-40 justify-between'>
-              <div className='flex min-w-0 items-center gap-3'>
+            <LayoutHeader className='sticky top-0 z-40 justify-between gap-2'>
+              {/* Application change: on a phone the brand sits closer to
+                  the sidebar's toggle, the toggle's own padding being gap
+                  enough. */}
+              <div className='flex min-w-0 items-center gap-1.5 sm:gap-3'>
                 <AppSidebarToggle />
-                {/* Application change: on a phone the header shows the mark
-                    alone, as the collapsed sidebar does, and no page trail;
-                    the lockup or the trail with the demo entry and the
-                    actions beside them is wider than the screen. */}
-                <div className='sm:hidden'>
-                  <AppBrand compact />
-                </div>
-                <div className='hidden sm:block md:hidden'>
-                  <AppBrand />
+                {/* Application change: on a phone the header shows the
+                    brand, a size smaller below sm, and no page trail, which with the
+                    demo entry and the actions beside it is wider than the
+                    screen; the brand draws smaller still when even it is
+                    (app-brand.tsx). */}
+                <div className='min-w-0 md:hidden'>
+                  <AppBrand small />
                 </div>
                 <div className='hidden h-5 w-px shrink-0 bg-border sm:block' />
                 {/* The current page's trail: the route tree's, or the one the page declares (`usePageBreadcrumb`). */}
