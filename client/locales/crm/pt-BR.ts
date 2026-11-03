@@ -1674,7 +1674,7 @@ export const crmPtBR: CrmWording = {
     awaitingCount: '{{count}} mensagens desde a última resposta',
     allNumbers: 'Todos os números',
     numberFilter: 'Número',
-    onNumber: 'Número {{number}}',
+    onNumber: 'Nosso número: {{number}}',
     linkedTo: 'Vinculada a',
     empty: {
       title: 'Nenhuma conversa do WhatsApp ainda',

@@ -1695,7 +1695,7 @@ export const crmDeDE: CrmWording = {
     awaitingCount: '{{count}} Nachrichten seit der letzten Antwort',
     allNumbers: 'Alle Nummern',
     numberFilter: 'Nummer',
-    onNumber: 'Über {{number}}',
+    onNumber: 'Unsere Nummer: {{number}}',
     linkedTo: 'Verknüpft mit',
     empty: {
       title: 'Noch keine WhatsApp-Unterhaltungen',

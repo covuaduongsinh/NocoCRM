@@ -1670,7 +1670,7 @@ export const crmIdID: CrmWording = {
     awaitingCount: '{{count}} pesan sejak balasan terakhir',
     allNumbers: 'Semua nomor',
     numberFilter: 'Nomor',
-    onNumber: 'Di {{number}}',
+    onNumber: 'Nomor kami: {{number}}',
     linkedTo: 'Ditautkan ke',
     empty: {
       title: 'Belum ada percakapan WhatsApp',

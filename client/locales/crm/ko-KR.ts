@@ -1642,7 +1642,7 @@ export const crmKoKR: CrmWording = {
     awaitingCount: '마지막 답장 이후 메시지 {{count}}개',
     allNumbers: '모든 번호',
     numberFilter: '번호',
-    onNumber: '{{number}} 번호',
+    onNumber: '회사 번호: {{number}}',
     linkedTo: '연결 대상',
     empty: {
       title: '아직 WhatsApp 대화가 없습니다',

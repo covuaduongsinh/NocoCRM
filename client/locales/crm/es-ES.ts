@@ -1690,7 +1690,7 @@ export const crmEsES: CrmWording = {
     awaitingCount: '{{count}} mensajes desde la última respuesta',
     allNumbers: 'Todos los números',
     numberFilter: 'Número',
-    onNumber: 'En {{number}}',
+    onNumber: 'Nuestro número: {{number}}',
     linkedTo: 'Vinculada a',
     empty: {
       title: 'Aún no hay conversaciones de WhatsApp',

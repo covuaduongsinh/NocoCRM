@@ -1655,7 +1655,7 @@ export const crmJaJP: CrmWording = {
     awaitingCount: '最後の返信以降 {{count}} 件のメッセージ',
     allNumbers: 'すべての番号',
     numberFilter: '番号',
-    onNumber: '番号：{{number}}',
+    onNumber: '自社番号：{{number}}',
     linkedTo: '関連付け先',
     empty: {
       title: 'WhatsApp の会話はまだありません',

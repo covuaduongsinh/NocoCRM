@@ -1587,7 +1587,7 @@ export const crmZhTW: CrmWording = {
     awaitingCount: '上次回覆後客戶傳來 {{count}} 則',
     allNumbers: '全部號碼',
     numberFilter: '號碼',
-    onNumber: '號碼：{{number}}',
+    onNumber: '公司號碼：{{number}}',
     linkedTo: '已關聯',
     empty: {
       title: '還沒有 WhatsApp 對話',

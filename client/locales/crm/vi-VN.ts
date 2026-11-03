@@ -1664,7 +1664,7 @@ export const crmViVN: CrmWording = {
     awaitingCount: '{{count}} tin nhắn kể từ lần trả lời gần nhất',
     allNumbers: 'Tất cả số',
     numberFilter: 'Số điện thoại',
-    onNumber: 'Trên số {{number}}',
+    onNumber: 'Số của công ty: {{number}}',
     linkedTo: 'Đã liên kết với',
     empty: {
       title: 'Chưa có hội thoại WhatsApp nào',

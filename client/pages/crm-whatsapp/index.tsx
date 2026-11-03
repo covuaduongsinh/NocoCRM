@@ -97,33 +97,39 @@ export default function WhatsAppPage(): ReactElement {
     <RecordDrawerContext.Provider
       value={{ open: drawer.open, close: drawer.close, inDrawer: false }}
     >
-      <PageContainer className='flex h-full flex-col'>
-        <PageHeader
-          title={toText(text('whatsapp.title'))}
-          // The number's connection, for whoever manages the CRM's settings,
-          // as the mailbox leads to its accounts.
-          // Which number's inbox the page shows, left of it: the page's
-          // context, switched rather than filtered.
-          actions={
-            <>
-              <NumberSwitch numbers={numbers} value={numberId} />
-              {meta?.settingsAccess ? (
-                <Button
-                  variant='outline'
-                  nativeButton={false}
-                  render={<Link to='/whatsapp/connection' />}
-                  aria-label={toText(text('whatsapp.manageConnection'))}
-                  title={toText(text('whatsapp.manageConnection'))}
-                >
-                  <Plug data-icon='inline-start' />
-                  <span className='hidden sm:inline'>
-                    {text('whatsapp.manageConnection')}
-                  </span>
-                </Button>
-              ) : null}
-            </>
-          }
-        />
+      {/* On a phone an open conversation has the screen: no page title or
+          switches over it, and a narrower margin round it. */}
+      <PageContainer
+        className={`flex h-full flex-col ${conversationId ? 'max-md:space-y-0 max-md:p-3' : ''}`}
+      >
+        <div className={conversationId ? 'hidden md:block' : undefined}>
+          <PageHeader
+            title={toText(text('whatsapp.title'))}
+            // The number's connection, for whoever manages the CRM's settings,
+            // as the mailbox leads to its accounts.
+            // Which number's inbox the page shows, left of it: the page's
+            // context, switched rather than filtered.
+            actions={
+              <>
+                <NumberSwitch numbers={numbers} value={numberId} />
+                {meta?.settingsAccess ? (
+                  <Button
+                    variant='outline'
+                    nativeButton={false}
+                    render={<Link to='/whatsapp/connection' />}
+                    aria-label={toText(text('whatsapp.manageConnection'))}
+                    title={toText(text('whatsapp.manageConnection'))}
+                  >
+                    <Plug data-icon='inline-start' />
+                    <span className='hidden sm:inline'>
+                      {text('whatsapp.manageConnection')}
+                    </span>
+                  </Button>
+                ) : null}
+              </>
+            }
+          />
+        </div>
         {/* Both panes scroll on their own: the card takes the height left
             under the header, down to the page's own bottom padding, the
             assistant's dock being hidden here (design: F7). */}

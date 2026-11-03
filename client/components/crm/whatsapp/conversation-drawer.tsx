@@ -135,20 +135,29 @@ function ConversationBody({ id }: { id: string }): ReactElement {
   const { contact } = conversation;
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
+      {/* The customer's number after their name, as the page's header
+          reads (pages/crm-whatsapp/conversation.tsx). */}
       <div className='flex flex-col gap-1 border-b px-4 py-3'>
-        <h2 className='truncate text-base font-medium' title={contact.name}>
-          {contact.name}
-        </h2>
-        <p className='flex flex-wrap gap-x-3 text-sm text-muted-foreground'>
-          {contact.phone ? <span>{contact.phone}</span> : null}
-          {conversation.number ? (
-            <span>
-              {text('whatsapp.onNumber', {
-                number: numberLabel(conversation.number),
-              })}
+        <div className='flex min-w-0 items-center gap-2'>
+          <h2
+            className='min-w-0 truncate text-base font-medium'
+            title={contact.name}
+          >
+            {contact.name}
+          </h2>
+          {contact.phone ? (
+            <span className='shrink-0 text-sm text-muted-foreground'>
+              {contact.phone}
             </span>
           ) : null}
-        </p>
+        </div>
+        {conversation.number ? (
+          <p className='text-sm text-muted-foreground'>
+            {text('whatsapp.onNumber', {
+              number: numberLabel(conversation.number),
+            })}
+          </p>
+        ) : null}
       </div>
       <WhatsAppMessages
         className='min-h-0 flex-1'

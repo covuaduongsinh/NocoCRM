@@ -142,7 +142,7 @@ export function WhatsAppComposer({
         <Button
           type='button'
           variant='ghost'
-          size='icon'
+          size='icon-lg'
           className='shrink-0 text-muted-foreground'
           disabled={busy}
           aria-label={toText(text('whatsapp.composer.attach'))}
@@ -158,7 +158,11 @@ export function WhatsAppComposer({
           disabled={busy}
           placeholder={toText(text('whatsapp.composer.placeholder'))}
           aria-label={toText(text('whatsapp.composer.placeholder'))}
-          className='max-h-40 min-h-9 resize-none'
+          // One line is exactly as tall as the buttons beside it (size-9),
+          // on a phone's larger text too and whatever the theme's spacing:
+          // a 5-unit line, 2 units of padding less the border on each side.
+          // More lines grow it up to max-h-40.
+          className='max-h-40 min-h-9 resize-none py-[calc(var(--spacing)*2-1px)] leading-5'
           onChange={(event) => setWords(event.target.value)}
           onKeyDown={(event) => {
             if (
@@ -173,7 +177,7 @@ export function WhatsAppComposer({
         />
         <Button
           type='submit'
-          size='icon'
+          size='icon-lg'
           className='shrink-0'
           disabled={!ready}
           aria-label={toText(text('whatsapp.composer.send'))}

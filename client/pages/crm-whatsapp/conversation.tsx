@@ -1,4 +1,5 @@
 import { ApiClientError, useToaster } from '@nocobase/app-client';
+import { useTranslation } from '@nocobase/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { WhatsAppComposer } from '../../components/crm/whatsapp/composer.js';
 import { MoreHorizontalIcon } from 'lucide-react';
@@ -261,9 +262,9 @@ export default function ConversationPane(): ReactElement {
   const context: ConversationContext = { conversation, settle, focusName };
   return (
     <>
-      {back}
       <ConversationHeader
         conversation={conversation}
+        back={`/whatsapp${listSearch}`}
         nameRef={nameRef}
         busy={busy}
         onDismiss={() => quick('dismissed')}
@@ -353,6 +354,7 @@ export default function ConversationPane(): ReactElement {
 
 function ConversationHeader({
   conversation,
+  back,
   nameRef,
   busy,
   onDismiss,
@@ -362,6 +364,8 @@ function ConversationHeader({
   search,
 }: {
   conversation: Conversation;
+  // The list, which a phone shows in place of the conversation.
+  back: string;
   nameRef: React.RefObject<HTMLHeadingElement | null>;
   busy?: string;
   onDismiss: () => void;
@@ -371,6 +375,7 @@ function ConversationHeader({
   search: string;
 }): ReactElement {
   const { text } = useCrmText();
+  const { t } = useTranslation();
   const { data: meta } = useMetadata();
   const numbers = useWhatsAppNumbers();
   const { contact, record } = conversation;
@@ -384,44 +389,82 @@ function ConversationHeader({
     pathname: `/whatsapp/${encodeURIComponent(conversation.id)}/${path}`,
     search,
   });
+  // The customer's number follows their name; the particulars take the
+  // whole width under them. On a phone the header keeps to a few lines, so
+  // the messages have the screen: the way back is an arrow beside the name
+  // rather than a row of its own, the number it came in on goes by its
+  // name alone, and a button (the customer not yet linked, or set aside)
+  // takes a row of its own, last, leaving the name and number room beside
+  // the menu.
+  const crowded = state !== 'linked';
   return (
-    <header className='flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-3'>
-      <div className='flex min-w-0 flex-col gap-1'>
+    <header className='flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border px-4 py-3'>
+      <div className='flex min-w-40 flex-1 basis-0 items-center gap-1'>
+        <BackButton
+          to={back}
+          className='-ml-2 size-8 shrink-0 justify-center md:hidden'
+        >
+          <span className='sr-only'>
+            {t('navigation.back', { defaultValue: 'Back' })}
+          </span>
+        </BackButton>
         <h2
           ref={nameRef}
           tabIndex={-1}
-          className='truncate text-base font-medium outline-none'
+          className='min-w-0 truncate text-base font-medium outline-none'
           title={contact.name}
         >
           {contact.name}
         </h2>
-        <div className='flex flex-wrap items-center gap-2 text-sm text-muted-foreground'>
-          {contact.phone ? <span>{contact.phone}</span> : null}
-          {conversation.number && numbers.length > 1 ? (
-            <span>
+        {contact.phone ? (
+          <span className='ml-1 shrink-0 text-sm text-muted-foreground'>
+            {contact.phone}
+          </span>
+        ) : null}
+      </div>
+      <div className='order-last flex basis-full flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground max-md:pl-7'>
+        {conversation.number && numbers.length > 1 ? (
+          <>
+            {/* A phone names it short, on a line of its own: its name, its
+                number only when it has none. */}
+            <span className='basis-full md:hidden'>
+              {text('whatsapp.onNumber', {
+                number: conversation.number.name || conversation.number.phone,
+              })}
+            </span>
+            <span className='hidden md:inline'>
               {text('whatsapp.onNumber', {
                 number: numberLabel(conversation.number),
               })}
             </span>
-          ) : null}
-          {state === 'unlinked' ? (
-            <Badge variant='outline'>{text('whatsapp.state.unlinked')}</Badge>
-          ) : state === 'linked' && record ? (
-            <span className='flex min-w-0 items-center gap-1'>
+            {/* A rule between the number and the customer's standing. */}
+            <span
+              aria-hidden
+              className='hidden h-3.5 w-px bg-border md:block'
+            />
+          </>
+        ) : null}
+        {state === 'unlinked' ? (
+          <Badge variant='outline'>{text('whatsapp.state.unlinked')}</Badge>
+        ) : state === 'linked' && record ? (
+          <span className='flex max-w-full min-w-0 items-center gap-1'>
+            <span className='whitespace-nowrap'>
               {text('whatsapp.linkedTo')}
-              {/* The record's kind, as the menu marks it. */}
-              <RecordIcon aria-hidden className='ml-1 size-3.5 shrink-0' />
-              <RecordLink
-                entity={record.entity}
-                record={{ id: record.id, name: record.name }}
-              />
             </span>
-          ) : state === 'dismissed' || state === 'spam' ? (
-            <span>{text(`whatsapp.setAside.${state}`)}</span>
-          ) : null}
-        </div>
+            {/* The record's kind, as the menu marks it. */}
+            <RecordIcon aria-hidden className='ml-1 size-3.5 shrink-0' />
+            <RecordLink
+              entity={record.entity}
+              record={{ id: record.id, name: record.name }}
+            />
+          </span>
+        ) : state === 'dismissed' || state === 'spam' ? (
+          <span>{text(`whatsapp.setAside.${state}`)}</span>
+        ) : null}
       </div>
-      <div className='flex flex-wrap items-center gap-2'>
+      <div
+        className={`flex flex-wrap items-center gap-2 ${crowded ? 'max-md:order-last max-md:basis-full max-md:pl-7' : ''}`}
+      >
         {state === 'unlinked' ? (
           <>
             <Button nativeButton={false} render={<Link to={overlay('link')} />}>
@@ -437,15 +480,7 @@ function ConversationHeader({
               </Button>
             ) : null}
           </>
-        ) : state === 'linked' ? (
-          <Button
-            variant='outline'
-            nativeButton={false}
-            render={<Link to={overlay('link')} />}
-          >
-            {text('whatsapp.changeLink')}
-          </Button>
-        ) : (
+        ) : state === 'linked' ? null : (
           <Button
             variant='outline'
             disabled={busy === 'unlinked'}
@@ -474,6 +509,13 @@ function ConversationHeader({
             <DropdownMenuContent align='end' className='w-auto min-w-40'>
               {mayChange ? (
                 <>
+                  {/* Changing a link is rare once it is made, so it waits
+                      in the menu rather than beside the name. */}
+                  {state === 'linked' ? (
+                    <DropdownMenuItem render={<Link to={overlay('link')} />}>
+                      {text('whatsapp.changeLink')}
+                    </DropdownMenuItem>
+                  ) : null}
                   <DropdownMenuItem onClick={onDismiss}>
                     {text('whatsapp.dismiss')}
                   </DropdownMenuItem>

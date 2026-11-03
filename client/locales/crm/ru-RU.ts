@@ -1667,7 +1667,7 @@ export const crmRuRU: CrmWording = {
     awaitingCount: 'Сообщений после последнего ответа: {{count}}',
     allNumbers: 'Все номера',
     numberFilter: 'Номер',
-    onNumber: 'На номер {{number}}',
+    onNumber: 'Наш номер: {{number}}',
     linkedTo: 'Привязано к',
     empty: {
       title: 'Диалогов WhatsApp пока нет',

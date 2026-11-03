@@ -1686,7 +1686,7 @@ export const crmFrFR: CrmWording = {
     awaitingCount: '{{count}} message(s) depuis la dernière réponse',
     allNumbers: 'Tous les numéros',
     numberFilter: 'Numéro',
-    onNumber: 'Sur le {{number}}',
+    onNumber: 'Notre numéro : {{number}}',
     linkedTo: 'Lié à',
     empty: {
       title: "Aucune conversation WhatsApp pour l'instant",

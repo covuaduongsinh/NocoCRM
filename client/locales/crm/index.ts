@@ -2568,7 +2568,7 @@ const wording = {
     ],
     allNumbers: ['All numbers', '全部号码'],
     numberFilter: ['Number', '号码'],
-    onNumber: ['On {{number}}', '号码：{{number}}'],
+    onNumber: ['Our number: {{number}}', '公司号码：{{number}}'],
     linkedTo: ['Linked to', '已关联'],
     empty: {
       title: ['No WhatsApp conversations yet', '还没有 WhatsApp 对话'],
