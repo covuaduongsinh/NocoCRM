@@ -429,19 +429,11 @@ describe('the assistant dock', () => {
     expect(chatFake.pinned[0]).toMatchObject({ id: 'l1' });
   });
 
-  it('is a round button on a phone that opens a new conversation from the record', async () => {
-    const user = userEvent.setup();
+  it('shows nothing on a phone, where the header opens the panel', () => {
     state.mobile = true;
     renderDock('/leads/l1', { name: 'Tang Rui' });
     expect(screen.queryByRole('textbox')).toBeNull();
-    await user.click(
-      screen.getByRole('button', { name: english('dock.open') }),
-    );
-    // A new conversation with the lead pinned, nothing sent.
-    expect(chatFake.created).toHaveLength(0);
-    expect(chatFake.pinned).toEqual([
-      { kind: 'leads', id: 'l1', label: 'Tang Rui' },
-    ]);
+    expect(screen.queryByRole('button')).toBeNull();
   });
 
   it('asks about the newest record when one record page replaces another', async () => {

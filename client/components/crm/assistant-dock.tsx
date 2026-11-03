@@ -10,9 +10,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../ui/tooltip.js';
-import { toText, useCrmText, useMetadata, type Entity } from './api.js';
+import { toText, useCrmText, useMetadata } from './api.js';
 import { usePanelOpen, useAskDraft, useFocusReturn } from './assistant-ask.js';
-import { recordPin, useAgentReadiness, useDiscuss } from './agent-chat/ask.js';
+import { useAgentReadiness } from './agent-chat/ask.js';
 import { AskComposer } from './assistant-ask-composer.js';
 import { useCurrentRecord, type CurrentRecord } from './current-record.js';
 
@@ -29,9 +29,9 @@ import { useCurrentRecord, type CurrentRecord } from './current-record.js';
 // their last row can be scrolled above it. One line until it is clicked, it
 // then opens into the ask boxes' composer (assistant-ask-composer.tsx) with
 // its files and its model, and closes to one line again once focus leaves an
-// empty box. On a phone it is a round button in the corner that opens the
-// panel. It hides while the panel is open, and
-// on pages filled by panes of their own that cannot leave room for it.
+// empty box. A phone has none: the header's ✨ button opens the panel there.
+// It hides while the panel is open, and on pages filled by panes of their own
+// that cannot leave room for it.
 
 // Pages the dock is not shown on: the overview, which opens on an ask box of
 // its own (assistant-ask-box.tsx); the Mail plugin's workspace, the inbox and
@@ -93,7 +93,6 @@ export function AssistantDock(): ReactElement | null {
   const { text } = useCrmText();
   const readiness = useAgentReadiness();
   const panelOpen = usePanelOpen();
-  const discuss = useDiscuss();
   const record = useCurrentRecord();
   const { pathname } = useLocation();
   const isMobile = useIsMobile();
@@ -111,17 +110,16 @@ export function AssistantDock(): ReactElement | null {
   // The suggestions show while the box is focused and empty, until Esc.
   const [listOpen, setListOpen] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const phoneRef = useRef<HTMLButtonElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
   // Focus given back when the panel closes leaves the dock one line: it
   // opens once the reader presses it or types, not by itself.
   const quietRef = useRef(false);
   useFocusReturn(
     () => {
-      quietRef.current = !isMobile;
-      return isMobile ? phoneRef.current : inputRef.current;
+      quietRef.current = true;
+      return inputRef.current;
     },
-    () => (isMobile ? phoneRef.current : dockRef.current),
+    () => dockRef.current,
   );
   // A press outside closes it too, focus or not: a page that drags on a
   // press (the board) keeps focus where it was, so no blur would come. Its
@@ -142,6 +140,7 @@ export function AssistantDock(): ReactElement | null {
   }, [focused, modelMenu]);
 
   if (
+    isMobile ||
     readiness.state === 'loading' ||
     hiddenOn(pathname) ||
     meta?.settings.assistantDock === false
@@ -204,7 +203,7 @@ export function AssistantDock(): ReactElement | null {
           a dialog's backdrop: a press beside the box lands on the veil and
           only closes the box, rather than on the list or the board behind
           it. */}
-      {focused && !isMobile && !panelOpen ? (
+      {focused && !panelOpen ? (
         <div
           aria-hidden
           data-dock-veil=''
@@ -224,133 +223,97 @@ export function AssistantDock(): ReactElement | null {
         // overlay, above a stacked record page's sticky tab bar (z-10);
         // while in use, over its veil, which covers the header (z-40) as a
         // dialog's backdrop does, every overlay (z-50) still above.
-        className={`pointer-events-none absolute inset-x-0 bottom-4 flex justify-end px-4 md:justify-center ${
-          focused && !isMobile ? 'z-40' : 'z-20'
+        className={`pointer-events-none absolute inset-x-0 bottom-4 flex justify-center px-4 ${
+          focused ? 'z-40' : 'z-20'
         }`}
         hidden={panelOpen}
       >
-        {isMobile ? (
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Button
-                  ref={phoneRef}
-                  size='icon-lg'
-                  aria-label={unavailable ?? toText(text('dock.open'))}
-                  disabled={Boolean(unavailable)}
-                  className='pointer-events-auto rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90'
-                  // A new conversation with the record pinned, nothing
-                  // sent: the person writes in the panel.
-                  onClick={() =>
-                    discuss(
-                      record
-                        ? [
-                            recordPin(
-                              record.entity as Entity,
-                              record.recordId,
-                              record.name ?? '',
-                            ),
-                          ]
-                        : [],
-                    )
-                  }
-                />
-              }
-            >
-              <Sparkles />
-            </TooltipTrigger>
-            <TooltipContent>
-              {unavailable ?? toText(text('dock.open'))}
-            </TooltipContent>
-          </Tooltip>
-        ) : (
-          <div
-            ref={dockRef}
-            // Shorter than the md and xl widths it had: the line it closes
-            // to and the composer it opens into.
-            className={`pointer-events-auto relative w-full ${
-              expanded ? 'max-w-[32rem]' : 'max-w-[22rem]'
-            }`}
-            onFocus={() => {
-              if (quietRef.current) {
-                quietRef.current = false;
-                return;
-              }
-              if (!focused) setListOpen(true);
-              setFocused(true);
-            }}
-            // Pressed while it already holds focus (given back quietly):
-            // it opens as a focus would open it.
-            onPointerDown={() => {
-              if (focused) return;
-              setListOpen(true);
-              setFocused(true);
-            }}
-            onBlur={(event) => {
-              const next = event.relatedTarget;
-              if (next) {
-                if (!dockRef.current?.contains(next)) setFocused(false);
-                return;
-              }
-              // Focus went to no element: a click on the page, or another
-              // window (the file picker), which keeps the dock's element
-              // active and so does not close it.
-              window.setTimeout(() => {
-                if (
-                  document.hasFocus() &&
-                  !dockRef.current?.contains(document.activeElement)
-                )
-                  setFocused(false);
-              });
-            }}
-          >
-            {unavailable ? (
-              // Disabled controls take no pointer events, so the reason's
-              // tooltip hangs on a wrapper around the box.
-              <Tooltip>
-                <TooltipTrigger render={<div className='w-full' />}>
-                  {box}
-                </TooltipTrigger>
-                <TooltipContent>{unavailable}</TooltipContent>
-              </Tooltip>
-            ) : (
-              box
-            )}
-            {/* After the box in the document, so Tab moves from the box to
+        <div
+          ref={dockRef}
+          // Shorter than the md and xl widths it had: the line it closes
+          // to and the composer it opens into.
+          className={`pointer-events-auto relative w-full ${
+            expanded ? 'max-w-[32rem]' : 'max-w-[22rem]'
+          }`}
+          onFocus={() => {
+            if (quietRef.current) {
+              quietRef.current = false;
+              return;
+            }
+            if (!focused) setListOpen(true);
+            setFocused(true);
+          }}
+          // Pressed while it already holds focus (given back quietly):
+          // it opens as a focus would open it.
+          onPointerDown={() => {
+            if (focused) return;
+            setListOpen(true);
+            setFocused(true);
+          }}
+          onBlur={(event) => {
+            const next = event.relatedTarget;
+            if (next) {
+              if (!dockRef.current?.contains(next)) setFocused(false);
+              return;
+            }
+            // Focus went to no element: a click on the page, or another
+            // window (the file picker), which keeps the dock's element
+            // active and so does not close it.
+            window.setTimeout(() => {
+              if (
+                document.hasFocus() &&
+                !dockRef.current?.contains(document.activeElement)
+              )
+                setFocused(false);
+            });
+          }}
+        >
+          {unavailable ? (
+            // Disabled controls take no pointer events, so the reason's
+            // tooltip hangs on a wrapper around the box.
+            <Tooltip>
+              <TooltipTrigger render={<div className='w-full' />}>
+                {box}
+              </TooltipTrigger>
+              <TooltipContent>{unavailable}</TooltipContent>
+            </Tooltip>
+          ) : (
+            box
+          )}
+          {/* After the box in the document, so Tab moves from the box to
                 the suggestions; drawn above it. They send with the files
                 attached, on the model picked. */}
-            {focused &&
-              listOpen &&
-              !draft.value &&
-              !draft.files.files.length &&
-              questions.length > 0 &&
-              !unavailable && (
-                <ul
-                  aria-label={toText(text('dock.suggestions'))}
-                  className='absolute bottom-full mb-2 flex w-full flex-col gap-0.5 rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg'
-                >
-                  {questions.map((key) => {
-                    const question = toText(text(`dock.q.${key}`));
-                    return (
-                      <li key={key}>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          className='w-full justify-start font-normal'
-                          // A click lands before the box's blur hides the list.
-                          onMouseDown={(event) => event.preventDefault()}
-                          onClick={() => send(question)}
-                        >
-                          <Sparkles className='text-primary' />
-                          <span className='truncate'>{question}</span>
-                        </Button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-          </div>
-        )}
+          {focused &&
+            listOpen &&
+            !draft.value &&
+            !draft.files.files.length &&
+            questions.length > 0 &&
+            !unavailable && (
+              <ul
+                aria-label={toText(text('dock.suggestions'))}
+                className='absolute bottom-full mb-2 flex w-full flex-col gap-0.5 rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg'
+              >
+                {questions.map((key) => {
+                  const question = toText(text(`dock.q.${key}`));
+                  return (
+                    <li key={key}>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='w-full justify-start font-normal'
+                        // A click lands before the box's blur hides the list.
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={() => send(question)}
+                      >
+                        <Sparkles className='text-primary' />
+                        <span className='truncate'>{question}</span>
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+        </div>
       </div>
     </TooltipProvider>
   );
