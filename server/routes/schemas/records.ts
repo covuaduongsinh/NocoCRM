@@ -167,6 +167,9 @@ function filterShape(entity: Entity): Record<string, z.ZodType> {
         .map(([key, description]) => [key, id(description)]),
     ),
     ...(has('source') ? { source: z.string().optional() } : {}),
+    ...(has('customerType') ? { customerType: z.string().optional() } : {}),
+    ...(has('chessLevel') ? { chessLevel: z.string().optional() } : {}),
+    ...(has('pipelineType') ? { pipelineType: z.string().optional() } : {}),
     ...(has('topic') ? { topic: z.string().optional() } : {}),
     ...(entity === 'opportunities'
       ? { contactId: id('With this contact among its people.') }

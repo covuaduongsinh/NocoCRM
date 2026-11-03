@@ -102,6 +102,9 @@ export interface ListOptions {
   opportunityId?: string;
   contactId?: string;
   source?: string;
+  customerType?: string;
+  chessLevel?: string;
+  pipelineType?: string;
   // "true" / "false": contacts by whether they are still at the company.
   employed?: string;
   // Tasks a user is an internal participant of (their id).
@@ -710,6 +713,9 @@ export class CrmService {
       'leadId',
       'opportunityId',
       'source',
+      'customerType',
+      'chessLevel',
+      'pipelineType',
       'topic',
       'approverId',
     ] as const)

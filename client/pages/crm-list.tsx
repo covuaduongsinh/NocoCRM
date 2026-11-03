@@ -353,11 +353,23 @@ function EntityList({ entity }: { entity: Entity }): ReactElement {
     : '';
   const sourceOptions = meta?.settings.options.source ?? [];
   const source = hasField('source') ? offered('source', sourceOptions) : '';
+  const customerType = hasField('customerType')
+    ? offered('customerType', ['individual', 'organization'])
+    : '';
+  const chessLevel = hasField('chessLevel')
+    ? offered('chessLevel', ['beginner', 'elementary', 'intermediate', 'advanced', 'master'])
+    : '';
+  const pipelineType = hasField('pipelineType')
+    ? offered('pipelineType', ['tuition', 'merchandise', 'b2b_school'])
+    : '';
   const filtering = Boolean(
     search ||
     status ||
     ownerId ||
     source ||
+    customerType ||
+    chessLevel ||
+    pipelineType ||
     employed ||
     topic ||
     approverId ||
@@ -369,6 +381,9 @@ function EntityList({ entity }: { entity: Entity }): ReactElement {
     status,
     ownerId,
     source,
+    customerType,
+    chessLevel,
+    pipelineType,
     employed,
     topic,
     approverId,
@@ -453,6 +468,9 @@ function EntityList({ entity }: { entity: Entity }): ReactElement {
     status,
     ownerId: whose === 'mine' ? toText(meta?.userId) : ownerId,
     source,
+    customerType,
+    chessLevel,
+    pipelineType,
     employed,
     topic,
     approverId,
@@ -855,6 +873,52 @@ function EntityList({ entity }: { entity: Entity }): ReactElement {
             ],
             value: employed || null,
             onChange: (value: string | null) => setFilter('employed', value),
+          },
+        ]
+      : []),
+    ...(hasField('customerType')
+      ? [
+          {
+            key: 'customerType',
+            label: toText(text('fields.customerType')),
+            options: [
+              { value: 'individual', label: toText(text('options.individual')) },
+              { value: 'organization', label: toText(text('options.organization')) },
+            ],
+            value: customerType || null,
+            onChange: (value: string | null) => setFilter('customerType', value),
+          },
+        ]
+      : []),
+    ...(hasField('chessLevel')
+      ? [
+          {
+            key: 'chessLevel',
+            label: toText(text('fields.chessLevel')),
+            options: [
+              { value: 'beginner', label: toText(text('options.beginner')) },
+              { value: 'elementary', label: toText(text('options.elementary')) },
+              { value: 'intermediate', label: toText(text('options.intermediate')) },
+              { value: 'advanced', label: toText(text('options.advanced')) },
+              { value: 'master', label: toText(text('options.master')) },
+            ],
+            value: chessLevel || null,
+            onChange: (value: string | null) => setFilter('chessLevel', value),
+          },
+        ]
+      : []),
+    ...(hasField('pipelineType')
+      ? [
+          {
+            key: 'pipelineType',
+            label: toText(text('fields.pipelineType')),
+            options: [
+              { value: 'tuition', label: toText(text('options.tuition')) },
+              { value: 'merchandise', label: toText(text('options.merchandise')) },
+              { value: 'b2b_school', label: toText(text('options.b2b_school')) },
+            ],
+            value: pipelineType || null,
+            onChange: (value: string | null) => setFilter('pipelineType', value),
           },
         ]
       : []),

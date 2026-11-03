@@ -330,6 +330,8 @@ export function Choice({
 // A new lead's fields that wait behind "More": the person's LinkedIn, the
 // company's particulars and attachments, usually filled later or by research.
 const LEAD_MORE_FIELDS = [
+  'company',
+  'jobTitle',
   'linkedin',
   'employees',
   'currency',
