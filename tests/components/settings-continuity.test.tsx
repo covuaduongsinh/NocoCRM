@@ -186,7 +186,24 @@ it('uses role labels and paired server filters, retaining the source and orderin
       }),
     }),
   );
-  await userEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
+  // The applied role follows the Filters button as a chip; the menu ends
+  // with Clear filters.
+  expect(
+    screen.getByRole('button', {
+      name: enUS.listToolbar.removeFilter.replace(
+        '{{name}}',
+        enUS.settings.assignedRoles,
+      ),
+    }),
+  ).toBeVisible();
+  await userEvent.click(
+    screen.getByRole('button', {
+      name: enUS.listToolbar.filtersApplied.replace('{{count}}', '1'),
+    }),
+  );
+  await userEvent.click(
+    await screen.findByRole('menuitem', { name: enUS.listToolbar.clear }),
+  );
   await waitFor(() =>
     expect(screen.getByTestId('location').textContent).not.toContain(
       'roleScope=',
@@ -204,6 +221,62 @@ it('uses role labels and paired server filters, retaining the source and orderin
       }),
     ),
   );
+});
+
+it('applies a status from the Filters menu and removes it from its chip', async () => {
+  const calls = vi.fn(({ path }: { path: string }) =>
+    path === 'authorization/permissions'
+      ? { data: { unrestricted: false, permissions: [] } }
+      : path === 'users/options'
+        ? options
+        : { data: [row], meta: { total: 1 } },
+  );
+  await renderWithApp(
+    <>
+      <UsersPage />
+      <Location />
+    </>,
+    {
+      route: '/settings/users',
+      namespace,
+      namespaces,
+      services,
+      fetch: answerApi(calls),
+    },
+  );
+  expect(await screen.findByText('Alice', { exact: true })).toBeVisible();
+  await userEvent.click(
+    screen.getByRole('button', { name: enUS.listToolbar.filters }),
+  );
+  await userEvent.click(
+    await screen.findByRole('menuitem', { name: enUS.settings.status }),
+  );
+  await userEvent.click(
+    await screen.findByRole('menuitemradio', { name: enUS.settings.disabled }),
+  );
+  await waitFor(() =>
+    expect(calls).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: 'users',
+        query: expect.objectContaining({ status: 'disabled' }),
+      }),
+    ),
+  );
+  expect(screen.getByTestId('location')).toHaveTextContent('status=disabled');
+  await userEvent.click(
+    await screen.findByRole('button', {
+      name: enUS.listToolbar.removeFilter.replace(
+        '{{name}}',
+        enUS.settings.status,
+      ),
+    }),
+  );
+  await waitFor(() =>
+    expect(screen.getByTestId('location')).not.toHaveTextContent('status='),
+  );
+  expect(
+    screen.getByRole('button', { name: enUS.listToolbar.filters }),
+  ).toBeVisible();
 });
 
 it('does not silently discard an incomplete role filter or expose an external return link', async () => {
@@ -509,7 +582,9 @@ it('refreshes a filtered list after disabling a user, corrects an empty last pag
   expect(screen.getByTestId('location')).toHaveTextContent('status=enabled');
   await waitFor(() =>
     expect(
-      screen.getByRole('textbox', { name: enUS.settings.userSearch }),
+      screen.getByRole('button', {
+        name: new RegExp(`^${enUS.listToolbar.filters}`),
+      }),
     ).toHaveFocus(),
   );
 });

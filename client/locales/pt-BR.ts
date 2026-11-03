@@ -446,6 +446,15 @@ const ptBR: AppResource = {
     signOut: 'Sair',
     signingOut: 'Saindo…',
   },
+  listToolbar: {
+    filters: 'Filtros',
+    filtersApplied: 'Filtros ({{count}} aplicados)',
+    removeFilter: 'Remover o filtro {{name}}',
+    clear: 'Limpar filtros',
+    keyword: 'Palavra-chave',
+    noMatches: 'Nenhuma correspondência',
+    searchPeople: 'Buscar pessoas',
+  },
   navigation: {
     home: 'Início',
     open: 'Abrir navegação',

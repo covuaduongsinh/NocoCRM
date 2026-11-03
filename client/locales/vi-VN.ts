@@ -442,6 +442,15 @@ const viVN: AppResource = {
     signOut: 'Đăng xuất',
     signingOut: 'Đang đăng xuất…',
   },
+  listToolbar: {
+    filters: 'Bộ lọc',
+    filtersApplied: 'Bộ lọc (đang áp dụng {{count}})',
+    removeFilter: 'Bỏ bộ lọc {{name}}',
+    clear: 'Xóa bộ lọc',
+    keyword: 'Từ khóa',
+    noMatches: 'Không có kết quả khớp',
+    searchPeople: 'Tìm người',
+  },
   navigation: {
     home: 'Tổng quan',
     open: 'Mở thanh điều hướng',

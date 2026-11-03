@@ -28,6 +28,9 @@ import {
   useRecordDrawerState,
 } from '../components/crm/record-drawer.js';
 import { useLocation, useNavigate } from 'react-router';
+import { useTranslation } from '@nocobase/i18n/client';
+import { type FilterDimension, FilterMenu } from '#components/filter-menu';
+import { useUrlSearch } from '#hooks/use-url-search';
 import { openOnRowClick } from '../components/crm/row-open.js';
 import { MonthPicker } from '../components/crm/month-picker.js';
 import {
@@ -38,7 +41,6 @@ import {
 } from '@tanstack/react-query';
 import {
   Plus,
-  ListFilter,
   Download,
   Upload,
   LayoutList,
@@ -46,7 +48,6 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
-  X,
   User,
   Factory,
   CalendarClock,
@@ -59,7 +60,6 @@ import { Button } from '../components/ui/button.js';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs.js';
 import { KindTag } from '../components/crm/kind-tag.js';
 import { Badge } from '../components/ui/badge.js';
-import { Input } from '../components/ui/input.js';
 import { Card, CardContent } from '../components/ui/card.js';
 import {
   Table,
@@ -87,7 +87,7 @@ import {
   Status,
   Value,
 } from '../components/crm/common.js';
-import { Choice, RecordForm } from '../components/crm/form.js';
+import { RecordForm } from '../components/crm/form.js';
 import { ReasonDialog } from '../components/crm/reasons.js';
 import { reasonFor } from '../components/crm/reason-rules.js';
 import { ImportDialog } from '../components/crm/import-export.js';
@@ -183,62 +183,31 @@ export default function CrmListPage(): ReactElement {
   // can render once more with the new location, and the last segment would
   // then be an id.
   const entity = location.pathname.split('/').filter(Boolean)[0] as Entity;
-  // "?metric=stale" opens the list already filtered by that card;
-  // "?status=pending" with that status filter applied.
-  const params = new URLSearchParams(location.search);
-  const initialMetric = params.get('metric') ?? undefined;
-  const initialStatus = params.get('status') ?? undefined;
-  // From the global search: "?search=" fills the search box; a link naming
-  // records ("?ids=a,b&found=title") narrows the list to them.
-  const initialSearch = params.get('search') ?? undefined;
-  const foundIds = params.get('ids');
-  const initialFound = foundIds
-    ? {
-        ids: foundIds.split(',').filter(Boolean),
-        // Plain text from the address, cut as the search cuts it.
-        title: (params.get('found') ?? '').slice(0, 60),
-      }
-    : undefined;
   return (
-    <EntityList
-      // A new search from the global search opens the list afresh, even on
-      // the list already shown.
-      key={`${entity}|${initialSearch ?? ''}|${foundIds ?? ''}`}
-      entity={entity}
-      initialMetric={initialMetric}
-      initialStatus={initialStatus}
-      initialSearch={initialSearch}
-      initialFound={initialFound}
-    />
+    // Its filters live in the address (?search=, ?status=, ?ownerId=…), so
+    // a link, a reload or Back opens the list as it was left.
+    <EntityList key={entity} entity={entity} />
   );
 }
-function EntityList({
-  entity,
-  initialMetric,
-  initialStatus,
-  initialSearch,
-  initialFound,
-}: {
-  entity: Entity;
-  initialMetric?: string;
-  initialStatus?: string;
-  initialSearch?: string;
-  initialFound?: { ids: string[]; title: string };
-}): ReactElement {
+function EntityList({ entity }: { entity: Entity }): ReactElement {
   const navigate = useNavigate();
   const { text, language } = useCrmText();
+  const { t } = useTranslation();
   const { data: meta, error: metadataError } = useMetadata();
   const api = useCrmApi();
   const scopeKey = useCrmScopeKey();
-  const [search, setSearch] = useState(initialSearch ?? '');
-  // Every list opens on every status (tasks list what is still to do above
-  // what is done), unless a workspace card opened it on a set of its own.
-  const defaultStatus = initialStatus ?? '';
-  const [status, setStatus] = useState(defaultStatus);
-  const [ownerId, setOwnerId] = useState('');
-  const [source, setSource] = useState('');
-  const [employed, setEmployed] = useState('');
-  const [topic, setTopic] = useState('');
+  // The list's filters, kept in the address: the keyword (?search=, which
+  // the global search's "All N" opens with), the menu's conditions, and a
+  // statistic card's records (?metric=) or the global search's found ones
+  // (?ids=a,b&found=title). A value the list does not offer is ignored.
+  const {
+    searchParams,
+    search,
+    inputProps: keywordInput,
+    updateParams,
+    clear,
+  } = useUrlSearch({ param: 'search' });
+  const param = (name: string): string => searchParams.get(name) ?? '';
   // Whose records: everyone's or the ones I own; for tasks also the ones
   // I take part in, for approvals the ones I decide.
   // The task and approval lists open on the reader's own (a task owned
@@ -247,9 +216,6 @@ function EntityList({
   const [scope, setScope] = useState<Scope>(
     entity === 'tasks' || entity === 'approvals' ? 'involved' : 'all',
   );
-  const [approverId, setApproverId] = useState('');
-  // A task's: one of its participants.
-  const [participantId, setParticipantId] = useState('');
   // The task list's tab: what is to do, or what is done or cancelled.
   // Leads and opportunities are worked as funnels, so they open on the
   // board; the rest, tasks too (the calendar beside the list), on the list.
@@ -263,35 +229,6 @@ function EntityList({
     key: string;
     direction: 'asc' | 'desc';
   }>();
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  // The keyword box; `/` brings it up, as in Linear and GitHub, while ⌘K
-  // stays the global search.
-  const keywordRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent): void => {
-      if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey)
-        return;
-      const target = event.target as HTMLElement | null;
-      if (
-        target?.closest('input,textarea,select,[contenteditable="true"]') ||
-        document.querySelector('[role="dialog"]')
-      )
-        return;
-      event.preventDefault();
-      setFiltersOpen(true);
-      requestAnimationFrame(() => keywordRef.current?.focus());
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, []);
-  // A statistic card clicked into a filter: the key names the chip, the ids
-  // are what the server restricts the list to.
-  // A metric filter: undefined until the reader touches it, null once
-  // cleared, so a workspace card's opening filter applies until dismissed.
-  // The AI's found records come in as one, named by the AI (`title`).
-  const [metric, setMetric] = useState<
-    { key: string; ids: string[]; title?: string } | null | undefined
-  >(() => (initialFound ? { key: 'found', ...initialFound } : undefined));
   // Unfiltered on purpose: the title shows how many leads exist, not how
   // many match the current filters. One row is enough to learn the total.
   const totals = useQuery({
@@ -300,32 +237,26 @@ function EntityList({
     enabled: entity !== 'tasks',
   });
   // A workspace card opens the list already filtered to its members: the
-  // statistics endpoint names them, once, when the page opens with a metric.
-  const initialMembers = useCrmQuery<{ members?: Record<string, string[]> }>(
+  // statistics endpoint names them when the page opens with a metric. The
+  // global search's found records come in as one, named by the AI (`title`).
+  const foundIds = param('ids');
+  const metricKey = param('metric');
+  const members = useCrmQuery<{ members?: Record<string, string[]> }>(
     `${toText(entity)}/statistics?`,
-    Boolean(initialMetric),
+    Boolean(metricKey) && !foundIds,
   );
-  const initialIds = initialMetric
-    ? initialMembers.data?.members?.[initialMetric]
-    : undefined;
-  const activeMetric =
-    metric === undefined
-      ? initialMetric && initialIds
-        ? { key: initialMetric, ids: initialIds }
-        : undefined
-      : (metric ?? undefined);
-  // What the page opens on (a task list's to-do status) is not a filter
-  // the reader set, so it leaves the search closed, as on every list.
-  const filtering = Boolean(
-    search ||
-    (status && status !== defaultStatus) ||
-    ownerId ||
-    source ||
-    employed ||
-    topic ||
-    approverId ||
-    participantId,
-  );
+  const metricIds = metricKey ? members.data?.members?.[metricKey] : undefined;
+  const activeMetric:
+    { key: string; ids: string[]; title?: string } | undefined = foundIds
+    ? {
+        key: 'found',
+        ids: foundIds.split(',').filter(Boolean),
+        // Plain text from the address, cut as the search cuts it.
+        title: param('found').slice(0, 60),
+      }
+    : metricKey && metricIds
+      ? { key: metricKey, ids: metricIds }
+      : undefined;
   const [month, setMonth] = useState(() =>
     new Date().toISOString().slice(0, 7),
   );
@@ -388,6 +319,72 @@ function EntityList({
   }, []);
   const client = useQueryClient();
   const definition = meta?.definitions[entity];
+  const users = meta?.users ?? [];
+  const hasField = (key: string): boolean =>
+    Boolean(definition?.fields.some((f) => f.key === key));
+  const offered = (name: string, values: readonly string[]): string => {
+    const value = param(name);
+    return values.includes(value) ? value : '';
+  };
+  const status = offered('status', definition?.statuses ?? []);
+  const ownerId = offered(
+    'ownerId',
+    users.map((u) => u.id),
+  );
+  const participantId =
+    entity === 'tasks'
+      ? offered(
+          'participantId',
+          users.filter((u) => !u.disabled).map((u) => u.id),
+        )
+      : '';
+  const topicOptions =
+    definition?.fields.find((f) => f.key === 'topic')?.options ?? [];
+  const topic = entity === 'approvals' ? offered('topic', topicOptions) : '';
+  const approverId =
+    entity === 'approvals'
+      ? offered(
+          'approverId',
+          users.filter((u) => u.canApprove).map((u) => u.id),
+        )
+      : '';
+  const employed = hasField('employed')
+    ? offered('employed', ['true', 'false'])
+    : '';
+  const sourceOptions = meta?.settings.options.source ?? [];
+  const source = hasField('source') ? offered('source', sourceOptions) : '';
+  const filtering = Boolean(
+    search ||
+    status ||
+    ownerId ||
+    source ||
+    employed ||
+    topic ||
+    approverId ||
+    participantId,
+  );
+  // A changed condition starts again from the first page.
+  const filterKey = [
+    search,
+    status,
+    ownerId,
+    source,
+    employed,
+    topic,
+    approverId,
+    participantId,
+    activeMetric?.key,
+  ].join('|');
+  const [pagedKey, setPagedKey] = useState(filterKey);
+  if (pagedKey !== filterKey) {
+    setPagedKey(filterKey);
+    setPage(1);
+  }
+  const setFilter = (name: string, value: string | null): void =>
+    updateParams((next) => {
+      if (value) next.set(name, value);
+      else next.delete(name);
+    });
   // A drop moves the card between the two columns' cached pages at once,
   // so it lands where it was dropped before the server has answered; the
   // refresh afterwards makes the columns exact, and a failure reloads them.
@@ -710,26 +707,25 @@ function EntityList({
       )}
     </>
   );
-  const change =
-    (setter: (value: string) => void) =>
-    (value: string): void => {
-      setter(value);
-      setPage(1);
-    };
-  // Clear filters, offered when they leave nothing: every condition back to
-  // what the page opens on, the sorting kept.
+  // Clear filters: every condition and the statistic card's records gone,
+  // whose records back to what the page opens on, the sorting kept.
   const clearFilters = (): void => {
-    setSearch('');
-    setStatus(defaultStatus);
-    setOwnerId('');
-    setSource('');
-    setEmployed('');
-    setTopic('');
-    setApproverId('');
-    setParticipantId('');
+    clear((next) => {
+      for (const name of [
+        'status',
+        'ownerId',
+        'source',
+        'employed',
+        'topic',
+        'approverId',
+        'participantId',
+        'metric',
+        'ids',
+        'found',
+      ])
+        next.delete(name);
+    });
     setScope(defaultScope);
-    setMetric(null);
-    setPage(1);
   };
   if (metadataError)
     return (
@@ -756,6 +752,127 @@ function EntityList({
       : view === 'list' && entity !== 'tasks'
         ? { state: listState, query }
         : undefined;
+  const people = (list: typeof users) =>
+    list.map((u) => ({ value: u.id, label: u.name }));
+  const personSearch = { placeholder: t('listToolbar.searchPeople') };
+  const ownerLabel = toText(
+    text(entity === 'approvals' ? 'fields.applicant' : 'owner'),
+  );
+  // The menu's conditions, those this object has; a statistic card's or the
+  // global search's records show as a chip of their own.
+  const filterDimensions: FilterDimension[] = [
+    ...(activeMetric
+      ? [
+          {
+            key: 'metric',
+            label: toText(text('showing')),
+            options: [],
+            value: activeMetric.key,
+            valueLabel: toText(
+              activeMetric.title !== undefined
+                ? text('globalSearch.foundChip', {
+                    title: activeMetric.title,
+                  })
+                : text(
+                    METRIC_TITLES[`${toText(entity)}.${activeMetric.key}`] ??
+                      activeMetric.key,
+                  ),
+            ),
+            onChange: () =>
+              updateParams((next) => {
+                for (const name of ['metric', 'ids', 'found'])
+                  next.delete(name);
+              }),
+            chipOnly: true,
+          },
+        ]
+      : []),
+    ...(definition.statuses.length
+      ? [
+          {
+            key: 'status',
+            label: toText(text('fields.status')),
+            options: definition.statuses.map((v) => ({
+              value: v,
+              label: toText(text(`options.${toText(v)}`)),
+            })),
+            value: status || null,
+            onChange: (value: string | null) => setFilter('status', value),
+          },
+        ]
+      : []),
+    {
+      key: 'ownerId',
+      label: ownerLabel,
+      options: people(users),
+      value: ownerId || null,
+      onChange: (value) => setFilter('ownerId', value),
+      search: personSearch,
+    },
+    ...(entity === 'tasks'
+      ? [
+          {
+            key: 'participantId',
+            label: toText(text('fields.internalParticipants')),
+            options: people(users.filter((u) => !u.disabled)),
+            value: participantId || null,
+            onChange: (value: string | null) =>
+              setFilter('participantId', value),
+            search: personSearch,
+          },
+        ]
+      : []),
+    ...(entity === 'approvals'
+      ? [
+          {
+            key: 'topic',
+            label: toText(text('fields.topic')),
+            options: topicOptions.map((v) => ({
+              value: v,
+              label: toText(text(`options.${toText(v)}`)),
+            })),
+            value: topic || null,
+            onChange: (value: string | null) => setFilter('topic', value),
+          },
+          {
+            key: 'approverId',
+            label: toText(text('fields.approverId')),
+            options: people(users.filter((u) => u.canApprove)),
+            value: approverId || null,
+            onChange: (value: string | null) => setFilter('approverId', value),
+            search: personSearch,
+          },
+        ]
+      : []),
+    ...(hasField('employed')
+      ? [
+          {
+            key: 'employed',
+            label: toText(text('fields.employed')),
+            options: [
+              { value: 'true', label: toText(text('yes')) },
+              { value: 'false', label: toText(text('no')) },
+            ],
+            value: employed || null,
+            onChange: (value: string | null) => setFilter('employed', value),
+          },
+        ]
+      : []),
+    ...(hasField('source')
+      ? [
+          {
+            key: 'source',
+            label: toText(text('fields.source')),
+            options: sourceOptions.map((v) => ({
+              value: v,
+              label: toText(text(`options.${toText(v)}`, { defaultValue: v })),
+            })),
+            value: source || null,
+            onChange: (value: string | null) => setFilter('source', value),
+          },
+        ]
+      : []),
+  ];
   const toolbar = (
     <>
       {/* The calendar's month, left of the view switch: its own stepper
@@ -839,18 +956,6 @@ function EntityList({
           busy={feedbackQuery.query.isFetching}
         />
       )}
-      {/* Filtering this list, not the global search (⌘K): the keyword
-          among the other conditions, brought up by `/` as well. */}
-      <Button
-        variant={filtersOpen || filtering ? 'secondary' : 'ghost'}
-        size='icon'
-        aria-label={text('filterList')}
-        title={`${toText(text('filterList'))} · /`}
-        aria-expanded={filtersOpen}
-        onClick={() => setFiltersOpen((v) => !v)}
-      >
-        <ListFilter />
-      </Button>
       {/* Tasks are not imported or exported. */}
       {entity !== 'tasks' && (
         <div className='flex gap-2'>
@@ -927,6 +1032,27 @@ function EntityList({
       actions={
         <>
           {toolbar}
+          {/* The filters, then the primary action on the right. The keyword
+              is a filter of this list, apart from the global search (⌘K). */}
+          <FilterMenu
+            dimensions={filterDimensions}
+            keyword={{
+              applied: search,
+              inputProps: keywordInput,
+              onClear: () => clear(),
+              placeholder: toText(
+                text('filterIn', { list: text(`entities.${toText(entity)}`) }),
+              ),
+            }}
+            onClear={clearFilters}
+            slashOpens
+          />
+          {/* How many records the conditions leave. */}
+          {narrowed && view === 'list' && entity !== 'tasks' && query.data ? (
+            <span className='text-sm text-muted-foreground tabular-nums'>
+              {text('matchCount', { count: query.data.meta.total })}
+            </span>
+          ) : null}
           {newButton}
         </>
       }
@@ -934,172 +1060,6 @@ function EntityList({
       // and the record pages' own shortcuts cover it.
     >
       <ErrorNotice error={error} />
-      {activeMetric && (
-        <div className='flex items-center gap-2 text-sm'>
-          <span className='text-muted-foreground'>{text('showing')}</span>
-          <Button variant='secondary' size='sm' onClick={() => setMetric(null)}>
-            {activeMetric.title !== undefined
-              ? text('globalSearch.foundChip', { title: activeMetric.title })
-              : text(
-                  METRIC_TITLES[`${toText(entity)}.${activeMetric.key}`] ??
-                    activeMetric.key,
-                )}
-            <X className='size-3.5' />
-          </Button>
-        </div>
-      )}
-      {/* The keyword as a condition of its own, cleared from its chip, and
-          how many records the conditions leave. */}
-      {search ? (
-        <div className='flex flex-wrap items-center gap-2 text-sm'>
-          <Button
-            variant='secondary'
-            size='sm'
-            aria-label={toText(text('clearKeyword', { text: search }))}
-            onClick={() => change(setSearch)('')}
-          >
-            {text('keywordChip', { text: search })}
-            <X className='size-3.5' />
-          </Button>
-          {entity !== 'tasks' && query.data ? (
-            <span className='text-muted-foreground tabular-nums'>
-              {text('matchCount', { count: query.data.meta.total })}
-            </span>
-          ) : null}
-        </div>
-      ) : null}
-      {/* Filters live under the toolbar and open on demand; they stay open
-          whenever one is set so an active filter is never hidden. */}
-      {(filtersOpen || filtering) && (
-        // The fields on the card's white, set off from the page's grey.
-        <div className='flex flex-wrap items-center gap-3 [&_[data-slot=input]]:bg-card [&_[data-slot=select-trigger]]:bg-card'>
-          <div className='relative min-w-52 flex-1'>
-            <ListFilter className='absolute top-2 left-3 size-4 text-muted-foreground' />
-            <Input
-              ref={keywordRef}
-              className='pl-9'
-              aria-label={text('filterIn', {
-                list: text(`entities.${toText(entity)}`),
-              })}
-              placeholder={toText(
-                text('filterIn', { list: text(`entities.${toText(entity)}`) }),
-              )}
-              value={search}
-              onChange={(e) => change(setSearch)(e.target.value)}
-            />
-          </div>
-          {definition?.statuses.length ? (
-            <div className='w-44'>
-              <Choice
-                label={text('fields.status')}
-                emptyLabel={text('allOf', { what: text('fields.status') })}
-                value={status}
-                onChange={change(setStatus)}
-                choices={definition.statuses.map((v) => ({
-                  value: v,
-                  label: text(`options.${toText(v)}`),
-                }))}
-              />
-            </div>
-          ) : null}
-          <div className='w-44'>
-            <Choice
-              label={text(
-                entity === 'approvals' ? 'fields.applicant' : 'owner',
-              )}
-              emptyLabel={text('allOf', {
-                what: text(
-                  entity === 'approvals' ? 'fields.applicant' : 'owner',
-                ),
-              })}
-              value={ownerId}
-              onChange={change(setOwnerId)}
-              choices={
-                meta?.users.map((u) => ({ value: u.id, label: u.name })) ?? []
-              }
-            />
-          </div>
-          {entity === 'tasks' && (
-            <div className='w-44'>
-              <Choice
-                label={text('fields.internalParticipants')}
-                emptyLabel={text('allOf', {
-                  what: text('fields.internalParticipants'),
-                })}
-                value={participantId}
-                onChange={change(setParticipantId)}
-                choices={
-                  meta?.users
-                    .filter((u) => !u.disabled)
-                    .map((u) => ({ value: u.id, label: u.name })) ?? []
-                }
-              />
-            </div>
-          )}
-          {entity === 'approvals' && (
-            <>
-              <div className='w-44'>
-                <Choice
-                  label={text('fields.topic')}
-                  emptyLabel={text('allOf', { what: text('fields.topic') })}
-                  value={topic}
-                  onChange={change(setTopic)}
-                  choices={(
-                    definition?.fields.find((f) => f.key === 'topic')
-                      ?.options ?? []
-                  ).map((v) => ({
-                    value: v,
-                    label: text(`options.${toText(v)}`),
-                  }))}
-                />
-              </div>
-              <div className='w-44'>
-                <Choice
-                  label={text('fields.approverId')}
-                  emptyLabel={text('allOf', {
-                    what: text('fields.approverId'),
-                  })}
-                  value={approverId}
-                  onChange={change(setApproverId)}
-                  choices={
-                    meta?.users
-                      .filter((u) => u.canApprove)
-                      .map((u) => ({ value: u.id, label: u.name })) ?? []
-                  }
-                />
-              </div>
-            </>
-          )}
-          {definition?.fields.some((f) => f.key === 'employed') && (
-            <div className='w-44'>
-              <Choice
-                label={text('fields.employed')}
-                emptyLabel={text('allOf', { what: text('fields.employed') })}
-                value={employed}
-                onChange={change(setEmployed)}
-                choices={[
-                  { value: 'true', label: text('yes') },
-                  { value: 'false', label: text('no') },
-                ]}
-              />
-            </div>
-          )}
-          {definition?.fields.some((f) => f.key === 'source') && (
-            <div className='w-44'>
-              <Choice
-                label={text('fields.source')}
-                emptyLabel={text('allOf', { what: text('fields.source') })}
-                value={source}
-                onChange={change(setSource)}
-                choices={(meta?.settings.options.source ?? []).map((v) => ({
-                  value: v,
-                  label: text(`options.${toText(v)}`, { defaultValue: v }),
-                }))}
-              />
-            </div>
-          )}
-        </div>
-      )}
       {entity === 'tasks' && view === 'list' ? (
         // Tasks read as a to-do list, not a table; the records they concern
         // open in a drawer over it.

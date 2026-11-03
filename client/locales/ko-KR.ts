@@ -439,6 +439,15 @@ const koKR: AppResource = {
     signOut: '로그아웃',
     signingOut: '로그아웃하는 중…',
   },
+  listToolbar: {
+    filters: '필터',
+    filtersApplied: '필터({{count}}개 적용됨)',
+    removeFilter: '{{name}} 필터 제거',
+    clear: '필터 지우기',
+    keyword: '키워드',
+    noMatches: '일치하는 항목 없음',
+    searchPeople: '사람 검색',
+  },
   navigation: {
     home: '개요',
     open: '탐색 메뉴 열기',

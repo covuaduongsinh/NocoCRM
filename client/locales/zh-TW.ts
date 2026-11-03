@@ -412,6 +412,15 @@ const zhTW: AppResource = {
     signOut: '登出',
     signingOut: '正在登出…',
   },
+  listToolbar: {
+    filters: '篩選',
+    filtersApplied: '篩選（已選 {{count}} 項）',
+    removeFilter: '移除「{{name}}」篩選',
+    clear: '清除篩選',
+    keyword: '關鍵字',
+    noMatches: '沒有符合項目',
+    searchPeople: '搜尋人員',
+  },
   navigation: {
     home: '工作台',
     open: '開啟導覽',

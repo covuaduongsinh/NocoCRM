@@ -445,6 +445,15 @@ const idID: AppResource = {
     signOut: 'Keluar',
     signingOut: 'Sedang keluar…',
   },
+  listToolbar: {
+    filters: 'Filter',
+    filtersApplied: 'Filter ({{count}} diterapkan)',
+    removeFilter: 'Hapus filter {{name}}',
+    clear: 'Hapus semua filter',
+    keyword: 'Kata kunci',
+    noMatches: 'Tidak ada yang cocok',
+    searchPeople: 'Cari orang',
+  },
   navigation: {
     home: 'Beranda',
     open: 'Buka navigasi',

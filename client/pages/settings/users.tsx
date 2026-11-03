@@ -34,16 +34,9 @@ import { PlusIcon } from 'lucide-react';
 import { PageContainer } from '#components/page-container';
 import { PageHeader } from '#components/page-header';
 import { Button } from '#components/ui/button';
-import { Input } from '#components/ui/input';
 import { StatusBadge } from '#components/status-badge';
 import { Spinner } from '#components/ui/spinner';
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '#components/ui/select';
+import { type FilterDimension, FilterMenu } from '#components/filter-menu';
 import { ConfirmAction, SettingsError } from './shared.js';
 // Application change: inviting, resetting a password and deleting, which
 // this prepared page leaves out (accounts/user-extras.tsx,
@@ -193,12 +186,23 @@ function UserActions({
   );
 }
 
+// The account states the status filter offers, as the URL and the server take them.
+const STATUSES = ['enabled', 'disabled'] as const;
+
 export default function UsersPage(): ReactElement {
   const { t } = useTranslation();
   const { params, setParams, active } = useListLocation();
   const location = useLocation();
   const listPath = useResolvedPath('.').pathname;
-  const searchRef = useRef<HTMLInputElement>(null);
+  // Application change: the list filters through the header's Filters
+  // menu, its search box among the conditions, as the CRM's lists do. Focus
+  // that would have returned to the search box (back from a drawer, after
+  // an update) lands on the Filters button.
+  const filtersRef = useRef<HTMLDivElement>(null);
+  const focusFilters = useCallback(
+    () => filtersRef.current?.querySelector<HTMLElement>('button')?.focus(),
+    [],
+  );
   const previousPathRef = useRef(location.pathname);
   useEffect(() => {
     const returned =
@@ -211,10 +215,10 @@ export default function UsersPage(): ReactElement {
         document.activeElement === document.body ||
         !document.activeElement?.isConnected
       )
-        searchRef.current?.focus();
+        focusFilters();
     });
     return () => cancelAnimationFrame(frame);
-  }, [listPath, location.pathname]);
+  }, [focusFilters, listPath, location.pathname]);
   const [queryDraft, setQueryDraft] = useState<{
     key: string;
     value: string;
@@ -251,9 +255,9 @@ export default function UsersPage(): ReactElement {
     })),
   );
   const selectedRole =
-    roleScope && role ? JSON.stringify([roleScope, role]) : 'all';
+    roleScope && role ? JSON.stringify([roleScope, role]) : null;
   if (
-    selectedRole !== 'all' &&
+    selectedRole &&
     !roleChoices.some((option) => option.value === selectedRole)
   )
     roleChoices.push({ value: selectedRole, label: `${roleScope} · ${role}` });
@@ -263,7 +267,7 @@ export default function UsersPage(): ReactElement {
     sortColumns: ['name'],
   });
   const page = paginationState.pageIndex + 1;
-  const status = params.get('status') ?? 'all';
+  const status = STATUSES.find((value) => value === params.get('status'));
   const pageSize = paginationState.pageSize;
   const update = (key: string, value: string) => {
     setParams(
@@ -297,7 +301,7 @@ export default function UsersPage(): ReactElement {
     page: String(page),
     pageSize: String(pageSize),
     ...(params.get('q') ? { q: params.get('q')! } : {}),
-    ...(status !== 'all' ? { status } : {}),
+    ...(status ? { status } : {}),
     ...(roleScope ? { roleScope } : {}),
     ...(role ? { role } : {}),
     ...(sortingState[0]
@@ -348,15 +352,21 @@ export default function UsersPage(): ReactElement {
         });
       refreshUsers();
       if (updated && location.pathname === listPath)
-        requestAnimationFrame(() => searchRef.current?.focus());
+        requestAnimationFrame(focusFilters);
     },
-    [pageData, replaceData, refreshUsers, location.pathname, listPath],
+    [
+      pageData,
+      replaceData,
+      refreshUsers,
+      location.pathname,
+      listPath,
+      focusFilters,
+    ],
   );
   const canCreate = useUserPermission('create');
   const canAssign = useUserPermission('assign-role');
   const rows = request.data?.data ?? [];
-  const filtered =
-    Boolean(params.get('q') || roleScope || role) || status !== 'all';
+  const filtered = Boolean(params.get('q') || roleScope || role || status);
   const listState = resolveListState(
     {
       data: hasCurrentResponse ? request.data : undefined,
@@ -457,6 +467,42 @@ export default function UsersPage(): ReactElement {
         {canShowCreate ? create : null}
       </>
     ) : undefined;
+  // The filters, a menu in the header beside New user.
+  const filterDimensions: FilterDimension[] = [
+    {
+      key: 'status',
+      label: t('settings.status'),
+      options: STATUSES.map((value) => ({
+        value,
+        label: t(`settings.${value}`),
+      })),
+      value: status ?? null,
+      onChange: (value) => update('status', value ?? ''),
+    },
+    {
+      key: 'role',
+      label: t('settings.assignedRoles'),
+      options: roleChoices,
+      value: selectedRole,
+      onChange: (value) =>
+        setParams(
+          (old) => {
+            const next = new URLSearchParams(old);
+            next.delete('page');
+            if (!value) {
+              next.delete('roleScope');
+              next.delete('role');
+            } else {
+              const [scope, key] = JSON.parse(value) as [string, string];
+              next.set('roleScope', scope);
+              next.set('role', key);
+            }
+            return next;
+          },
+          { replace: true },
+        ),
+    },
+  ];
   return (
     <>
       <PageContainer>
@@ -466,89 +512,38 @@ export default function UsersPage(): ReactElement {
         <PageHeader
           title={t('settings.users')}
           description={t('settings.usersDescription')}
-          actions={actions}
+          actions={
+            <>
+              {active &&
+              hasCurrentResponse &&
+              request.loading &&
+              request.data ? (
+                <UsersRefreshing />
+              ) : null}
+              <div ref={filtersRef} className='contents'>
+                <FilterMenu
+                  dimensions={filterDimensions}
+                  keyword={{
+                    applied: params.get('q') ?? '',
+                    inputProps: {
+                      value: query,
+                      onCompositionStart: () => setComposing(true),
+                      onCompositionEnd: () => setComposing(false),
+                      onChange: (event) => setQuery(event.target.value),
+                    },
+                    onClear: () => {
+                      setQuery('');
+                      update('q', '');
+                    },
+                    placeholder: t('settings.userSearch'),
+                  }}
+                  onClear={clearFilters}
+                />
+              </div>
+              {actions}
+            </>
+          }
         />
-        <div className='flex flex-wrap items-center gap-3'>
-          <Input
-            ref={searchRef}
-            className='w-full sm:max-w-xs'
-            value={query}
-            aria-label={t('settings.userSearch')}
-            placeholder={t('settings.userSearch')}
-            onCompositionStart={() => setComposing(true)}
-            onCompositionEnd={() => setComposing(false)}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <Select
-            items={['all', 'enabled', 'disabled'].map((value) => ({
-              value,
-              label: t(`settings.${value}`),
-            }))}
-            value={status}
-            onValueChange={(value) => update('status', String(value))}
-          >
-            <SelectTrigger aria-label={t('settings.status')}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className='w-auto max-w-[min(var(--container-sm),var(--available-width))] min-w-(--anchor-width) [&_[data-slot=select-item]>:first-child]:whitespace-normal'>
-              {['all', 'enabled', 'disabled'].map((item) => (
-                <SelectItem key={item} value={item}>
-                  {t(`settings.${item}`)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            items={[
-              { value: 'all', label: t('settings.allRoles') },
-              ...roleChoices,
-            ]}
-            value={selectedRole}
-            onValueChange={(value) => {
-              if (!value) return;
-              setParams(
-                (old) => {
-                  const next = new URLSearchParams(old);
-                  next.delete('page');
-                  if (value === 'all') {
-                    next.delete('roleScope');
-                    next.delete('role');
-                  } else {
-                    const [scope, key] = JSON.parse(value) as [string, string];
-                    next.set('roleScope', scope);
-                    next.set('role', key);
-                  }
-                  return next;
-                },
-                { replace: true },
-              );
-            }}
-          >
-            <SelectTrigger aria-label={t('settings.roleFilter')}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className='w-auto max-w-[min(var(--container-sm),var(--available-width))] min-w-(--anchor-width) [&_[data-slot=select-item]>:first-child]:whitespace-normal'>
-              {[
-                { value: 'all', label: t('settings.allRoles') },
-                ...roleChoices,
-              ].map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {filtered && listState !== 'no-results' && (
-            <Button variant='ghost' onClick={clearFilters}>
-              {t('settings.clear')}
-            </Button>
-          )}
-          <div className='ml-auto flex h-8 w-28 items-center justify-end'>
-            {active && hasCurrentResponse && request.loading && request.data ? (
-              <UsersRefreshing />
-            ) : null}
-          </div>
-        </div>
         {Boolean(roleScope) !== Boolean(role) && (
           <p role='alert' className='text-sm text-destructive'>
             {t('settings.roleFilterIncomplete')}

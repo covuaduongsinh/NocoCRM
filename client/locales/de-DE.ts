@@ -452,6 +452,15 @@ const deDE: AppResource = {
     signOut: 'Abmelden',
     signingOut: 'Wird abgemeldet…',
   },
+  listToolbar: {
+    filters: 'Filter',
+    filtersApplied: 'Filter ({{count}} aktiv)',
+    removeFilter: 'Filter {{name}} entfernen',
+    clear: 'Filter zurücksetzen',
+    keyword: 'Stichwort',
+    noMatches: 'Keine Treffer',
+    searchPeople: 'Personen suchen',
+  },
   navigation: {
     home: 'Übersicht',
     open: 'Navigation öffnen',

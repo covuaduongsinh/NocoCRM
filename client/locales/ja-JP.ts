@@ -446,6 +446,15 @@ const jaJP: AppResource = {
     signOut: 'ログアウト',
     signingOut: 'ログアウト中…',
   },
+  listToolbar: {
+    filters: 'フィルター',
+    filtersApplied: 'フィルター（{{count}} 件適用中）',
+    removeFilter: '「{{name}}」フィルターを解除',
+    clear: 'フィルターをクリア',
+    keyword: 'キーワード',
+    noMatches: '一致する項目はありません',
+    searchPeople: 'ユーザーを検索',
+  },
   navigation: {
     home: 'ホーム',
     open: 'ナビゲーションを開く',

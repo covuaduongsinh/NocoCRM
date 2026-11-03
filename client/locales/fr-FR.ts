@@ -449,6 +449,15 @@ const frFR: AppResource = {
     signOut: 'Se déconnecter',
     signingOut: 'Déconnexion…',
   },
+  listToolbar: {
+    filters: 'Filtres',
+    filtersApplied: 'Filtres ({{count}} appliqués)',
+    removeFilter: 'Retirer le filtre {{name}}',
+    clear: 'Effacer les filtres',
+    keyword: 'Mot-clé',
+    noMatches: 'Aucune correspondance',
+    searchPeople: 'Rechercher des personnes',
+  },
   navigation: {
     home: 'Accueil',
     open: 'Ouvrir la navigation',

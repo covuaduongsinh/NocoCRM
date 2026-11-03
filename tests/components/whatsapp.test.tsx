@@ -438,12 +438,27 @@ describe('the workspace', () => {
         ) => Promise<unknown>,
       ),
     );
-    render(routes('/whatsapp?view=all'));
+    const { unmount } = render(routes('/whatsapp?view=all'));
     const list = await screen.findByRole('list');
     expect(await within(list).findByText('Abroad')).toBeTruthy();
-    expect(
-      screen.getByRole('combobox', { name: crmEn.whatsapp.numberFilter }),
-    ).toBeTruthy();
+    // A switch of which number's inbox the page shows, in its header, not a
+    // filter to clear.
+    const numberSwitch = screen.getByRole('combobox', {
+      name: crmEn.whatsapp.numberFilter,
+    });
+    expect(numberSwitch.closest('header')).toBeTruthy();
+    expect(numberSwitch.textContent).toContain(crmEn.whatsapp.allNumbers);
+    await userEvent.click(numberSwitch);
+    await userEvent.click(
+      await screen.findByRole('option', { name: 'Abroad · +44 7700 900123' }),
+    );
+    await waitFor(() =>
+      expect(state.api).toHaveBeenCalledWith(
+        'whatsapp/conversations?view=all&numberId=n2&page=1&pageSize=50',
+      ),
+    );
+    expect(numberSwitch.textContent).toContain('Abroad · +44 7700 900123');
+    unmount();
     // Picked from the address: the list asks for that number's alone.
     render(routes('/whatsapp?view=all&number=n2'));
     await waitFor(() =>
@@ -451,6 +466,19 @@ describe('the workspace', () => {
         'whatsapp/conversations?view=all&numberId=n2&page=1&pageSize=50',
       ),
     );
+  });
+
+  it('names a lone number without a menu', async () => {
+    respond({
+      'whatsapp/numbers': {
+        data: [{ id: 'n1', phone: '+1 555 0100', name: 'Sales', mode: 'api' }],
+      },
+    });
+    render(routes('/whatsapp?view=all'));
+    expect(await screen.findByText('Sales · +1 555 0100')).toBeTruthy();
+    expect(
+      screen.queryByRole('combobox', { name: crmEn.whatsapp.numberFilter }),
+    ).toBe(null);
   });
 
   it('sets a customer aside at once, and offers to restore them', async () => {

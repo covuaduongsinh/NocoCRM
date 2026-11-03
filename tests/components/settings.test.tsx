@@ -67,7 +67,11 @@ describe('template system settings', () => {
     expect(
       screen.queryByRole('link', { name: 'New user' }),
     ).not.toBeInTheDocument();
-    const search = screen.getByRole('textbox', {
+    // The search box is the first thing in the header's Filters menu.
+    await user.click(
+      screen.getByRole('button', { name: enUS.listToolbar.filters }),
+    );
+    const search = await screen.findByRole('textbox', {
       name: enUS.settings.userSearch,
     });
     await user.type(search, 'Ali');
@@ -105,7 +109,10 @@ describe('template system settings', () => {
         fetch: answerApi(calls),
       },
     );
-    const search = screen.getByRole('textbox', {
+    fireEvent.click(
+      await screen.findByRole('button', { name: enUS.listToolbar.filters }),
+    );
+    const search = await screen.findByRole('textbox', {
       name: enUS.settings.userSearch,
     });
     fireEvent.compositionStart(search);
@@ -130,7 +137,18 @@ describe('template system settings', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'External query' }),
     );
-    await waitFor(() => expect(search).toHaveValue('Bob'));
+    // Clicking outside closed the menu; opened again, its box shows the
+    // term the address now holds.
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: new RegExp(`^${enUS.listToolbar.filters}`),
+      }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByRole('textbox', { name: enUS.settings.userSearch }),
+      ).toHaveValue('Bob'),
+    );
   });
   it('shows failed role options with retry and prevents incomplete saves', async () => {
     const calls = vi.fn(({ path }: { path: string }) => {

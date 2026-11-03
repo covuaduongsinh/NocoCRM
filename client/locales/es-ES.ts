@@ -447,6 +447,15 @@ const esES: AppResource = {
     signOut: 'Cerrar sesión',
     signingOut: 'Cerrando sesión…',
   },
+  listToolbar: {
+    filters: 'Filtros',
+    filtersApplied: 'Filtros ({{count}} aplicados)',
+    removeFilter: 'Quitar el filtro {{name}}',
+    clear: 'Borrar filtros',
+    keyword: 'Palabra clave',
+    noMatches: 'Sin coincidencias',
+    searchPeople: 'Buscar personas',
+  },
   navigation: {
     home: 'Inicio',
     open: 'Abrir la navegación',

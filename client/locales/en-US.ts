@@ -120,6 +120,16 @@ const enUS = {
       won: { who: 'Sophie Bennett', what: 'the signed contract is back' },
     },
   },
+  // A list's Filters menu and its chips (client/components/filter-menu.tsx).
+  listToolbar: {
+    filters: 'Filters',
+    filtersApplied: 'Filters ({{count}} applied)',
+    removeFilter: 'Remove the {{name}} filter',
+    clear: 'Clear filters',
+    keyword: 'Keyword',
+    noMatches: 'No matches',
+    searchPeople: 'Search people',
+  },
   navigation: { ...systemEnUS.navigation, home: 'Overview' },
 };
 

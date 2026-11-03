@@ -102,17 +102,26 @@ export default function WhatsAppPage(): ReactElement {
           title={toText(text('whatsapp.title'))}
           // The number's connection, for whoever manages the CRM's settings,
           // as the mailbox leads to its accounts.
+          // Which number's inbox the page shows, left of it: the page's
+          // context, switched rather than filtered.
           actions={
-            meta?.settingsAccess ? (
-              <Button
-                variant='outline'
-                nativeButton={false}
-                render={<Link to='/whatsapp/connection' />}
-              >
-                <Plug data-icon='inline-start' />
-                {text('whatsapp.manageConnection')}
-              </Button>
-            ) : undefined
+            <>
+              <NumberSwitch numbers={numbers} value={numberId} />
+              {meta?.settingsAccess ? (
+                <Button
+                  variant='outline'
+                  nativeButton={false}
+                  render={<Link to='/whatsapp/connection' />}
+                  aria-label={toText(text('whatsapp.manageConnection'))}
+                  title={toText(text('whatsapp.manageConnection'))}
+                >
+                  <Plug data-icon='inline-start' />
+                  <span className='hidden sm:inline'>
+                    {text('whatsapp.manageConnection')}
+                  </span>
+                </Button>
+              ) : null}
+            </>
           }
         />
         {/* Both panes scroll on their own: the card takes the height left
@@ -147,9 +156,6 @@ export default function WhatsAppPage(): ReactElement {
                   ))}
                 </TabsList>
               </Tabs>
-              {numbers.length > 1 ? (
-                <NumberFilter numbers={numbers} value={numberId} />
-              ) : null}
             </div>
             <ConversationList
               view={view}
@@ -196,16 +202,24 @@ export default function WhatsAppPage(): ReactElement {
 
 const ALL = '__all__';
 
-// Which number's conversations the list shows, all of them when none.
-function NumberFilter({
+// The number whose conversations the page shows (?number=), or all of them;
+// a lone number is named without a menu.
+function NumberSwitch({
   numbers,
   value,
 }: {
   numbers: WhatsAppNumberLabel[];
   value?: string;
-}): ReactElement {
+}): ReactElement | null {
   const { text } = useCrmText();
   const [, setParams] = useSearchParams();
+  if (numbers.length === 0) return null;
+  if (numbers.length === 1)
+    return (
+      <span className='text-sm whitespace-nowrap text-muted-foreground'>
+        {numberLabel(numbers[0])}
+      </span>
+    );
   const items = [
     { value: ALL, label: toText(text('whatsapp.allNumbers')) },
     ...numbers.map((n) => ({ value: n.id, label: numberLabel(n) })),
@@ -228,14 +242,33 @@ function NumberFilter({
     >
       <SelectTrigger
         aria-label={toText(text('whatsapp.numberFilter'))}
-        className='w-full'
+        className='w-auto shrink-0 whitespace-nowrap'
       >
-        <SelectValue />
+        {/* The number whole on one line; on a phone, short of room, it
+            drops its name, and the connection button its words. */}
+        <SelectValue>
+          {(current: string) => {
+            const number = numbers.find((n) => n.id === current);
+            if (!number) return toText(text('whatsapp.allNumbers'));
+            return number.name ? (
+              <span>
+                <span className='hidden sm:inline'>{number.name} · </span>
+                {number.phone}
+              </span>
+            ) : (
+              number.phone
+            );
+          }}
+        </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className='w-auto min-w-(--anchor-width)'>
         <SelectGroup>
           {items.map((item) => (
-            <SelectItem key={item.value} value={item.value}>
+            <SelectItem
+              key={item.value}
+              value={item.value}
+              className='whitespace-nowrap'
+            >
               {item.label}
             </SelectItem>
           ))}

@@ -98,6 +98,15 @@ const zhCN: AppResource = {
       won: { who: '王小芳', what: '盖章合同已回签' },
     },
   },
+  listToolbar: {
+    filters: '筛选',
+    filtersApplied: '筛选（已选 {{count}} 项）',
+    removeFilter: '移除「{{name}}」筛选',
+    clear: '清除筛选',
+    keyword: '关键词',
+    noMatches: '没有匹配项',
+    searchPeople: '搜索人员',
+  },
   navigation: { ...systemZhCN.navigation, home: '工作台' },
 };
 

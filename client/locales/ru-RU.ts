@@ -446,6 +446,15 @@ const ruRU: AppResource = {
     signOut: 'Выйти',
     signingOut: 'Выход…',
   },
+  listToolbar: {
+    filters: 'Фильтры',
+    filtersApplied: 'Фильтры (применено: {{count}})',
+    removeFilter: 'Убрать фильтр «{{name}}»',
+    clear: 'Сбросить фильтры',
+    keyword: 'Ключевое слово',
+    noMatches: 'Нет совпадений',
+    searchPeople: 'Поиск людей',
+  },
   navigation: {
     home: 'Обзор',
     open: 'Открыть навигацию',
