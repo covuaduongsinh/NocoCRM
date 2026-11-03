@@ -125,12 +125,19 @@ export function AppLayout({ routes }: AppLayoutProps): ReactElement {
             <LayoutHeader className='sticky top-0 z-40 justify-between'>
               <div className='flex min-w-0 items-center gap-3'>
                 <AppSidebarToggle />
-                <div className='md:hidden'>
+                {/* Application change: on a phone the header shows the mark
+                    alone, as the collapsed sidebar does, and no page trail;
+                    the lockup or the trail with the demo entry and the
+                    actions beside them is wider than the screen. */}
+                <div className='sm:hidden'>
+                  <AppBrand compact />
+                </div>
+                <div className='hidden sm:block md:hidden'>
                   <AppBrand />
                 </div>
-                <div className='h-5 w-px shrink-0 bg-border' />
+                <div className='hidden h-5 w-px shrink-0 bg-border sm:block' />
                 {/* The current page's trail: the route tree's, or the one the page declares (`usePageBreadcrumb`). */}
-                <Breadcrumbs denied={denied} />
+                <Breadcrumbs className='hidden sm:block' denied={denied} />
               </div>
               <HeaderActions />
             </LayoutHeader>
