@@ -2,56 +2,99 @@ param(
   [string]$VpsIp = "217.15.160.118",
   [string]$SshUser = "root",
   [string]$SshKey = "C:\Users\duongsinh\.ssh\id_ed25519",
-  [string]$ContainerName = "compose-quantify-haptic-feed-dgisax-app-1"
+  [string]$SiteUrl = "https://nococrm.dsc.edu.vn/main",
+  [switch]$SkipClientBuild,
+  [switch]$SkipServerBuild,
+  [switch]$SkipBuild
 )
 
 $ErrorActionPreference = "Stop"
 
+$repoRoot = Split-Path -Parent $PSScriptRoot
+Set-Location $repoRoot
+
 Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "  NocoCRM: Fast Build & Deploy to VPS" -ForegroundColor Cyan
+Write-Host "  NocoCRM: Fast Build & 1-Click VPS Deploy" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 
-# 1. Build standalone bundle
-Write-Host "[1/5] Building standalone Linux-x64 bundle..." -ForegroundColor Yellow
-pnpm build
+# 1. Build Client and Server
+if (-not $SkipBuild) {
+  if (-not $SkipClientBuild) {
+    Write-Host "[1/6] Building Client with Vite..." -ForegroundColor Yellow
+    pnpm exec vite build
+    if ($LASTEXITCODE -ne 0) { throw "Client build failed" }
+  } else {
+    Write-Host "[1/6] Skipping Client build (--SkipClientBuild)" -ForegroundColor DarkGray
+  }
 
-$tarPath = "storage/exports/dist.tar.gz"
-if (!(Test-Path $tarPath)) {
-  Write-Error "Build output not found at $tarPath"
-  exit 1
+  if (-not $SkipServerBuild) {
+    Write-Host "[2/6] Building Server with TypeScript & tsc-alias..." -ForegroundColor Yellow
+    pnpm exec tsc -p tsconfig.server.json
+    if ($LASTEXITCODE -ne 0) { throw "Server tsc failed" }
+    pnpm exec tsc-alias -p tsconfig.server.json
+    if ($LASTEXITCODE -ne 0) { throw "Server tsc-alias failed" }
+  } else {
+    Write-Host "[2/6] Skipping Server build (--SkipServerBuild)" -ForegroundColor DarkGray
+  }
+} else {
+  Write-Host "[1-2/6] Skipping all builds (--SkipBuild)" -ForegroundColor DarkGray
 }
 
-# 2. Get next release version from VPS
-Write-Host "[2/5] Determining next release version on VPS..." -ForegroundColor Yellow
+# 2. Prepare bundle assets
+Write-Host "[3/6] Packaging deployment bundle..." -ForegroundColor Yellow
+New-Item -ItemType Directory -Force -Path "storage/exports" | Out-Null
+Copy-Item -Force "package.json" "dist/package.json"
+if (Test-Path "storage/exports/variables.json") {
+  Copy-Item -Force "storage/exports/variables.json" "dist/variables.json"
+}
+
+$tarPath = "storage/exports/dist_fast.tar.gz"
+if (Test-Path $tarPath) { Remove-Item -Force $tarPath }
+
+tar -czf $tarPath -C dist client server package.json variables.json
+$tarItem = Get-Item $tarPath
+$sizeMb = [math]::Round($tarItem.Length / 1MB, 2)
+Write-Host "Bundle created: $tarPath ($sizeMb MB)" -ForegroundColor Green
+
+# 3. Determine target release on VPS
+Write-Host "[4/6] Determining next release version on VPS..." -ForegroundColor Yellow
 $currentRelease = ssh -i $SshKey -o StrictHostKeyChecking=no "$SshUser@$VpsIp" "ls -1 /srv/nococrm-dsc/releases 2>/dev/null | grep -E '^v[0-9]+$' | sort -V | tail -n 1"
 $nextNum = 2
 if ($currentRelease -match '^v(\d+)$') {
   $nextNum = [int]$matches[1] + 1
 }
 $releaseName = "v$nextNum"
-Write-Host "Target Release: $releaseName" -ForegroundColor Green
+Write-Host "Target Release: $releaseName (active was $currentRelease)" -ForegroundColor Green
 
-# 3. Upload bundle to VPS
-Write-Host "[3/5] Uploading bundle ($releaseName)..." -ForegroundColor Yellow
+# 4. Upload bundle
+Write-Host "[5/6] Uploading bundle to VPS ($sizeMb MB)..." -ForegroundColor Yellow
 ssh -i $SshKey -o StrictHostKeyChecking=no "$SshUser@$VpsIp" "mkdir -p /srv/nococrm-dsc/releases/$releaseName"
-scp -i $SshKey -o StrictHostKeyChecking=no $tarPath "${SshUser}@${VpsIp}:/srv/nococrm-dsc/releases/$releaseName/dist.tar.gz"
+scp -i $SshKey -o StrictHostKeyChecking=no $tarPath "${SshUser}@${VpsIp}:/srv/nococrm-dsc/releases/$releaseName/dist_fast.tar.gz"
 
-# 4. Extract bundle and update symlink
-Write-Host "[4/5] Extracting on VPS and updating current symlink..." -ForegroundColor Yellow
-ssh -i $SshKey -o StrictHostKeyChecking=no "$SshUser@$VpsIp" "cd /srv/nococrm-dsc/releases/$releaseName && tar -xzf dist.tar.gz && if [ -d dist/dist ]; then mv dist/dist dist_temp && rm -rf dist && mv dist_temp dist; fi && rm -f dist.tar.gz && ln -sfn /srv/nococrm-dsc/releases/$releaseName /srv/nococrm-dsc/releases/current"
-
-# 5. Restart container
-Write-Host "[5/5] Restarting container..." -ForegroundColor Yellow
-ssh -i $SshKey -o StrictHostKeyChecking=no "$SshUser@$VpsIp" "docker restart $ContainerName"
+# 5. Extract bundle, hardlink node_modules and update release symlink
+Write-Host "[6/6] Activating release on VPS & restarting container..." -ForegroundColor Yellow
+ssh -i $SshKey -o StrictHostKeyChecking=no "$SshUser@$VpsIp" "/usr/local/bin/nococrm-activate-release.sh $releaseName"
 
 # 6. Verify health
-Start-Sleep -Seconds 3
-Write-Host "Verifying service status..." -ForegroundColor Yellow
-$health = ssh -i $SshKey -o StrictHostKeyChecking=no "$SshUser@$VpsIp" "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:13000/api/auth/*"
-if ($health -eq "200") {
-  Write-Host "Deployment Successful! Service is Healthy (HTTP 200)." -ForegroundColor Green
-  Write-Host "Access at: https://nococrm.dsc.edu.vn" -ForegroundColor Cyan
+Write-Host "Verifying service health ($SiteUrl)..." -ForegroundColor Yellow
+$healthy = $false
+for ($i = 1; $i -le 15; $i++) {
+  Start-Sleep -Seconds 3
+  $code = (curl.exe -s -o /dev/null -w "%{http_code}" $SiteUrl)
+  if ($code -eq "200") {
+    $healthy = $true
+    break
+  }
+  Write-Host "Waiting for service to become ready... (attempt $i/15, code: $code)" -ForegroundColor DarkGray
+}
+
+if ($healthy) {
+  Write-Host "==========================================" -ForegroundColor Green
+  Write-Host "  DEPLOYMENT SUCCESSFUL! (HTTP 200)       " -ForegroundColor Green
+  Write-Host "  Active Release : $releaseName           " -ForegroundColor Green
+  Write-Host "  Live URL       : $SiteUrl               " -ForegroundColor Cyan
+  Write-Host "==========================================" -ForegroundColor Green
 } else {
-  Write-Host "Warning: Service responded with HTTP $health. Checking container logs..." -ForegroundColor Yellow
-  ssh -i $SshKey -o StrictHostKeyChecking=no "$SshUser@$VpsIp" "docker logs --tail 20 $ContainerName"
+  Write-Host "Warning: Service not returning 200 after restart. Checking container logs..." -ForegroundColor Red
+  ssh -i $SshKey -o StrictHostKeyChecking=no "$SshUser@$VpsIp" "docker logs --tail 25 compose-quantify-haptic-feed-dgisax-app-1"
 }
