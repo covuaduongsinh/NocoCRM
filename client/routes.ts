@@ -143,7 +143,6 @@ const appRoutes: AppClientRouteContribution = defineAppRoutes([
     navigation: { title: 'crm.navigation.records' },
     children: [
       ...[
-        ['students', GraduationCap],
         ['leads', Radar],
         ['opportunities', Handshake],
         ['companies', Building2],
