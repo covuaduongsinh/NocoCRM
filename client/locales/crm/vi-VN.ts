@@ -510,6 +510,7 @@ export const crmViVN: CrmWording = {
   loadMore: 'Tải thêm',
   justNow: 'vừa xong',
   tabScope: {
+    students: 'Học viên của {{entity}} này',
     tasks: 'Công việc liên kết với {{entity}} này',
     approvals: 'Phê duyệt cho {{entity}} này',
     contacts: 'Liên hệ tại {{entity}} này',
@@ -1638,6 +1639,7 @@ export const crmViVN: CrmWording = {
     },
   },
   entity: {
+    students: 'học viên',
     leads: 'khách hàng tiềm năng',
     companies: 'công ty',
     contacts: 'liên hệ',
@@ -2403,6 +2405,7 @@ export const crmViVN: CrmWording = {
       'Đang theo dõi: tin tức của công ty được kiểm tra trên web hằng tuần. Nhấp để ngừng theo dõi.',
   },
   entities: {
+    students: 'Học viên',
     leads: 'Đăng ký mới & Leads',
     companies: 'Trường học & Tổ chức',
     contacts: 'Phụ huynh & Khách hàng',
@@ -2411,6 +2414,12 @@ export const crmViVN: CrmWording = {
     approvals: 'Phê duyệt',
   },
   fields: {
+    birthDate: 'Ngày sinh',
+    school: 'Trường học',
+    grade: 'Khối lớp',
+    ratingElo: 'Hệ số Elo',
+    active: 'Đang theo học',
+    notes: 'Ghi chú',
     id: 'ID bản ghi',
     name: 'Tên',
     customerType: 'Loại khách hàng',
@@ -2454,7 +2463,7 @@ export const crmViVN: CrmWording = {
       companyId: 'Công ty',
       opportunityId: 'Cơ hội',
     },
-    contactId: 'Liên hệ',
+    contactId: 'Phụ huynh / Liên hệ',
     newCompanyName: 'Tên công ty mới',
     opportunityName: 'Tên cơ hội',
     createOpportunity: 'Tạo cơ hội',

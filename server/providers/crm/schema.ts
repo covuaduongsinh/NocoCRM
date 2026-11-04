@@ -16,7 +16,7 @@ export function toText(value: unknown): string {
 }
 
 export type Entity =
-  'leads' | 'companies' | 'contacts' | 'opportunities' | 'tasks' | 'approvals';
+  'leads' | 'companies' | 'contacts' | 'opportunities' | 'tasks' | 'approvals' | 'students';
 export interface CrmRecord extends Row {
   id: string;
   name: string;
@@ -444,6 +444,36 @@ export const definitions: Record<Entity, EntityDefinition> = {
       attachments,
     ],
   },
+  students: {
+    table: "crmStudents",
+    statuses: [],
+    columns: [
+      "name",
+      "contactId",
+      "gender",
+      "birthDate",
+      "school",
+      "grade",
+      "chessLevel",
+      "ratingElo",
+      "active",
+      "ownerId",
+      "updatedAt",
+    ],
+    fields: [
+      field("name", "text", true),
+      field("contactId", "relation", false, undefined, "contacts"),
+      field("gender", "select", false, ["male", "female"]),
+      field("birthDate", "date", false),
+      field("school", "text", false),
+      field("grade", "text", false),
+      field("chessLevel", "select", false, chessLevels),
+      field("ratingElo", "number", false),
+      field("notes", "textarea", false),
+      field("active", "boolean", false),
+      owner,
+    ],
+  },
 };
 export const entities: Entity[] = Object.keys(definitions) as Entity[];
 export const systemFields: string[] = [
@@ -464,6 +494,7 @@ export const extraFields: Partial<Record<Entity, string[]>> = {
   opportunities: ['closedAt'],
   tasks: ['completedAt'],
   approvals: ['status', 'decisionComment', 'submittedAt', 'decidedAt'],
+  students: ['nocobaseStudentId', 'syncedAt'],
 };
 export function fieldsFor(entity: Entity): string[] {
   return [

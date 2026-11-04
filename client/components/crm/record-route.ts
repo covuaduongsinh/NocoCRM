@@ -5,6 +5,7 @@ import type { Entity } from './api.js';
 // at /crm on Studio, a lead was /crm/crm/leads/<id>. The old addresses lead
 // to these (pages/crm-legacy-redirect.tsx).
 export const RECORD_ENTITIES: readonly Entity[] = [
+  'students',
   'leads',
   'opportunities',
   'companies',

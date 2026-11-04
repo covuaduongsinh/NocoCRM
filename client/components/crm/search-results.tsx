@@ -22,6 +22,7 @@ import { DEFAULT_TIME_ZONE } from '../../../server/providers/crm/zone-time.js';
 // The particulars on each kind's line, the ones the reader may read; a
 // lead's, a deal's and a contact's company are in their title.
 const DETAILS: Record<Entity, readonly string[]> = {
+  students: ['chessLevel', 'school'],
   leads: ['status'],
   opportunities: ['stage', 'amount'],
   companies: ['industry', 'city'],

@@ -803,6 +803,7 @@ const wording = {
   // The line heading a record's tab, as the Mail tab's does: what the tab
   // lists, by the record's kind.
   tabScope: {
+    students: ['Students of this {{entity}}', '关联到此{{entity}}的学员'],
     tasks: ['Tasks linked to this {{entity}}', '关联到此{{entity}}的任务'],
     approvals: ['Approvals for this {{entity}}', '此{{entity}}的审批'],
     contacts: ['Contacts at this {{entity}}', '此{{entity}}的联系人'],
@@ -2536,6 +2537,7 @@ const wording = {
   },
   // Singular, for "New lead" / "Delete contact"; Chinese has no plural.
   entity: {
+    students: ['student', '学员'],
     leads: ['lead', '线索'],
     companies: ['company', '公司'],
     contacts: ['contact', '联系人'],
@@ -3097,6 +3099,7 @@ const wording = {
     ],
   },
   entities: {
+    students: ['Students', '学员'],
     leads: ['Leads', '线索'],
     companies: ['Companies', '公司'],
     contacts: ['Contacts', '联系人'],
@@ -3106,6 +3109,12 @@ const wording = {
   },
 
   fields: {
+    birthDate: ['Date of birth', '出生日期'],
+    school: ['School', '就读学校'],
+    grade: ['Grade / Class', '年级 / 班级'],
+    ratingElo: ['Elo rating', 'Elo 等级分'],
+    active: ['Active / Enrolled', '在读状态'],
+    notes: ['Notes', '备注'],
     id: ['Record ID', '记录 ID'],
     name: ['Name', '名称'],
     customerType: ['Customer type', '客户类型'],

@@ -1,5 +1,6 @@
 import {
   Building2,
+  GraduationCap,
   Handshake,
   ListChecks,
   Radar,
@@ -12,6 +13,7 @@ import type { Entity } from './api.js';
 // Each record kind's menu icon (client/routes.ts), for wherever a record is
 // named by its kind: the global search's groups, a WhatsApp customer's link.
 export const ENTITY_ICONS: Record<Entity, LucideIcon> = {
+  students: GraduationCap,
   leads: Radar,
   opportunities: Handshake,
   companies: Building2,

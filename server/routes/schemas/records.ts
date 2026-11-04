@@ -41,6 +41,7 @@ export const objectNames: Record<Entity, ObjectNames> = {
   },
   tasks: { one: 'Task', many: 'Tasks', param: 'taskId' },
   approvals: { one: 'Approval', many: 'Approvals', param: 'approvalId' },
+  students: { one: 'Student', many: 'Students', param: 'studentId' },
 };
 
 // An opportunity's contact: who, and their part in the deal.

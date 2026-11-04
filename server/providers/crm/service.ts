@@ -196,7 +196,9 @@ export function deletionChecks(entity: Entity): [Entity, string][] {
         // the deal out. Tasks cascade or unlink as they do for an
         // company; a converted lead's pointer is cleared.
         [['approvals', 'opportunityId']]
-      : [];
+      : entity === 'contacts'
+        ? [['students', 'contactId']]
+        : [];
 }
 
 // The roles that may own records; see save().
@@ -712,6 +714,7 @@ export class CrmService {
       'companyId',
       'leadId',
       'opportunityId',
+      'contactId',
       'source',
       'customerType',
       'chessLevel',
@@ -1509,7 +1512,7 @@ export class CrmService {
             : entity === 'contacts'
               ? { contactId: id }
               : {};
-    if (['leads', 'companies', 'contacts', 'opportunities'].includes(entity))
+    if (['leads', 'companies', 'contacts', 'opportunities', 'students'].includes(entity))
       await firstPage('tasks', { ...link, sort: 'dueAt' });
     if (entity === 'companies') {
       await firstPage('contacts', { companyId: id });
@@ -1533,8 +1536,10 @@ export class CrmService {
         .where((eb) => compileFilter(eb, leadAccess.scope))
         .execute();
     }
-    if (entity === 'contacts')
+    if (entity === 'contacts') {
+      await firstPage('students', { contactId: id });
       await firstPage('opportunities', { contactId: id });
+    }
     if (entity === 'opportunities') {
       await firstPage('approvals', { opportunityId: id });
       // The people a deal can involve come from its company; the page

@@ -126,6 +126,7 @@ function shiftMonth(month: string, by: number): string {
 // control); objects not listed have none.
 type Scope = 'all' | 'mine' | 'involved';
 const scopes: Partial<Record<string, readonly Scope[]>> = {
+  students: ['all', 'mine'],
   leads: ['all', 'mine'],
   opportunities: ['all', 'mine'],
   companies: ['all', 'mine'],

@@ -16,6 +16,7 @@ import {
   useRecordLink,
 } from '../components/crm/record-drawer.js';
 import {
+  GraduationCap,
   UserRound,
   History,
   Mail,
@@ -346,7 +347,7 @@ export default function EntityDetail({
     entity === 'companies'
       ? (['contacts', 'opportunities'] as const)
       : entity === 'contacts'
-        ? (['opportunities'] as const)
+        ? (['students', 'opportunities'] as const)
         : entity === 'opportunities'
           ? (['approvals'] as const)
           : ([] as const)
@@ -1042,6 +1043,7 @@ export default function EntityDetail({
     leads: Radar,
     opportunities: Handshake,
     approvals: ListChecks,
+    students: GraduationCap,
     attachments: Paperclip,
     mail: Mail,
     whatsapp: MessageCircle,
