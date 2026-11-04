@@ -346,6 +346,14 @@ const LEAD_MORE_FIELDS = [
   'attachments',
 ];
 
+const CONTACT_MORE_FIELDS = [
+  'companyId',
+  'jobTitle',
+  'linkedin',
+  'employed',
+  'primary',
+];
+
 export function RecordForm({
   entity,
   initial = {},
@@ -420,13 +428,19 @@ export function RecordForm({
       ? meta.userId
       : undefined,
     ...(entity === 'leads'
-      ? { status: 'new' }
+      ? { status: 'new', customerType: 'individual' }
       : entity === 'companies'
         ? { status: 'prospect', currency: meta?.settings.currency ?? 'USD' }
         : entity === 'contacts'
-          ? { employed: true, primary: false, gender: 'unknown' }
+          ? {
+              customerType: 'individual',
+              employed: true,
+              primary: false,
+              gender: 'unknown',
+            }
           : entity === 'opportunities'
             ? {
+                pipelineType: 'tuition',
                 stage: 'contact',
                 currency: meta?.settings.currency ?? 'USD',
               }
@@ -615,7 +629,12 @@ export function RecordForm({
         ),
       ),
   );
-  const moreFields = entity === 'leads' ? LEAD_MORE_FIELDS : [];
+  const moreFields =
+    entity === 'leads'
+      ? LEAD_MORE_FIELDS
+      : entity === 'contacts'
+        ? CONTACT_MORE_FIELDS
+        : [];
   const tucked = (f: Field): boolean =>
     !id &&
     !showMore &&

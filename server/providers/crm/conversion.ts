@@ -113,6 +113,12 @@ export async function convertLead(
   if (input.companyName) companyInput.name = toText(input.companyName);
   const contactInput: Row = {
     name: lead.name,
+    customerType: lead.customerType || 'individual',
+    studentName: lead.studentName ?? null,
+    studentBirthYear: lead.studentBirthYear ?? null,
+    chessLevel: lead.chessLevel ?? null,
+    preferredBranch: lead.preferredBranch ?? null,
+    trialNotes: lead.trialNotes ?? null,
     phone: lead.phone,
     email: lead.email,
     linkedin: lead.linkedin,
@@ -174,16 +180,20 @@ export async function convertLead(
       actor,
       'opportunities',
       {
-        name: input.opportunityName || company.name,
+        name:
+          input.opportunityName ||
+          (lead.studentName
+            ? `Học phí cờ vua - ${toText(lead.studentName)}`
+            : company.name),
         ownerId: lead.ownerId,
         source: lead.source,
         companyId: company.id,
-        // A lead is converted once its scene, scale and deployment or
-        // edition are clear, which is what qualification asks for: the deal
-        // starts there rather than at first contact (the opportunity
-        // follow-up skill's stages).
         stage: 'qualification',
         amount: input.amount ?? null,
+        pipelineType: 'tuition',
+        studentName: lead.studentName ?? null,
+        chessLevel: lead.chessLevel ?? null,
+        preferredBranch: lead.preferredBranch ?? null,
         // What the person set on the deal in the conversion dialog beside
         // its name and amount; the rest comes from the lead and the company.
         ...Object.fromEntries(
@@ -197,6 +207,50 @@ export async function convertLead(
       tx,
     );
   const now = new Date().toISOString();
+  if (
+    lead.studentName &&
+    typeof lead.studentName === 'string' &&
+    lead.studentName.trim()
+  ) {
+    try {
+      const studentNameTrimmed = lead.studentName.trim();
+      const existingStudent = await tx
+        .selectFrom('crmStudents')
+        .select('id')
+        .where('name', '=', studentNameTrimmed)
+        .where('contactId', '=', contact.id)
+        .executeTakeFirst();
+      if (!existingStudent) {
+        const studentId = crypto.randomUUID();
+        const birthYear = lead.studentBirthYear
+          ? parseInt(toText(lead.studentBirthYear), 10)
+          : null;
+        const birthDate = birthYear ? `${birthYear}-01-01T00:00:00.000Z` : null;
+        await tx
+          .insertInto('crmStudents')
+          .values({
+            id: studentId,
+            name: studentNameTrimmed,
+            contactId: contact.id,
+            ownerId: lead.ownerId,
+            createdById: lead.createdById || lead.ownerId,
+            gender:
+              lead.gender === 'male' || lead.gender === 'female'
+                ? lead.gender
+                : null,
+            birthDate: birthDate,
+            chessLevel: lead.chessLevel || 'L0',
+            notes: lead.trialNotes || null,
+            active: true,
+            createdAt: now,
+            updatedAt: now,
+          })
+          .execute();
+      }
+    } catch {
+      // Ignore if table not present or insert fails
+    }
+  }
   const access = await conditions(actor, 'leads', 'update');
   const updated = await tx
     .updateTable('crmLeads')

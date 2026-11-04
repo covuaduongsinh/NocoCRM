@@ -16,7 +16,13 @@ export function toText(value: unknown): string {
 }
 
 export type Entity =
-  'leads' | 'companies' | 'contacts' | 'opportunities' | 'tasks' | 'approvals' | 'students';
+  | 'leads'
+  | 'companies'
+  | 'contacts'
+  | 'opportunities'
+  | 'tasks'
+  | 'approvals'
+  | 'students';
 export interface CrmRecord extends Row {
   id: string;
   name: string;
@@ -56,15 +62,17 @@ export interface EntityDefinition {
   columns: string[];
 }
 export const sources: string[] = [
-  'zalo',
   'facebook',
-  'walkIn',
+  'zalo',
   'website',
+  'walkIn',
+  'customerReferral',
+  'schoolPartner',
+  'eventTournament',
   'marketing',
   'exhibition',
   'search',
   'ai',
-  'customerReferral',
   'employeeReferral',
   'partner',
   'outbound',
@@ -134,12 +142,18 @@ export const currencies: string[] = [
   'CAD',
 ];
 export const chessLevels: string[] = [
+  'L0',
+  'L1',
+  'L2',
+  'L3',
+  'L4',
   'beginner',
   'elementary',
   'intermediate',
   'advanced',
   'master',
 ];
+export const preferredBranches: string[] = ['cs1', 'cs2', 'online'];
 export const chessBusinessTypes: string[] = [
   'chessCourse',
   'chessBook',
@@ -224,10 +238,10 @@ export const definitions: Record<Entity, EntityDefinition> = {
     statuses: ['new', 'working', 'nurturing', 'converted', 'invalid'],
     columns: [
       'name',
-      'customerType',
       'studentName',
-      'chessLevel',
       'phone',
+      'chessLevel',
+      'preferredBranch',
       'status',
       'source',
       'ownerId',
@@ -239,6 +253,9 @@ export const definitions: Record<Entity, EntityDefinition> = {
       field('studentName', 'text', false),
       field('studentBirthYear', 'text', false),
       field('chessLevel', 'select', false, chessLevels),
+      field('preferredBranch', 'select', false, preferredBranches),
+      field('trialDate', 'datetime', false),
+      field('trialNotes', 'textarea', false),
       field('company'),
       ...person,
       // As a contact's, and carried to the contact a conversion creates;
@@ -334,16 +351,21 @@ export const definitions: Record<Entity, EntityDefinition> = {
     statuses: [],
     columns: [
       'name',
-      'customerType',
+      'studentName',
       'phone',
-      'email',
+      'chessLevel',
+      'preferredBranch',
       'companyId',
-      'employed',
       'ownerId',
     ],
     fields: [
       field('name', 'text', true),
       field('customerType', 'select', false, ['individual', 'organization']),
+      field('studentName', 'text', false),
+      field('studentBirthYear', 'text', false),
+      field('chessLevel', 'select', false, chessLevels),
+      field('preferredBranch', 'select', false, preferredBranches),
+      field('trialNotes', 'textarea', false),
       { ...company, required: false },
       ...person,
       owner,
@@ -361,8 +383,9 @@ export const definitions: Record<Entity, EntityDefinition> = {
     // The amount column is formatted in its currency, so no currency column.
     columns: [
       'name',
-      'pipelineType',
       'studentName',
+      'pipelineType',
+      'preferredBranch',
       'chessLevel',
       'stage',
       'businessType',
@@ -372,9 +395,14 @@ export const definitions: Record<Entity, EntityDefinition> = {
     ],
     fields: [
       field('name', 'text', true),
-      field('pipelineType', 'select', false, ['tuition', 'merchandise', 'b2b_school']),
+      field('pipelineType', 'select', false, [
+        'tuition',
+        'merchandise',
+        'b2b_school',
+      ]),
       field('studentName', 'text', false),
       field('chessLevel', 'select', false, chessLevels),
+      field('preferredBranch', 'select', false, preferredBranches),
       { ...company, required: false },
       owner,
       field('stage', 'select', true, stages),
@@ -445,32 +473,32 @@ export const definitions: Record<Entity, EntityDefinition> = {
     ],
   },
   students: {
-    table: "crmStudents",
+    table: 'crmStudents',
     statuses: [],
     columns: [
-      "name",
-      "contactId",
-      "gender",
-      "birthDate",
-      "school",
-      "grade",
-      "chessLevel",
-      "ratingElo",
-      "active",
-      "ownerId",
-      "updatedAt",
+      'name',
+      'contactId',
+      'gender',
+      'birthDate',
+      'school',
+      'grade',
+      'chessLevel',
+      'ratingElo',
+      'active',
+      'ownerId',
+      'updatedAt',
     ],
     fields: [
-      field("name", "text", true),
-      field("contactId", "relation", false, undefined, "contacts"),
-      field("gender", "select", false, ["male", "female"]),
-      field("birthDate", "date", false),
-      field("school", "text", false),
-      field("grade", "text", false),
-      field("chessLevel", "select", false, chessLevels),
-      field("ratingElo", "number", false),
-      field("notes", "textarea", false),
-      field("active", "boolean", false),
+      field('name', 'text', true),
+      field('contactId', 'relation', false, undefined, 'contacts'),
+      field('gender', 'select', false, ['male', 'female']),
+      field('birthDate', 'date', false),
+      field('school', 'text', false),
+      field('grade', 'text', false),
+      field('chessLevel', 'select', false, chessLevels),
+      field('ratingElo', 'number', false),
+      field('notes', 'textarea', false),
+      field('active', 'boolean', false),
       owner,
     ],
   },
@@ -631,6 +659,8 @@ export const defaultSettings: CrmSettings = {
       'other',
     ],
     topic: ['discount', 'paymentTerms', 'contractTerms', 'commitment', 'other'],
+    chessLevel: chessLevels,
+    preferredBranch: preferredBranches,
   },
 };
 export class CrmError extends Error {

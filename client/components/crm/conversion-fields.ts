@@ -20,6 +20,12 @@ export const inherited = {
   ],
   contacts: [
     'name',
+    'customerType',
+    'studentName',
+    'studentBirthYear',
+    'chessLevel',
+    'preferredBranch',
+    'trialNotes',
     'gender',
     'phone',
     'email',
@@ -53,6 +59,12 @@ export function proposalFor(
       }
     : {
         name: lead.name,
+        customerType: lead.customerType || 'individual',
+        studentName: lead.studentName,
+        studentBirthYear: lead.studentBirthYear,
+        chessLevel: lead.chessLevel,
+        preferredBranch: lead.preferredBranch,
+        trialNotes: lead.trialNotes,
         // A new contact without the lead's starts as unknown.
         gender: lead.gender ?? 'unknown',
         phone: lead.phone,
