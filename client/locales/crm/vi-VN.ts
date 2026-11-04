@@ -1914,7 +1914,7 @@ export const crmViVN: CrmWording = {
     reports: 'Báo cáo',
     inbox: 'Hộp thư đến',
     conversations: 'Tất cả hội thoại',
-    records: 'Quản lý Đào tạo & Bán hàng',
+    records: 'Quản lý Tuyển sinh & Khách hàng',
     integrations: 'Tích hợp',
     mailbox: 'Hộp thư',
     whatsapp: 'WhatsApp',
