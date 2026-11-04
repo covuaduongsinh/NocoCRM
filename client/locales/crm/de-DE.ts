@@ -190,6 +190,8 @@ export const crmDeDE: CrmWording = {
     inColleagues:
       'In Postfächern von Kollegen: {{count}}. Nur der Inhaber eines Postfachs kann dessen E-Mails öffnen.',
     mailboxOf: 'Im Postfach von {{name}}',
+    colleagueOnly:
+      'Diese Unterhaltung liegt im Postfach von {{name}}, nur {{name}} kann sie öffnen.',
     loadFailed: 'E-Mails konnten nicht geladen werden.',
     scope: 'Ihre E-Mails mit {{terms}}',
     scopeCompany: 'Ihre E-Mails mit {{name}}',

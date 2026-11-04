@@ -187,6 +187,8 @@ export const crmViVN: CrmWording = {
     inColleagues:
       'Trong hộp thư của đồng nghiệp: {{count}}. Chỉ chủ hộp thư mới mở được email.',
     mailboxOf: 'Trong hộp thư của {{name}}',
+    colleagueOnly:
+      'Cuộc trò chuyện này nằm trong hộp thư của {{name}}, chỉ {{name}} mới mở được.',
     loadFailed: 'Không thể tải email.',
     scope: 'Email của bạn với {{terms}}',
     scopeCompany: 'Email của bạn với {{name}}',

@@ -185,6 +185,8 @@ export const crmKoKR: CrmWording = {
     inColleagues:
       '동료의 메일함에 {{count}}건 있습니다. 메일함의 메일은 소유자만 열 수 있습니다.',
     mailboxOf: '{{name}}님의 메일함',
+    colleagueOnly:
+      '이 대화는 {{name}}님의 메일함에 있어 {{name}}님만 열 수 있습니다.',
     loadFailed: '메일을 불러올 수 없습니다.',
     scope: '{{terms}}와(과) 주고받은 메일',
     scopeCompany: '{{name}}와(과) 주고받은 메일',

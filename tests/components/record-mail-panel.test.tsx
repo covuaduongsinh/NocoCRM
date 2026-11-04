@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -12,6 +13,11 @@ import {
 // conversations in colleagues' mailboxes, listed after the reader's own.
 
 const colleagues = vi.hoisted(() => ({ list: undefined as unknown }));
+const toast = vi.hoisted(() => vi.fn());
+vi.mock('@nocobase/app-client', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@nocobase/app-client')>()),
+  useToaster: () => ({ show: toast, close: vi.fn() }),
+}));
 vi.mock('../../client/components/crm/colleagues-mail.js', () => ({
   useColleaguesMail: () => colleagues.list,
 }));
@@ -79,6 +85,7 @@ function show(
 afterEach(() => {
   cleanup();
   colleagues.list = undefined;
+  toast.mockReset();
 });
 
 describe('a record’s Mail tab', () => {
@@ -100,6 +107,27 @@ describe('a record’s Mail tab', () => {
     expect(screen.getByText(/mail\.mailboxOf/)).toHaveTextContent('Chen');
     // The reader's own mailboxes hold none, but there is mail to show.
     expect(screen.queryByText('mail.empty')).not.toBeInTheDocument();
+  });
+
+  it("says why a colleague's conversation does not open when it is clicked", async () => {
+    colleagues.list = [
+      {
+        key: 'acc:c1',
+        subject: 'Re: data migration',
+        count: 2,
+        lastFrom: 'Zheng Liang',
+        owner: 'Chen',
+        at: '2026-10-10T03:00:00.000Z',
+      },
+    ];
+    show(['zheng@lead.example'], { record: true });
+    await userEvent.click(
+      screen.getByRole('button', { name: /Re: data migration/ }),
+    );
+    expect(toast).toHaveBeenCalledWith({
+      type: 'info',
+      title: expect.stringMatching(/mail\.colleagueOnly.*Chen/),
+    });
   });
 
   it('names the addresses it looks for', () => {

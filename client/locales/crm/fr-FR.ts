@@ -188,6 +188,8 @@ export const crmFrFR: CrmWording = {
     inColleagues:
       "Dans les boîtes mail de vos collègues : {{count}}. Seul le titulaire d'une boîte mail peut en ouvrir les e-mails.",
     mailboxOf: 'Dans la boîte mail de {{name}}',
+    colleagueOnly:
+      'Cette conversation se trouve dans la boîte mail de {{name}} et ne peut être ouverte que par cette personne.',
     loadFailed: 'Impossible de charger les e-mails.',
     scope: 'Vos e-mails avec {{terms}}',
     scopeCompany: 'Vos e-mails avec {{name}}',
