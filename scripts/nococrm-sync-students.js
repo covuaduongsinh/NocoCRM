@@ -51,6 +51,9 @@ function runSync() {
   const ncDb = new Database(NOCOBASE_DB_PATH);
   const sf = new SnowflakeIdGenerator({ workerId: 0, epochSeconds: 1605024000 });
 
+  const defaultAdmin = crmDb.prepare("SELECT id FROM user LIMIT 1").get();
+  const defaultOwnerId = defaultAdmin ? defaultAdmin.id : '7dab7278-68e8-4d96-a41e-75742263c8e7';
+
   // 1. Ensure sync tracking columns in crm_students
   const studentCols = crmDb.prepare("PRAGMA table_info(crm_students)").all().map(c => c.name);
   if (!studentCols.includes('nocobase_student_id')) {
@@ -62,14 +65,14 @@ function runSync() {
 
   // 2. Auto-import won opportunities with student_name into crm_students if not exists
   const wonOpps = crmDb.prepare(`
-    SELECT o.id, o.student_name, o.chess_level, o.contacts, o.created_at
+    SELECT o.id, o.student_name, o.chess_level, o.contacts, o.owner_id, o.created_at
     FROM crm_opportunities o
     WHERE o.stage = 'closed_won' AND o.student_name IS NOT NULL AND TRIM(o.student_name) != ''
   `).all();
 
   const insertStudentStmt = crmDb.prepare(`
-    INSERT INTO crm_students (id, name, contact_id, chess_level, active, created_at, updated_at)
-    VALUES (?, ?, ?, ?, 1, ?, ?)
+    INSERT INTO crm_students (id, name, contact_id, owner_id, created_by_id, chess_level, active, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)
   `);
 
   for (const opp of wonOpps) {
@@ -85,14 +88,15 @@ function runSync() {
           contactId = opp.contacts;
         }
       }
-      insertStudentStmt.run(studentId, opp.student_name.trim(), contactId, opp.chess_level || null, opp.created_at, opp.created_at);
+      const owner = opp.owner_id || defaultOwnerId;
+      insertStudentStmt.run(studentId, opp.student_name.trim(), contactId, owner, owner, opp.chess_level || null, opp.created_at, opp.created_at);
       log(`Imported won opportunity student '${opp.student_name}' into NocoCRM students`);
     }
   }
 
   // 3. Auto-import converted leads with student_name into crm_students if not exists
   const convertedLeads = crmDb.prepare(`
-    SELECT l.id, l.student_name, l.student_birth_year, l.chess_level, l.converted_contact_id, l.created_at
+    SELECT l.id, l.student_name, l.student_birth_year, l.chess_level, l.converted_contact_id, l.owner_id, l.created_at
     FROM crm_leads l
     WHERE l.status = 'converted' AND l.student_name IS NOT NULL AND TRIM(l.student_name) != ''
   `).all();
@@ -101,11 +105,13 @@ function runSync() {
     const existing = crmDb.prepare("SELECT id FROM crm_students WHERE name = ?").get(lead.student_name.trim());
     if (!existing) {
       const studentId = require('crypto').randomUUID();
-      const birthDate = lead.student_birth_year ? `${lead.student_birth_year}-01-01` : null;
+      const birthYear = lead.student_birth_year ? parseInt(lead.student_birth_year, 10) : null;
+      const birthDate = birthYear ? `${birthYear}-01-01` : null;
+      const owner = lead.owner_id || defaultOwnerId;
       crmDb.prepare(`
-        INSERT INTO crm_students (id, name, contact_id, birth_date, chess_level, active, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, 1, ?, ?)
-      `).run(studentId, lead.student_name.trim(), lead.converted_contact_id || null, birthDate, lead.chess_level || null, lead.created_at, lead.created_at);
+        INSERT INTO crm_students (id, name, contact_id, owner_id, created_by_id, birth_date, chess_level, active, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
+      `).run(studentId, lead.student_name.trim(), lead.converted_contact_id || null, owner, owner, birthDate, lead.chess_level || null, lead.created_at, lead.created_at);
       log(`Imported converted lead student '${lead.student_name}' into NocoCRM students`);
     }
   }
