@@ -1,6 +1,8 @@
 import type { ReactElement, ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import type { LucideIcon } from 'lucide-react';
+import { TabRow } from './tab-row.js';
+import { tabClass } from './tab-class.js';
 
 // Tabs that are addresses (Auto follow-up's agents, the settings' pages),
 // drawn as a record page's tabs (DetailTabBar in pages/crm-detail.tsx):
@@ -8,7 +10,9 @@ import type { LucideIcon } from 'lucide-react';
 // of it, the others muted until hovered, each led by its icon (or what it
 // gives in its place, an agent's avatar) and followed by what it adds (a
 // count, a state). A click replaces the address, so the
-// browser's back leaves the page rather than stepping through its tabs.
+// browser's back leaves the page rather than stepping through its tabs. One
+// line, scrolling sideways when they do not fit (TabRow); a phone leaves out
+// the icons, keeping what stands for someone (an agent's avatar).
 export function LinkTabs({
   tabs,
   label,
@@ -29,10 +33,11 @@ export function LinkTabs({
 }): ReactElement {
   const navigate = useNavigate();
   return (
-    <div
-      role='tablist'
-      aria-label={label}
-      className={`flex w-full flex-wrap gap-x-5 border-b border-border ${className}`}
+    <TabRow
+      label={label}
+      selected={tabs.find((tab) => tab.selected)?.to}
+      tabCount={tabs.length}
+      className={className}
     >
       {tabs.map(({ to, label: name, icon: Icon, lead, selected, extra }) => (
         <button
@@ -41,17 +46,13 @@ export function LinkTabs({
           role='tab'
           aria-selected={selected}
           onClick={() => void navigate(to, { replace: true })}
-          className={`-mb-px flex h-10 items-center gap-1.5 border-b-2 text-sm font-medium transition-colors outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset ${
-            selected
-              ? 'border-foreground text-foreground'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
+          className={tabClass(selected)}
         >
-          {lead ?? <Icon className='size-4' />}
+          {lead ?? <Icon className='size-4 max-md:hidden' />}
           {name}
           {extra}
         </button>
       ))}
-    </div>
+    </TabRow>
   );
 }
