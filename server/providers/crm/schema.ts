@@ -112,12 +112,16 @@ export const churnReasons: string[] = [
   'other',
 ];
 export const lostReasons: string[] = [
-  'price',
+  'tuitionHigh',
+  'distanceFar',
+  'scheduleConflict',
+  'childDislike',
   'toCompetitor',
-  'noBudget',
-  'noDecision',
-  'requirementMismatch',
   'timing',
+  'requirementMismatch',
+  'noDecision',
+  'price',
+  'noBudget',
   'other',
 ];
 export const pauseReasons: string[] = [
@@ -155,6 +159,10 @@ export const chessLevels: string[] = [
 ];
 export const preferredBranches: string[] = ['cs1', 'cs2', 'online'];
 export const chessBusinessTypes: string[] = [
+  'course12',
+  'course24',
+  'course48',
+  'course1on1',
   'chessCourse',
   'chessBook',
   'chessEquipment',
@@ -181,10 +189,10 @@ export const stages: string[] = [
 export const probabilities: Record<string, number> = {
   contact: 0.1,
   qualification: 0.25,
-  validation: 0.45,
-  proposal: 0.6,
-  negotiation: 0.75,
-  contract: 0.9,
+  validation: 0.5,
+  proposal: 0.75,
+  negotiation: 0.9,
+  contract: 0.95,
   won: 1,
   lost: 0,
   paused: 0,
@@ -636,14 +644,7 @@ export const defaultSettings: CrmSettings = {
   options: {
     source: sources,
     industry: industries,
-    businessType: [
-      'newBusiness',
-      'expansion',
-      'crossSell',
-      'renewal',
-      'tender',
-      'other',
-    ],
+    businessType: chessBusinessTypes,
     companyType: ['direct', 'partner', 'reseller', 'other'],
     churnReason: churnReasons,
     currency: currencies,

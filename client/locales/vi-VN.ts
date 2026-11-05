@@ -572,10 +572,10 @@ const viVN: AppResource = {
       converted: 'Đã chuyển đổi',
     },
     stages: {
-      qualification: 'Đánh giá',
-      proposal: 'Đề xuất',
-      negotiation: 'Đàm phán',
-      won: 'Thắng',
+      qualification: 'Tư vấn',
+      proposal: 'Học thử tốt',
+      negotiation: 'Chờ đóng phí',
+      won: 'Đã đóng phí',
     },
     steps: {
       captured: {
