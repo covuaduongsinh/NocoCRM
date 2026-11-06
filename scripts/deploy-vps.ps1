@@ -51,7 +51,13 @@ if (Test-Path "storage/exports/variables.json") {
 $tarPath = "storage/exports/dist_fast.tar.gz"
 if (Test-Path $tarPath) { Remove-Item -Force $tarPath }
 
-tar -czf $tarPath -C dist client server package.json variables.json
+# Ensure data json files are in dist/database/main/seeds/data
+if (Test-Path "database/main/seeds/data") {
+  New-Item -ItemType Directory -Force -Path "dist/database/main/seeds/data" | Out-Null
+  Copy-Item -Recurse -Force "database/main/seeds/data/*" "dist/database/main/seeds/data/"
+}
+
+tar -czf $tarPath -C dist client server database cli package.json variables.json
 $tarItem = Get-Item $tarPath
 $sizeMb = [math]::Round($tarItem.Length / 1MB, 2)
 Write-Host "Bundle created: $tarPath ($sizeMb MB)" -ForegroundColor Green

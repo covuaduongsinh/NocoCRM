@@ -58,7 +58,6 @@ const seed: SeedDefinition = defineSeed({
         trialNotes: c.notes,
         employed: true,
         primary: false,
-        active: true,
         createdAt: now,
         updatedAt: now,
       }));
@@ -107,7 +106,7 @@ const seed: SeedDefinition = defineSeed({
         preferredBranch: ld.preferredBranch,
         trialDate: ld.trialDate ? new Date(ld.trialDate) : null,
         trialNotes: ld.trialNotes,
-        description: ld.description,
+        message: ld.description,
         createdAt: now,
         updatedAt: now,
       }));
