@@ -187,6 +187,8 @@ export const crmPtBR: CrmWording = {
     inColleagues:
       'Nas caixas de e-mail de colegas: {{count}}. Somente o dono de uma caixa de e-mail pode abrir as mensagens dela.',
     mailboxOf: 'Na caixa de e-mail de {{name}}',
+    colleagueOnly:
+      'Esta conversa está na caixa de e-mail de {{name}}; somente {{name}} pode abri-la.',
     loadFailed: 'Não foi possível carregar os e-mails.',
     scope: 'Seus e-mails com {{terms}}',
     scopeCompany: 'Seus e-mails com {{name}}',

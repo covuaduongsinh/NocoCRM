@@ -187,6 +187,8 @@ export const crmEsES: CrmWording = {
     inColleagues:
       'En buzones de compañeros: {{count}}. Solo el propietario de un buzón puede abrir su correo.',
     mailboxOf: 'En el buzón de {{name}}',
+    colleagueOnly:
+      'Esta conversación está en el buzón de {{name}}; solo {{name}} puede abrirla.',
     loadFailed: 'No se ha podido cargar el correo.',
     scope: 'Tu correo con {{terms}}',
     scopeCompany: 'Tu correo con {{name}}',

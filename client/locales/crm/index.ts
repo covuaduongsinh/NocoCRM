@@ -295,6 +295,11 @@ const wording = {
       '同事邮箱里的往来：{{count}} 个会话，只有邮箱主人能打开原文。',
     ],
     mailboxOf: ["In {{name}}'s mailbox", '在{{name}}的邮箱'],
+    // A click on one of them.
+    colleagueOnly: [
+      "This conversation is in {{name}}'s mailbox, so only {{name}} can open it.",
+      '这个会话在{{name}}的邮箱里，只有{{name}}能打开。',
+    ],
     loadFailed: ['Mail could not be loaded.', '邮件加载失败。'],
     scope: ['Your mail with {{terms}}', '你与 {{terms}} 的往来邮件'],
     scopeCompany: ['Your mail with {{name}}', '你与{{name}}的往来邮件'],

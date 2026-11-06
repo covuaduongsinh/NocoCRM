@@ -181,6 +181,7 @@ export const crmZhTW: CrmWording = {
     inColleagues:
       '同事信箱裡的往來：{{count}} 個對話，只有信箱擁有者能開啟原文。',
     mailboxOf: '在{{name}}的信箱',
+    colleagueOnly: '這個會話在{{name}}的信箱裡，只有{{name}}能開啟。',
     loadFailed: '郵件載入失敗。',
     scope: '你與 {{terms}} 的往來郵件',
     scopeCompany: '你與{{name}}的往來郵件',

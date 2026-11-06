@@ -186,6 +186,8 @@ export const crmJaJP: CrmWording = {
     inColleagues:
       '同僚のメールボックス内：{{count}} 件。メールを開けるのはそのメールボックスの所有者のみです。',
     mailboxOf: '{{name}}さんのメールボックス内',
+    colleagueOnly:
+      'この会話は{{name}}さんのメールボックスにあり、{{name}}さんだけが開けます。',
     loadFailed: 'メールを読み込めませんでした。',
     scope: '{{terms}}とのメール',
     scopeCompany: '{{name}}とのメール',

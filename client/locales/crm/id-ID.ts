@@ -187,6 +187,8 @@ export const crmIdID: CrmWording = {
     inColleagues:
       'Di kotak surat rekan kerja: {{count}}. Hanya pemilik kotak surat yang dapat membuka emailnya.',
     mailboxOf: 'Di kotak surat {{name}}',
+    colleagueOnly:
+      'Percakapan ini ada di kotak surat {{name}}, hanya {{name}} yang dapat membukanya.',
     loadFailed: 'Email tidak dapat dimuat.',
     scope: 'Email Anda dengan {{terms}}',
     scopeCompany: 'Email Anda dengan {{name}}',

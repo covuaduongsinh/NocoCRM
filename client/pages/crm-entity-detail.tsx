@@ -1621,21 +1621,26 @@ function RelatedItem({
 }): ReactElement {
   const link = useRecordLink(entity, toText(record.id));
   return (
-    <li>
+    <li className='@container'>
       {/* One line: the name and its state, and what else there is, muted,
-          at the row's end; the name gives way first. */}
+          at the row's end; the name gives way first. Where that leaves it no
+          room (a phone, a drawer) it takes lines of its own, with the rest
+          under it; the row's own width decides, not the screen's. */}
       <Link
-        className='flex min-w-0 items-center gap-3 px-4 py-3 transition-colors hover:bg-hover'
+        className='flex min-w-0 flex-col gap-1.5 px-4 py-3 transition-colors hover:bg-hover @xl:flex-row @xl:items-center @xl:gap-3'
         {...link}
       >
-        <span className='flex min-w-0 items-center gap-2'>
-          <span className='truncate text-sm font-medium' title={title}>
+        <span className='flex min-w-0 flex-wrap items-center gap-2 @xl:flex-nowrap'>
+          <span
+            className='line-clamp-2 basis-full text-sm font-medium @xl:line-clamp-1 @xl:basis-auto'
+            title={title}
+          >
             {title}
           </span>
           {tag}
         </span>
         {details.length ? (
-          <span className='ml-auto flex shrink-0 gap-3 text-xs whitespace-nowrap text-muted-foreground tabular-nums'>
+          <span className='flex shrink-0 flex-wrap gap-x-3 gap-y-1 text-xs whitespace-nowrap text-muted-foreground tabular-nums @xl:ml-auto'>
             {details}
           </span>
         ) : null}
@@ -2364,16 +2369,21 @@ function ApprovalItem({ approval }: { approval: Data }): ReactElement {
   const name = toText(approval.name);
   // One line, as a related deal's row: its topic, name and status, whose
   // side the reader is on, and who asks and who decides, muted at the
-  // row's end, each by an icon (the label on hover).
+  // row's end, each by an icon (the label on hover). Where that leaves the
+  // name no room (a phone, a drawer) it takes lines of its own, with the
+  // rest under it; the row's own width decides, not the screen's.
   return (
-    <li>
+    <li className='@container'>
       <Link
-        className='flex min-w-0 items-center gap-3 px-4 py-3 transition-colors hover:bg-hover'
+        className='flex min-w-0 flex-col gap-1.5 px-4 py-3 transition-colors hover:bg-hover @xl:flex-row @xl:items-center @xl:gap-3'
         {...approvalLink}
       >
-        <span className='flex min-w-0 items-center gap-2'>
+        <span className='flex min-w-0 flex-wrap items-center gap-2 @xl:flex-nowrap'>
           <KindTag value={approval.topic} />
-          <span className='truncate text-sm font-medium' title={name}>
+          <span
+            className='order-first line-clamp-2 basis-full text-sm font-medium @xl:order-none @xl:line-clamp-1 @xl:basis-auto'
+            title={name}
+          >
             {name}
           </span>
           <Status value={approval.status} />
@@ -2385,7 +2395,7 @@ function ApprovalItem({ approval }: { approval: Data }): ReactElement {
             </Badge>
           )}
         </span>
-        <span className='ml-auto flex shrink-0 gap-3 text-xs whitespace-nowrap text-muted-foreground'>
+        <span className='flex shrink-0 flex-wrap gap-x-3 gap-y-1 text-xs whitespace-nowrap text-muted-foreground @xl:ml-auto'>
           {(
             [
               ['fields.applicant', approval.ownerId, User],

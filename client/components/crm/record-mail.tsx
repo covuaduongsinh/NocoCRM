@@ -495,42 +495,57 @@ function ColleaguesMail({
   timeZone: string;
 }): ReactElement | null {
   const { text } = useCrmText();
+  const toaster = useToaster();
   if (!conversations.length) return null;
   return (
     <section className='space-y-2'>
-      {/* Worded and set as the line over the reader's own mail. */}
-      <p className='truncate text-xs text-muted-foreground'>
+      {/* Worded and set as the line over the reader's own mail, but whole:
+          it says why these rows do not open, which a phone's width would
+          cut off. */}
+      <p className='text-xs text-muted-foreground'>
         {text('mail.inColleagues', { count: conversations.length })}
       </p>
       <ul className='divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-xs'>
         {conversations.map((conversation) => (
-          <li
-            key={conversation.key}
-            className='flex min-w-0 items-start gap-3 px-3 py-2.5'
-          >
-            <span aria-hidden className='mt-1.5 size-2 shrink-0' />
-            <span className='min-w-0 flex-1'>
-              <span className='flex items-baseline gap-2'>
-                <span className='truncate text-sm'>
-                  {conversation.lastFrom || conversation.owner}
+          <li key={conversation.key}>
+            {/* Its summary is all there is to read here, so a click says why
+                rather than doing nothing. */}
+            <button
+              type='button'
+              className='flex w-full min-w-0 items-start gap-3 px-3 py-2.5 text-left transition-colors outline-none hover:bg-hover focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset'
+              onClick={() =>
+                toaster.show({
+                  type: 'info',
+                  title: toText(
+                    text('mail.colleagueOnly', { name: conversation.owner }),
+                  ),
+                })
+              }
+            >
+              <span aria-hidden className='mt-1.5 size-2 shrink-0' />
+              <span className='min-w-0 flex-1'>
+                <span className='flex items-baseline gap-2'>
+                  <span className='truncate text-sm'>
+                    {conversation.lastFrom || conversation.owner}
+                  </span>
+                  <span className='ml-auto shrink-0 text-xs text-muted-foreground'>
+                    {localDate(conversation.at, '', timeZone)}
+                  </span>
                 </span>
-                <span className='ml-auto shrink-0 text-xs text-muted-foreground'>
-                  {localDate(conversation.at, '', timeZone)}
+                <span className='block truncate text-sm'>
+                  {conversation.subject || toText(text('feed.mail.noSubject'))}
+                </span>
+                <span className='block truncate text-xs text-muted-foreground'>
+                  {toText(
+                    conversation.count === 1
+                      ? text('feed.mail.countOne')
+                      : text('feed.mail.count', { count: conversation.count }),
+                  )}
+                  {' · '}
+                  {text('mail.mailboxOf', { name: conversation.owner })}
                 </span>
               </span>
-              <span className='block truncate text-sm'>
-                {conversation.subject || toText(text('feed.mail.noSubject'))}
-              </span>
-              <span className='block truncate text-xs text-muted-foreground'>
-                {toText(
-                  conversation.count === 1
-                    ? text('feed.mail.countOne')
-                    : text('feed.mail.count', { count: conversation.count }),
-                )}
-                {' · '}
-                {text('mail.mailboxOf', { name: conversation.owner })}
-              </span>
-            </span>
+            </button>
           </li>
         ))}
       </ul>
