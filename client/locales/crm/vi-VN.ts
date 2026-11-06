@@ -2596,8 +2596,6 @@ export const crmViVN: CrmWording = {
     nurturing: 'Nuôi dưỡng',
     converted: 'Đã chuyển đổi',
     invalid: 'Không hợp lệ',
-    price: 'Giá',
-    toCompetitor: 'Chuyển sang đối thủ',
     businessChange: 'Thay đổi kinh doanh',
     serviceDissatisfied: 'Không hài lòng với dịch vụ',
     closedOrMerged: 'Đóng cửa hoặc sáp nhập',
