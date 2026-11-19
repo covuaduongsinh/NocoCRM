@@ -38,10 +38,11 @@ async function load(yaml: string) {
 }
 
 it('loads the actual commented Redis example through the application runtime without exposing credentials', async () => {
-  const source = await readFile(
+  const raw = await readFile(
     new URL('../../config.example.yml', import.meta.url),
     'utf8',
   );
+  const source = raw.replace(/\r\n/g, '\n');
   const example = source.match(/^# realtime:\n(?:#(?: {2,}.*)?\n)*/m)?.[0];
   expect(example).toBeDefined();
   const runtime = await load(

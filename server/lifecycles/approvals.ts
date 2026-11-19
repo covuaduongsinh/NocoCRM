@@ -125,7 +125,6 @@ export const approvalLifecycle: Lifecycle<ApprovalTypes> =
     ],
     parameters: { approverRule: DEFAULT_APPROVER_RULE },
     parameterConfiguration: {
-      readMode: 'live',
       groups: [approverParameterGroup],
     },
     transitions: {

@@ -11,7 +11,7 @@ import { expect, it } from 'vitest';
 const exec = promisify(execFile);
 async function compile(config: string): Promise<void> {
   try {
-    await exec('pnpm', ['exec', 'tsc', '-p', config], { cwd: appRoot });
+    await exec('pnpm', ['exec', 'tsc', '-p', config], { cwd: appRoot, shell: true });
   } catch (error) {
     throw new Error((error as { stdout: string }).stdout, { cause: error });
   }
@@ -66,7 +66,7 @@ it('runs compiled extensionless server imports without source files or a loader'
         '--outDir',
         path.join(directory, 'dist'),
       ],
-      { cwd: appRoot },
+      { cwd: appRoot, shell: true },
     );
     await rm(source, { recursive: true });
     const runner = path.join(directory, 'runner.mjs');

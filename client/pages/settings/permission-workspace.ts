@@ -41,6 +41,7 @@ const crmObjects = [
   'crm.opportunities',
   'crm.tasks',
   'crm.approvals',
+  'crm.students',
 ].map((id) => ({
   type: 'composite',
   id,

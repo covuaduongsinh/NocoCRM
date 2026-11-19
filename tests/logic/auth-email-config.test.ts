@@ -56,10 +56,9 @@ it('inherits private authentication sender mappings without changing other mail 
 // Application change, kept: the CRM's example still shows the inline auth.email senders, which the template
 // replaced with the shared `mailers` example in 1.0.0-beta.92 (both remain supported).
 it('ships separate, valid SMTP and Resend authentication examples', async () => {
-  const example = await readFile(
-    new URL('../../config.example.yml', import.meta.url),
-    'utf8',
-  );
+  const example = (
+    await readFile(new URL('../../config.example.yml', import.meta.url), 'utf8')
+  ).replaceAll('\r\n', '\n');
   const blocks = [...example.matchAll(/^ {2}# email:\n(?: {2}# {3}.*\n)+/gm)];
   expect(blocks).toHaveLength(2);
   const directory = await mkdtemp(
@@ -84,10 +83,9 @@ it('ships separate, valid SMTP and Resend authentication examples', async () => 
 });
 
 it('ships a valid shared mailer example with private mapped credentials', async () => {
-  const example = await readFile(
-    new URL('../../config.example.yml', import.meta.url),
-    'utf8',
-  );
+  const example = (
+    await readFile(new URL('../../config.example.yml', import.meta.url), 'utf8')
+  ).replaceAll('\r\n', '\n');
   const block = example.match(/^# mailers:\n(?:#.*\n)+/m)?.[0];
   expect(block).toBeTruthy();
   const directory = await mkdtemp(path.join(os.tmpdir(), 'mailers-example-'));

@@ -14,8 +14,8 @@ import appRuntime from '../../server/runtime.js';
 // its own header and fills the placeholder key of the live `secrets` section, keeping everything else verbatim. These
 // are the parts of the example it relies on.
 describe('config.example.yml', () => {
-  const read = () =>
-    readFile(new URL('../../config.example.yml', import.meta.url), 'utf8');
+  const read = async () =>
+    (await readFile(new URL('../../config.example.yml', import.meta.url), 'utf8')).replace(/\r\n/g, '\n');
 
   it('opens with the instruction config init replaces', async () => {
     expect((await read()).split('\n')[0]).toMatch(
@@ -37,7 +37,7 @@ describe('config.example.yml', () => {
   // Redis Jobs and Queue live in commercial plugins now, so the application
   // supplies no Redis defaults and the example has to state its adapter.
   it('selects Redis Jobs only through what the uncommented example declares', async () => {
-    const source = await read();
+    const source = (await read()).replace(/\r\n/g, '\n');
     const example = /^# jobs:\n(?:#(?: {2,}.*)?\n)*/mu.exec(source)?.[0];
     expect(example).toBeDefined();
     const directory = await mkdtemp(path.join(tmpdir(), 'crm-config-example-'));

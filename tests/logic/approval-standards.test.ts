@@ -24,7 +24,7 @@ const skill = (name: string): string =>
 // The standards' lines, one per kind of term, then the company's say.
 const standards = (text: string): string[] =>
   text
-    .split('\n')
+    .split(/\r?\n/)
     .filter((line) =>
       /^- (Discount|Payment terms|Contract terms|Delivery commitments): |^- Standards the company adds/.test(
         line,
@@ -43,7 +43,7 @@ describe('the approval standards', () => {
 
 // A skill's frontmatter: its single-line values.
 const front = (name: string) => {
-  const text = /^---\n([\s\S]*?)\n---\n/.exec(skill(name))?.[1] ?? '';
+  const text = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/.exec(skill(name))?.[1] ?? '';
   return {
     text,
     description: /^description:\s*(.+)$/m.exec(text)?.[1].trim() ?? '',
@@ -59,7 +59,7 @@ describe('the skill files', () => {
       const { text, description } = front(name);
       expect(text).toMatch(new RegExp(`^name: ${name}$`, 'm'));
       expect(description).not.toBe('');
-      for (const line of text.split('\n')) {
+      for (const line of text.split(/\r?\n/)) {
         const value = /^\s*[\w.]+:\s(.*)$/.exec(line)?.[1] ?? '';
         if (/^['"[{|>]/.test(value)) continue;
         expect(`${line} → ${/: |\s#/.test(value)}`).toBe(`${line} → false`);

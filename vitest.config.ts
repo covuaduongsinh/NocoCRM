@@ -37,8 +37,6 @@ export default defineConfig({
           include: ['tests/logic/**/*.test.{ts,tsx}'],
           exclude: clientLogic,
           ...databaseTimeouts,
-          // Database fixtures and command output capture run one file at a time.
-          fileParallelism: false,
           setupFiles: [foundationScan],
         },
       }),
@@ -47,8 +45,6 @@ export default defineConfig({
           root,
           name: 'client',
           environment: './tests/setup/application-environment.ts',
-          // Client integration tests also start isolated application databases.
-          fileParallelism: false,
           include: ['tests/components/**/*.test.{ts,tsx}', ...clientLogic],
           ...databaseTimeouts,
           setupFiles: ['./tests/setup/client-config.ts', foundationScan],
@@ -66,6 +62,7 @@ export default defineConfig({
         },
       }),
     ],
+    // Test files run in parallel: every test application gets its own temporary directory and database from @nocobase/app-testing, and each file runs in its own process.
     // Only the directories above contain Vitest suites. Playwright has its own runner.
     // Keep the command usable if an application intentionally removes all scaffold tests.
     passWithNoTests: true,

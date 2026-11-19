@@ -152,6 +152,9 @@ const meta = z.record(z.string(), z.json());
 export const ApprovalLifecycleView: z.ZodType<LifecycleDescription> = z
   .object({
     name: z.string(),
+    key: z.string(),
+    version: z.number().int(),
+    definitionField: z.string().optional(),
     initial: z.string(),
     initialStates: names,
     states: names,
@@ -189,8 +192,6 @@ export const ApprovalLifecycleView: z.ZodType<LifecycleDescription> = z
     // What an administrator may set on it: the approver rule.
     parameterConfiguration: z
       .object({
-        readMode: z.string(),
-        snapshotTransition: z.string().optional(),
         groups: z.array(
           z.object({
             key: z.string(),
@@ -207,7 +208,6 @@ export const ApprovalLifecycleView: z.ZodType<LifecycleDescription> = z
                   'reviewers',
                 ]),
                 title: z.string(),
-                readMode: z.enum(['snapshot', 'live']).optional(),
                 bindings: z
                   .array(
                     z.object({

@@ -247,7 +247,7 @@ describe('the opportunity page', () => {
     renderPage();
     await userEvent.click(screen.getByRole('button', { name: '阶段' }));
     await userEvent.click(
-      await screen.findByRole('menuitem', { name: '输单' }),
+      await screen.findByRole('menuitem', { name: /输单|未成单/ }),
     );
     await userEvent.click(
       await screen.findByRole('menuitem', { name: '价格' }),

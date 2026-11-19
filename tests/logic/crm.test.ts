@@ -17,6 +17,7 @@ import {
   definitions,
   fieldsFor,
   lostReasons,
+  probabilities,
   object,
   toText,
   entities,
@@ -10856,7 +10857,7 @@ describe('overview reports', () => {
       commitCount: 1,
       bestCase: { CNY: 1500 },
       bestCaseCount: 2,
-      weighted: { CNY: 1000 * 0.6 + 500 * 0.1 },
+      weighted: { CNY: 1000 * probabilities.proposal + 500 * probabilities.contact },
     });
     // The quarter (July to September) adds September's deal.
     expect(revenue.forecast.quarter).toMatchObject({

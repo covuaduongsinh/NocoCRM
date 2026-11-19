@@ -17,6 +17,10 @@ const seed: SeedDefinition = defineSeed({
   name: '202611050002_import_lark_crm_data',
   transaction: true,
   async run({ query }) {
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     const dataPath = join(__dirname, 'data', 'lark_crm_full.json');
     if (!existsSync(dataPath)) {
       console.warn(`[Seed NocoCRM] Data file not found at ${dataPath}. Skipping.`);
