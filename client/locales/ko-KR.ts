@@ -1,15 +1,17 @@
 import fileUi from '../extensions/nocobase-file-component-ui/locales/ko-KR.js';
+import notificationLogsUi from '../extensions/nocobase-notification-logs-ui/locales/ko-KR.js';
 import type { AppResource } from './en-US.js';
 import { crmKoKR } from './crm/ko-KR.js';
 import settingsKoKR from './settings/ko-KR.js';
+import databaseExplorer from './database-explorer/ko-KR.js';
 
-// The pages in ko-KR: the template's copy (./system/), the AI skills'
-// display text and the CRM's own (./crm/ko-KR.ts), with the same keys as
-// ./en-US.ts. The template ships no ko-KR, so its copy is translated
-// here; a template upgrade that adds keys fails the type check until they
-// are translated.
+// The pages in ko-KR: the template's copy (./system/) and the CRM's own
+// (./crm/ko-KR.ts), with the same keys as ./en-US.ts. The template ships no
+// ko-KR, so its copy is translated here; a template upgrade that adds keys
+// fails the type check until they are translated.
 const koKR: AppResource = {
   ...fileUi,
+  ...notificationLogsUi,
   'auth.passwordResetSuccess':
     '비밀번호가 재설정되었습니다. 새 비밀번호로 로그인하세요.',
   'auth.requestNewResetLink': '새 재설정 링크 요청',
@@ -17,6 +19,22 @@ const koKR: AppResource = {
   'auth.connectionFailed': '연결할 수 없습니다',
   'auth.connectionFailedDescription':
     '실시간 연결을 준비할 수 없습니다. 다시 시도해 애플리케이션에 들어가거나 로그아웃하세요.',
+  // The template's Database Explorer copy, translated in ./database-explorer/.
+  databaseExplorer,
+  taskProgress: {
+    queued: '시작 대기 중',
+    running: '진행 중',
+    completed: '완료됨',
+    failed: '실패',
+    canceled: '취소됨',
+    count: '{{total}}개 중 {{processed}}개',
+    processed: '{{processed}}개 처리됨',
+    background: '이 페이지를 떠나도 계속 실행됩니다.',
+  },
+  pendingFeedback: {
+    working: '처리 중…',
+    longWait: '평소보다 오래 걸리고 있습니다. 계속 기다리셔도 됩니다.',
+  },
   listFeedback: {
     loading: '불러오는 중',
     empty: '아직 데이터가 없습니다',
@@ -128,6 +146,9 @@ const koKR: AppResource = {
   'auth.loginDescription': '사용자 이름 또는 이메일과 비밀번호로 로그인하세요.',
   'auth.registerTitle': '계정 만들기',
   'auth.registerDescription': '시작하려면 계정을 만드세요.',
+  'auth.registrationAccepted': '가입 요청을 보냈습니다',
+  'auth.registrationGuidance':
+    '보낸 사용자 이름과 비밀번호로 로그인해 보세요. 이 이메일로 이미 계정이 있다면 새 정보는 적용되지 않습니다. 기존 계정으로 로그인하거나 비밀번호를 재설정하세요. 로그인하기 전에 애플리케이션이 안내하는 인증 절차를 따르세요.',
   'auth.forgotTitle': '비밀번호 찾기',
   'auth.forgotDescription':
     '이메일을 입력하면 계정이 있는 경우 재설정 링크를 보내 드립니다.',
@@ -171,9 +192,9 @@ const koKR: AppResource = {
   'auth.continueWith': '{provider}(으)로 계속',
   'auth.about': '이 애플리케이션 정보',
   'auth.platform': 'AI 네이티브 애플리케이션 플랫폼',
-  'auth.marketingTitleFirst': 'AI는 자유롭게 만들고,',
-  'auth.marketingTitleSecond': 'NocoBase는',
-  'auth.marketingTitleThird': '신뢰성을 지킵니다.',
+  // The template's brand line (its zh-CN keeps it in English too).
+  'auth.marketingTitleFirst': 'AI + NocoBase',
+  'auth.marketingTitleSecond': 'Build reliable business systems',
   'auth.marketingDescription':
     'AI에게 유연한 프론트엔드 프레임워크를 제공해 모든 경험을 자유롭게 만들게 하고, 그 아래의 데이터, 권한, 거버넌스는 NocoBase가 지킵니다.',
   'auth.frontend': 'AI 네이티브 프론트엔드',
@@ -187,15 +208,25 @@ const koKR: AppResource = {
   'status.denied': '접근 거부됨',
   'status.pageFailed': '페이지를 불러올 수 없습니다',
   'status.retry': '다시 시도',
+  'status.refreshing': '새로 고치는 중',
+  'status.reloadPage': '페이지 새로 고침',
+  'status.retryFailedDescription':
+    '여전히 불러올 수 없습니다. 페이지 전체를 새로 고치면 해결될 수 있지만, 이 페이지에서 저장하지 않은 변경 사항이 사라질 수 있습니다.',
   'navigation.brandHome': 'NocoCRM 홈',
   'navigation.brandApps': 'NocoBase 애플리케이션',
   'routeOverlay.close': '닫기',
+  'routeOverlay.discardTitle': '변경 사항을 취소할까요?',
+  'routeOverlay.discardDescription':
+    '변경 사항이 저장되지 않았으며 사라집니다.',
+  'routeOverlay.keepEditing': '계속 편집',
+  'routeOverlay.discard': '취소하기',
   'status.deniedDescription': '{{label}}에 접근할 권한이 없습니다.',
   'status.routeFailedDescription':
     '{{packageName}}의 경로 {{label}}을(를) 불러올 수 없습니다.',
+  // The template's brand line, which its own zh-CN keeps in English too.
   shell: {
-    buildFreely: 'AI는 자유롭게 만듭니다.',
-    reliability: '<brand>NocoBase</brand>가 신뢰성을 지킵니다.',
+    brandPartnership: 'AI + <brand>NocoBase</brand>',
+    buildReliableSystems: 'Build reliable business systems',
   },
   home: {
     platform: 'NocoBase · AI 네이티브 애플리케이션 플랫폼',
@@ -450,6 +481,7 @@ const koKR: AppResource = {
   },
   navigation: {
     home: '개요',
+    resources: '리소스',
     open: '탐색 메뉴 열기',
     close: '탐색 메뉴 닫기',
     expand: '탐색 메뉴 펼치기',
@@ -460,11 +492,17 @@ const koKR: AppResource = {
     breadcrumb: '이동 경로',
     breadcrumbMore: '중간 단계 표시',
     back: '뒤로',
+    backTo: '{{label}}(으)로 돌아가기',
   },
   dataTable: {
     noResults: '결과가 없습니다.',
     sortAscending: '오름차순',
     sortDescending: '내림차순',
+    sort: '정렬',
+    sortBy: '정렬 기준',
+    filters: '필터',
+    filtersApplied: '필터 · {{count}}',
+    selectPage: '이 페이지 모두 선택',
     hideColumn: '숨기기',
     view: '보기',
     toggleColumns: '열 표시 전환',
@@ -479,19 +517,8 @@ const koKR: AppResource = {
   datePicker: {
     placeholder: '날짜 선택',
     rangePlaceholder: '날짜 범위 선택',
+    clear: '지우기',
   },
-  'Lead follow-up': '리드 후속 조치',
-  'Review everything a lead has now (the lead itself, its tasks, comments and related records in the CRM) and recommend the next step — keep following up, nurture, convert or invalid — with the reasons; when following up, say clearly how to follow up and what exactly to do. Use when a new lead comes in, when the user asks to follow up a lead or follow it up again, or asks "what should I do next with this lead".':
-    '리드에 관한 현재 정보(리드 자체, 작업, 댓글, CRM의 관련 레코드)를 모두 검토하고 계속 후속 조치, 육성, 전환 또는 무효 중 다음 단계를 이유와 함께 권장합니다. 후속 조치를 권장할 때는 어떻게 후속 조치할지와 구체적으로 무엇을 할지 명확히 설명합니다. 새 리드가 들어왔을 때, 사용자가 리드의 후속 조치나 재후속 조치를 요청할 때, 또는 "이 리드로 다음에 무엇을 해야 하나요?"라고 물을 때 사용합니다.',
-  'Opportunity follow-up': '영업 기회 후속 조치',
-  'Reviews everything about an opportunity as it now stands (the opportunity itself, the company, contacts and their roles, tasks, comments, approvals, the source lead) and judges whether its stage holds up and what to do next — advance to the next stage, keep at it in the current stage, pause, or mark it lost — with the reasons, risks and gaps to fill; when advancing, spells out exactly what to do. Use when a lead\'s conversion opens a new opportunity, when the outcome of an opportunity\'s task has been recorded, when the user asks for a follow-up, or when asked "what is the next step for this opportunity?".':
-    '영업 기회의 현재 상황(영업 기회 자체, 회사, 연락처와 그 역할, 작업, 댓글, 승인, 원본 리드)을 모두 검토하고, 현재 단계가 타당한지와 다음에 할 일(다음 단계로 진행, 현 단계 유지, 보류 또는 실주로 표시)을 이유, 위험 요소, 보완할 점과 함께 판단합니다. 진행을 권장할 때는 구체적으로 무엇을 할지 설명합니다. 리드 전환으로 새 영업 기회가 열렸을 때, 영업 기회 작업의 결과가 기록되었을 때, 사용자가 후속 조치를 요청할 때, 또는 "이 영업 기회의 다음 단계는 무엇인가요?"라고 물을 때 사용합니다.',
-  'Approval review': '승인 검토',
-  'Helps an approver judge whether an approval request (discount, payment terms, contract terms, delivery commitment) is worth approving — how far the asked terms are from the standard, the effect on the amount and on collection, the opportunity\'s situation and the evidence supporting this concession, the other approvals submitted with it on the same opportunity, how earlier requests of the same kind were decided, the risks and what the applicant left unclear — then recommends approve, approve on conditions, reject or ask for more information, and drafts the decision comment. Use it after an approval is submitted, or when the approver asks "should this approval be approved?".':
-    '승인자가 승인 요청(할인, 결제 조건, 계약 조건, 납품 약속)을 승인할 가치가 있는지 판단하도록 돕습니다. 요청 조건이 표준과 얼마나 다른지, 금액과 수금에 미치는 영향, 영업 기회의 상황과 이번 양보를 뒷받침하는 근거, 같은 영업 기회에서 함께 제출된 다른 승인, 같은 유형의 이전 요청이 어떻게 결정되었는지, 위험 요소와 신청자가 불분명하게 남긴 부분을 살핀 후 승인, 조건부 승인, 반려 또는 추가 정보 요청을 권장하고 결정 의견 초안을 작성합니다. 승인이 제출된 후나 승인자가 "이 승인을 승인해야 하나요?"라고 물을 때 사용합니다.',
-  'Task preparation': '작업 준비',
-  "Prepares a salesperson for a task they are about to do with a customer (a call, a meeting, a visit, a demo) — what the task should achieve, where things stand from the record's tasks, comments and mail, who is on the other side and what part each plays, the questions to ask, what to bring, the risks, and the points to cover in order. Use it on the morning of a task, or when the task's owner asks to be prepared.":
-    '영업 사원이 고객과 곧 진행할 작업(통화, 회의, 방문, 데모)을 준비하도록 돕습니다. 작업의 목표, 레코드의 작업·댓글·메일로 본 현재 상황, 상대방이 누구이며 각자 어떤 역할을 하는지, 질문할 내용, 가져갈 것, 위험 요소, 순서대로 다룰 내용을 정리합니다. 작업 당일 아침이나 작업 담당자가 준비를 요청할 때 사용합니다.',
   flowDiagram: {
     controls: '다이어그램 컨트롤',
     fitView: '화면에 맞추기',
@@ -614,7 +641,13 @@ const koKR: AppResource = {
     },
   },
   // The template's Settings copy, translated in ./settings/.
-  settings: settingsKoKR,
+  settings: {
+    ...settingsKoKR,
+    // The Notification management module's logs tab, named as the
+    // notification-logs-ui block names it
+    // (client/pages/settings/routes.ts).
+    notificationLogs: '알림 로그',
+  },
   crm: crmKoKR,
 };
 

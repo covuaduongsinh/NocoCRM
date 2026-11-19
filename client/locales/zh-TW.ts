@@ -1,21 +1,39 @@
 import fileUi from '../extensions/nocobase-file-component-ui/locales/zh-TW.js';
+import notificationLogsUi from '../extensions/nocobase-notification-logs-ui/locales/zh-TW.js';
 import type { AppResource } from './en-US.js';
 import { crmZhTW } from './crm/zh-TW.js';
 import settingsZhTW from './settings/zh-TW.js';
+import databaseExplorer from './database-explorer/zh-TW.js';
 
-// The pages in zh-TW: the template's copy (./system/), the AI skills'
-// display text and the CRM's own (./crm/zh-TW.ts), with the same keys as
-// ./en-US.ts. The template ships no zh-TW, so its copy is translated
-// here; a template upgrade that adds keys fails the type check until they
-// are translated.
+// The pages in zh-TW: the template's copy (./system/) and the CRM's own
+// (./crm/zh-TW.ts), with the same keys as ./en-US.ts. The template ships no
+// zh-TW, so its copy is translated here; a template upgrade that adds keys
+// fails the type check until they are translated.
 const zhTW: AppResource = {
   ...fileUi,
+  ...notificationLogsUi,
   'auth.passwordResetSuccess': '密碼已重設，請用新密碼登入。',
   'auth.requestNewResetLink': '重新申請重設連結',
   'auth.preparingSession': '正在準備登入工作階段…',
   'auth.connectionFailed': '連線失敗',
   'auth.connectionFailedDescription':
     '即時連線暫時無法準備就緒。請重試後進入應用程式，或登出。',
+  // The template's Database Explorer copy, translated in ./database-explorer/.
+  databaseExplorer,
+  taskProgress: {
+    queued: '等待開始',
+    running: '進行中',
+    completed: '已完成',
+    failed: '失敗',
+    canceled: '已取消',
+    count: '{{processed}} / {{total}}',
+    processed: '已處理 {{processed}}',
+    background: '離開此頁面後仍會繼續執行。',
+  },
+  pendingFeedback: {
+    working: '處理中…',
+    longWait: '耗時比平常久，你可以繼續等待。',
+  },
   listFeedback: {
     loading: '載入中',
     empty: '尚無資料',
@@ -117,6 +135,9 @@ const zhTW: AppResource = {
   'auth.loginDescription': '使用使用者名稱或電子郵件和密碼登入',
   'auth.registerTitle': '建立帳戶',
   'auth.registerDescription': '建立帳戶以開始使用',
+  'auth.registrationAccepted': '註冊申請已送出',
+  'auth.registrationGuidance':
+    '請嘗試使用你送出的使用者名稱和密碼登入。如果此電子郵件已有帳戶，新資料不會生效。請使用原帳戶登入或找回密碼。登入前，請依照應用程式提供的驗證說明操作。',
   'auth.forgotTitle': '忘記密碼',
   'auth.forgotDescription': '輸入電子郵件，如果帳戶存在，我們將傳送重設連結',
   'auth.passwordResetUnavailable': '未開啟自助找回，請聯絡管理員重設密碼。',
@@ -156,9 +177,9 @@ const zhTW: AppResource = {
   'auth.continueWith': '使用 {provider} 繼續',
   'auth.about': '關於此應用程式',
   'auth.platform': 'AI 原生應用程式平台',
-  'auth.marketingTitleFirst': '讓 AI 自由建構',
-  'auth.marketingTitleSecond': 'NocoBase 保障',
-  'auth.marketingTitleThird': '可靠運作',
+  // The template's brand line (its zh-CN keeps it in English too).
+  'auth.marketingTitleFirst': 'AI + NocoBase',
+  'auth.marketingTitleSecond': 'Build reliable business systems',
   'auth.marketingDescription':
     '讓 AI 在靈活的前端框架上建構體驗，由 NocoBase 保障底層資料、權限與治理',
   'auth.frontend': 'AI 原生前端',
@@ -171,15 +192,24 @@ const zhTW: AppResource = {
   'status.denied': '無權存取',
   'status.pageFailed': '無法載入頁面',
   'status.retry': '重試',
+  'status.refreshing': '正在重新整理',
+  'status.reloadPage': '重新載入頁面',
+  'status.retryFailedDescription':
+    '仍然無法載入。重新載入整個頁面可能有幫助；此頁面上未儲存的變更可能會遺失。',
   'navigation.brandHome': 'NocoCRM 首頁',
   'navigation.brandApps': 'NocoBase 應用程式',
   'routeOverlay.close': '關閉',
+  'routeOverlay.discardTitle': '放棄修改？',
+  'routeOverlay.discardDescription': '修改尚未儲存，離開後將會遺失。',
+  'routeOverlay.keepEditing': '繼續編輯',
+  'routeOverlay.discard': '放棄',
   'status.deniedDescription': '你沒有存取 {{label}} 的權限。',
   'status.routeFailedDescription':
     '無法載入 {{packageName}} 的路由 {{label}}。',
+  // The template's brand line, which its own zh-CN keeps in English too.
   shell: {
-    buildFreely: 'AI 自由建構',
-    reliability: '<brand>NocoBase</brand> 保障可靠',
+    brandPartnership: 'AI + <brand>NocoBase</brand>',
+    buildReliableSystems: 'Build reliable business systems',
   },
   home: {
     platform: 'NocoBase · AI 原生應用程式平台',
@@ -423,6 +453,7 @@ const zhTW: AppResource = {
   },
   navigation: {
     home: '工作台',
+    resources: '參考資料',
     open: '開啟導覽',
     close: '關閉導覽',
     expand: '展開導覽',
@@ -433,11 +464,17 @@ const zhTW: AppResource = {
     breadcrumb: '麵包屑',
     breadcrumbMore: '顯示中間層級',
     back: '返回',
+    backTo: '返回{{label}}',
   },
   dataTable: {
     noResults: '暫無資料。',
     sortAscending: '遞增',
     sortDescending: '遞減',
+    sort: '排序',
+    sortBy: '排序方式',
+    filters: '篩選',
+    filtersApplied: '篩選 · {{count}}',
+    selectPage: '全選本頁',
     hideColumn: '隱藏',
     view: '檢視',
     toggleColumns: '顯示欄位',
@@ -452,19 +489,8 @@ const zhTW: AppResource = {
   datePicker: {
     placeholder: '選擇日期',
     rangePlaceholder: '選擇日期範圍',
+    clear: '清除',
   },
-  'Lead follow-up': '跟進線索',
-  'Review everything a lead has now (the lead itself, its tasks, comments and related records in the CRM) and recommend the next step — keep following up, nurture, convert or invalid — with the reasons; when following up, say clearly how to follow up and what exactly to do. Use when a new lead comes in, when the user asks to follow up a lead or follow it up again, or asks "what should I do next with this lead".':
-    '綜合檢視一條線索現在的全部資訊（線索本身、任務、備註和 CRM 裡的相關記錄），給出下一步建議：繼續跟進、放入培育、轉換還是無效，以及理由；繼續跟進時寫清楚怎麼跟、具體做什麼。新線索進來、使用者要求跟進或重新跟進、或問「這條線索下一步怎麼做」時使用。',
-  'Opportunity follow-up': '跟進商機',
-  'Reviews everything about an opportunity as it now stands (the opportunity itself, the company, contacts and their roles, tasks, comments, approvals, the source lead) and judges whether its stage holds up and what to do next — advance to the next stage, keep at it in the current stage, pause, or mark it lost — with the reasons, risks and gaps to fill; when advancing, spells out exactly what to do. Use when a lead\'s conversion opens a new opportunity, when the outcome of an opportunity\'s task has been recorded, when the user asks for a follow-up, or when asked "what is the next step for this opportunity?".':
-    '綜合檢視一個商機現在的全部資訊（商機本身、公司、聯絡人和角色、任務、備註、審批、來源線索），判斷它的階段站不站得住、下一步做什麼：推進到下一階段、留在本階段繼續推進、暫停還是輸單，以及理由、風險和要補的缺口；推進時寫清楚具體做什麼。線索轉換出新商機、記錄了商機任務的結果、使用者要求跟進，或問「這個商機下一步怎麼做」時使用。',
-  'Approval review': '審批輔助',
-  'Helps an approver judge whether an approval request (discount, payment terms, contract terms, delivery commitment) is worth approving — how far the asked terms are from the standard, the effect on the amount and on collection, the opportunity\'s situation and the evidence supporting this concession, the other approvals submitted with it on the same opportunity, how earlier requests of the same kind were decided, the risks and what the applicant left unclear — then recommends approve, approve on conditions, reject or ask for more information, and drafts the decision comment. Use it after an approval is submitted, or when the approver asks "should this approval be approved?".':
-    '幫審批人看一個審批申請（折扣、帳期、合約條款、交付承諾）值不值得批：申請的條件和標準差多少、對金額和收款的影響、商機的情況和支撐這次讓步的證據、同一商機一起提交的其他審批、以往同類審批是怎麼批的、風險和申請人沒說清的地方，最後給出批准、有條件批准、駁回或需要補充資訊的建議，並寫好審批意見。審批提交後、審批人問「這個審批該不該批」時使用。',
-  'Task preparation': '任務準備',
-  "Prepares a salesperson for a task they are about to do with a customer (a call, a meeting, a visit, a demo) — what the task should achieve, where things stand from the record's tasks, comments and mail, who is on the other side and what part each plays, the questions to ask, what to bring, the risks, and the points to cover in order. Use it on the morning of a task, or when the task's owner asks to be prepared.":
-    '為業務即將和客戶進行的任務（電話、會議、拜訪、展示）做準備：任務要達成什麼、從記錄的任務、評論和郵件看事情進展到哪一步、對方都有誰以及各自的角色、要問的問題、要帶的資料、風險，以及依順序要講的重點。在任務當天早上，或任務負責人要求準備時使用。',
   flowDiagram: {
     controls: '流程圖控制',
     fitView: '符合畫布',
@@ -587,7 +613,13 @@ const zhTW: AppResource = {
     },
   },
   // The template's Settings copy, translated in ./settings/.
-  settings: settingsZhTW,
+  settings: {
+    ...settingsZhTW,
+    // The Notification management module's logs tab, named as the
+    // notification-logs-ui block names it
+    // (client/pages/settings/routes.ts).
+    notificationLogs: '通知日誌',
+  },
   crm: crmZhTW,
 };
 

@@ -1,15 +1,17 @@
 import fileUi from '../extensions/nocobase-file-component-ui/locales/vi-VN.js';
+import notificationLogsUi from '../extensions/nocobase-notification-logs-ui/locales/vi-VN.js';
 import type { AppResource } from './en-US.js';
 import { crmViVN } from './crm/vi-VN.js';
 import settingsViVN from './settings/vi-VN.js';
+import databaseExplorer from './database-explorer/vi-VN.js';
 
-// The pages in vi-VN: the template's copy (./system/), the AI skills'
-// display text and the CRM's own (./crm/vi-VN.ts), with the same keys as
-// ./en-US.ts. The template ships no vi-VN, so its copy is translated
-// here; a template upgrade that adds keys fails the type check until they
-// are translated.
+// The pages in vi-VN: the template's copy (./system/) and the CRM's own
+// (./crm/vi-VN.ts), with the same keys as ./en-US.ts. The template ships no
+// vi-VN, so its copy is translated here; a template upgrade that adds keys
+// fails the type check until they are translated.
 const viVN: AppResource = {
   ...fileUi,
+  ...notificationLogsUi,
   'auth.passwordResetSuccess':
     'Mật khẩu của bạn đã được đặt lại. Hãy đăng nhập bằng mật khẩu mới.',
   'auth.requestNewResetLink': 'Yêu cầu liên kết đặt lại mới',
@@ -17,6 +19,23 @@ const viVN: AppResource = {
   'auth.connectionFailed': 'Không thể kết nối',
   'auth.connectionFailedDescription':
     'Không thể chuẩn bị kết nối thời gian thực. Hãy thử lại để vào ứng dụng hoặc đăng xuất.',
+  // The template's Database Explorer copy, translated in ./database-explorer/.
+  databaseExplorer,
+  taskProgress: {
+    queued: 'Đang chờ bắt đầu',
+    running: 'Đang chạy',
+    completed: 'Đã hoàn tất',
+    failed: 'Thất bại',
+    canceled: 'Đã hủy',
+    count: '{{processed}} / {{total}}',
+    processed: 'Đã xử lý {{processed}}',
+    background: 'Tác vụ vẫn chạy nếu bạn rời trang này.',
+  },
+  pendingFeedback: {
+    working: 'Đang xử lý…',
+    longWait:
+      'Việc này mất nhiều thời gian hơn bình thường. Bạn có thể tiếp tục chờ.',
+  },
   listFeedback: {
     loading: 'Đang tải',
     empty: 'Chưa có dữ liệu',
@@ -129,6 +148,9 @@ const viVN: AppResource = {
     'Đăng nhập bằng tên người dùng hoặc email và mật khẩu.',
   'auth.registerTitle': 'Tạo tài khoản',
   'auth.registerDescription': 'Tạo tài khoản để bắt đầu.',
+  'auth.registrationAccepted': 'Đã gửi yêu cầu đăng ký',
+  'auth.registrationGuidance':
+    'Hãy thử đăng nhập bằng tên người dùng và mật khẩu bạn đã gửi. Nếu email này đã có tài khoản, thông tin mới sẽ không có hiệu lực. Hãy đăng nhập bằng tài khoản ban đầu hoặc khôi phục mật khẩu. Làm theo mọi hướng dẫn xác minh của ứng dụng trước khi đăng nhập.',
   'auth.forgotTitle': 'Quên mật khẩu',
   'auth.forgotDescription':
     'Nhập email của bạn, chúng tôi sẽ gửi liên kết đặt lại nếu tài khoản tồn tại.',
@@ -171,9 +193,9 @@ const viVN: AppResource = {
   'auth.continueWith': 'Tiếp tục với {provider}',
   'auth.about': 'Giới thiệu ứng dụng',
   'auth.platform': 'Nền tảng ứng dụng AI-native',
-  'auth.marketingTitleFirst': 'Để AI tự do xây dựng.',
-  'auth.marketingTitleSecond': 'NocoBase giữ cho mọi thứ',
-  'auth.marketingTitleThird': 'đáng tin cậy.',
+  // The template's brand line (its zh-CN keeps it in English too).
+  'auth.marketingTitleFirst': 'AI + NocoBase',
+  'auth.marketingTitleSecond': 'Build reliable business systems',
   'auth.marketingDescription':
     'Trao cho AI một framework frontend linh hoạt để định hình từng trải nghiệm, trong khi NocoBase bảo vệ dữ liệu, quyền hạn và quản trị bên dưới.',
   'auth.frontend': 'Frontend AI-native',
@@ -188,15 +210,24 @@ const viVN: AppResource = {
   'status.denied': 'Truy cập bị từ chối',
   'status.pageFailed': 'Không thể tải trang',
   'status.retry': 'Thử lại',
+  'status.refreshing': 'Đang làm mới',
+  'status.reloadPage': 'Tải lại trang',
+  'status.retryFailedDescription':
+    'Vẫn không tải được. Tải lại toàn bộ trang có thể giúp ích; các thay đổi chưa lưu trên trang này có thể bị mất.',
   'navigation.brandHome': 'Trang chủ NocoCRM',
   'navigation.brandApps': 'Ứng dụng NocoBase',
   'routeOverlay.close': 'Đóng',
+  'routeOverlay.discardTitle': 'Bỏ các thay đổi?',
+  'routeOverlay.discardDescription': 'Các thay đổi chưa được lưu và sẽ bị mất.',
+  'routeOverlay.keepEditing': 'Tiếp tục chỉnh sửa',
+  'routeOverlay.discard': 'Bỏ',
   'status.deniedDescription': 'Bạn không có quyền truy cập {{label}}.',
   'status.routeFailedDescription':
     'Không thể tải route {{label}} từ {{packageName}}.',
+  // The template's brand line, which its own zh-CN keeps in English too.
   shell: {
-    buildFreely: 'AI tự do xây dựng.',
-    reliability: '<brand>NocoBase</brand> giữ cho mọi thứ đáng tin cậy.',
+    brandPartnership: 'AI + <brand>NocoBase</brand>',
+    buildReliableSystems: 'Build reliable business systems',
   },
   home: {
     platform: 'NocoBase · Nền tảng ứng dụng AI-native',
@@ -453,6 +484,7 @@ const viVN: AppResource = {
   },
   navigation: {
     home: 'Tổng quan',
+    resources: 'Tài nguyên',
     open: 'Mở thanh điều hướng',
     close: 'Đóng thanh điều hướng',
     expand: 'Mở rộng thanh điều hướng',
@@ -463,11 +495,17 @@ const viVN: AppResource = {
     breadcrumb: 'Đường dẫn',
     breadcrumbMore: 'Hiện các cấp ở giữa',
     back: 'Quay lại',
+    backTo: 'Quay lại {{label}}',
   },
   dataTable: {
     noResults: 'Không có kết quả.',
     sortAscending: 'Tăng dần',
     sortDescending: 'Giảm dần',
+    sort: 'Sắp xếp',
+    sortBy: 'Sắp xếp theo',
+    filters: 'Bộ lọc',
+    filtersApplied: 'Bộ lọc · {{count}}',
+    selectPage: 'Chọn tất cả trên trang này',
     hideColumn: 'Ẩn',
     view: 'Hiển thị',
     toggleColumns: 'Ẩn/hiện cột',
@@ -482,19 +520,8 @@ const viVN: AppResource = {
   datePicker: {
     placeholder: 'Chọn ngày',
     rangePlaceholder: 'Chọn khoảng ngày',
+    clear: 'Xóa',
   },
-  'Lead follow-up': 'Theo dõi khách hàng tiềm năng',
-  'Review everything a lead has now (the lead itself, its tasks, comments and related records in the CRM) and recommend the next step — keep following up, nurture, convert or invalid — with the reasons; when following up, say clearly how to follow up and what exactly to do. Use when a new lead comes in, when the user asks to follow up a lead or follow it up again, or asks "what should I do next with this lead".':
-    'Xem xét mọi thông tin hiện có của một khách hàng tiềm năng (bản thân khách hàng tiềm năng, các công việc, bình luận và bản ghi liên quan trong CRM) và đề xuất bước tiếp theo — tiếp tục theo dõi, nuôi dưỡng, chuyển đổi hay đánh dấu không hợp lệ — kèm lý do; khi tiếp tục theo dõi, nêu rõ cách theo dõi và cụ thể cần làm gì. Dùng khi có khách hàng tiềm năng mới, khi người dùng yêu cầu theo dõi hoặc theo dõi lại một khách hàng tiềm năng, hoặc hỏi "tôi nên làm gì tiếp với khách hàng tiềm năng này".',
-  'Opportunity follow-up': 'Theo dõi cơ hội',
-  'Reviews everything about an opportunity as it now stands (the opportunity itself, the company, contacts and their roles, tasks, comments, approvals, the source lead) and judges whether its stage holds up and what to do next — advance to the next stage, keep at it in the current stage, pause, or mark it lost — with the reasons, risks and gaps to fill; when advancing, spells out exactly what to do. Use when a lead\'s conversion opens a new opportunity, when the outcome of an opportunity\'s task has been recorded, when the user asks for a follow-up, or when asked "what is the next step for this opportunity?".':
-    'Xem xét mọi thông tin hiện tại của một cơ hội (bản thân cơ hội, công ty, các liên hệ và vai trò của họ, công việc, bình luận, phê duyệt, khách hàng tiềm năng nguồn) và đánh giá giai đoạn hiện tại có hợp lý không cũng như nên làm gì tiếp — chuyển sang giai đoạn tiếp theo, tiếp tục ở giai đoạn hiện tại, tạm dừng hay đánh dấu thua — kèm lý do, rủi ro và những thiếu sót cần bổ sung; khi chuyển giai đoạn, nêu cụ thể cần làm gì. Dùng khi việc chuyển đổi một khách hàng tiềm năng mở ra cơ hội mới, khi kết quả một công việc của cơ hội đã được ghi lại, khi người dùng yêu cầu theo dõi, hoặc khi được hỏi "bước tiếp theo của cơ hội này là gì?".',
-  'Approval review': 'Xem xét phê duyệt',
-  'Helps an approver judge whether an approval request (discount, payment terms, contract terms, delivery commitment) is worth approving — how far the asked terms are from the standard, the effect on the amount and on collection, the opportunity\'s situation and the evidence supporting this concession, the other approvals submitted with it on the same opportunity, how earlier requests of the same kind were decided, the risks and what the applicant left unclear — then recommends approve, approve on conditions, reject or ask for more information, and drafts the decision comment. Use it after an approval is submitted, or when the approver asks "should this approval be approved?".':
-    'Giúp người phê duyệt đánh giá một yêu cầu phê duyệt (chiết khấu, điều khoản thanh toán, điều khoản hợp đồng, cam kết giao hàng) có đáng phê duyệt không — điều kiện được yêu cầu chênh lệch bao nhiêu so với tiêu chuẩn, ảnh hưởng đến số tiền và việc thu tiền, tình hình của cơ hội và bằng chứng ủng hộ nhượng bộ này, các phê duyệt khác được gửi cùng trên cùng cơ hội, các yêu cầu cùng loại trước đây đã được quyết định thế nào, các rủi ro và những điểm người đề nghị chưa làm rõ — rồi đề xuất phê duyệt, phê duyệt có điều kiện, từ chối hoặc yêu cầu bổ sung thông tin, và soạn sẵn bình luận cho quyết định. Dùng sau khi một phê duyệt được gửi, hoặc khi người phê duyệt hỏi "có nên phê duyệt yêu cầu này không?".',
-  'Task preparation': 'Chuẩn bị công việc',
-  "Prepares a salesperson for a task they are about to do with a customer (a call, a meeting, a visit, a demo) — what the task should achieve, where things stand from the record's tasks, comments and mail, who is on the other side and what part each plays, the questions to ask, what to bring, the risks, and the points to cover in order. Use it on the morning of a task, or when the task's owner asks to be prepared.":
-    'Giúp nhân viên bán hàng chuẩn bị cho một công việc sắp làm với khách hàng (cuộc gọi, cuộc họp, chuyến thăm, buổi demo) — công việc cần đạt được gì, tình hình hiện tại dựa trên các công việc, bình luận và email của bản ghi, phía bên kia gồm những ai và mỗi người đóng vai trò gì, các câu hỏi cần đặt ra, những gì cần mang theo, các rủi ro, và các điểm cần trao đổi theo thứ tự. Dùng vào buổi sáng ngày diễn ra công việc, hoặc khi người phụ trách công việc yêu cầu được chuẩn bị.',
   flowDiagram: {
     controls: 'Điều khiển sơ đồ',
     fitView: 'Vừa khung nhìn',
@@ -617,7 +644,13 @@ const viVN: AppResource = {
     },
   },
   // The template's Settings copy, translated in ./settings/.
-  settings: settingsViVN,
+  settings: {
+    ...settingsViVN,
+    // The Notification management module's logs tab, named as the
+    // notification-logs-ui block names it
+    // (client/pages/settings/routes.ts).
+    notificationLogs: 'Nhật ký thông báo',
+  },
   crm: crmViVN,
 };
 

@@ -21,7 +21,7 @@ vi.mock('../../client/pages/settings/accounts/user-extras.js', () => ({
   PendingInvitations: () => null,
 }));
 vi.mock('../../client/pages/settings/accounts/user-row-extras.js', () => ({
-  useUserExtras: () => ({ items: null, dialogs: null, offered: false }),
+  useUserExtras: () => ({ actions: [], dialogs: null }),
 }));
 
 const namespace = '@nocobase/user-drawer-test';
@@ -60,9 +60,8 @@ function Pages({ base }: { readonly base: string }) {
       <Routes>
         <Route path={base} element={<UsersPage />}>
           <Route path='create' element={<UserForm />} />
-          <Route path=':userId' element={<UserDetail />}>
-            <Route path='edit' element={<UserForm />} />
-          </Route>
+          <Route path=':userId' element={<UserDetail />} />
+          <Route path=':userId/edit' element={<UserForm />} />
         </Route>
         <Route path='*' element={<h1>Fallback home</h1>} />
       </Routes>
@@ -196,18 +195,23 @@ it.each(['/users', '/settings/users'])(
       exact: true,
     });
     expect(edit).toHaveAttribute('href', `${base}/alice/edit${search}`);
+    // Account actions sit in the row's "⋮" menu, not as buttons on the row (T1.5).
     expect(
-      screen.getByRole('button', { name: 'Disable', exact: true }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Revoke sessions', exact: true }),
-    ).toBeVisible();
+      screen.queryByRole('button', { name: 'Disable', exact: true }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Edit Alice' }),
     ).not.toBeInTheDocument();
+    const menu = await screen.findByRole('button', {
+      name: 'Actions for Alice',
+      expanded: false,
+    });
+    await user.click(menu);
     expect(
-      screen.queryByRole('button', { name: 'Actions for Alice' }),
-    ).not.toBeInTheDocument();
+      (await screen.findAllByRole('menuitem')).map((item) => item.textContent),
+    ).toEqual(['Disable', 'Revoke sessions']);
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(menu).toHaveFocus());
     if (base === '/users') {
       edit.focus();
       await user.keyboard('{Enter}');
@@ -466,7 +470,7 @@ it('blocks closing and duplicate submission until the unified save completes', a
   await user.click(screen.getByRole('button', { name: 'Save', exact: true }));
   await waitFor(() => expect(name).toBeDisabled());
   expect(
-    screen.getByRole('button', { name: enUS.settings.saving }),
+    await screen.findByRole('button', { name: enUS.settings.saving }),
   ).toBeDisabled();
   expect(
     screen.getByRole('button', { name: 'Cancel', exact: true }),

@@ -1,15 +1,17 @@
 import fileUi from '../extensions/nocobase-file-component-ui/locales/de-DE.js';
+import notificationLogsUi from '../extensions/nocobase-notification-logs-ui/locales/de-DE.js';
 import type { AppResource } from './en-US.js';
 import { crmDeDE } from './crm/de-DE.js';
 import settingsDeDE from './settings/de-DE.js';
+import databaseExplorer from './database-explorer/de-DE.js';
 
-// The pages in de-DE: the template's copy (./system/), the AI skills'
-// display text and the CRM's own (./crm/de-DE.ts), with the same keys as
-// ./en-US.ts. The template ships no de-DE, so its copy is translated
-// here; a template upgrade that adds keys fails the type check until they
-// are translated.
+// The pages in de-DE: the template's copy (./system/) and the CRM's own
+// (./crm/de-DE.ts), with the same keys as ./en-US.ts. The template ships no
+// de-DE, so its copy is translated here; a template upgrade that adds keys
+// fails the type check until they are translated.
 const deDE: AppResource = {
   ...fileUi,
+  ...notificationLogsUi,
   'auth.passwordResetSuccess':
     'Ihr Passwort wurde zurückgesetzt. Melden Sie sich mit Ihrem neuen Passwort an.',
   'auth.requestNewResetLink': 'Neuen Link zum Zurücksetzen anfordern',
@@ -17,6 +19,22 @@ const deDE: AppResource = {
   'auth.connectionFailed': 'Verbindung nicht möglich',
   'auth.connectionFailedDescription':
     'Die Echtzeitverbindung konnte nicht hergestellt werden. Versuchen Sie es erneut, um die Anwendung zu öffnen, oder melden Sie sich ab.',
+  // The template's Database Explorer copy, translated in ./database-explorer/.
+  databaseExplorer,
+  taskProgress: {
+    queued: 'Wartet auf den Start',
+    running: 'Läuft',
+    completed: 'Abgeschlossen',
+    failed: 'Fehlgeschlagen',
+    canceled: 'Abgebrochen',
+    count: '{{processed}} von {{total}}',
+    processed: '{{processed}} verarbeitet',
+    background: 'Es läuft weiter, wenn Sie diese Seite verlassen.',
+  },
+  pendingFeedback: {
+    working: 'Wird bearbeitet…',
+    longWait: 'Das dauert länger als gewöhnlich. Sie können weiter warten.',
+  },
   listFeedback: {
     loading: 'Wird geladen',
     empty: 'Noch keine Daten',
@@ -136,6 +154,9 @@ const deDE: AppResource = {
     'Melden Sie sich mit Benutzername oder E-Mail und Passwort an.',
   'auth.registerTitle': 'Konto erstellen',
   'auth.registerDescription': 'Erstellen Sie ein Konto, um loszulegen.',
+  'auth.registrationAccepted': 'Registrierungsanfrage gesendet',
+  'auth.registrationGuidance':
+    'Versuchen Sie, sich mit dem gesendeten Benutzernamen und Passwort anzumelden. Gibt es für diese E-Mail-Adresse bereits ein Konto, werden die neuen Angaben nicht übernommen. Melden Sie sich mit Ihrem ursprünglichen Konto an oder setzen Sie Ihr Passwort zurück. Folgen Sie vor der Anmeldung allen Bestätigungsanweisungen der Anwendung.',
   'auth.forgotTitle': 'Passwort vergessen',
   'auth.forgotDescription':
     'Geben Sie Ihre E-Mail-Adresse ein. Falls das Konto existiert, senden wir einen Link zum Zurücksetzen.',
@@ -180,9 +201,9 @@ const deDE: AppResource = {
   'auth.continueWith': 'Weiter mit {provider}',
   'auth.about': 'Über diese Anwendung',
   'auth.platform': 'KI-native Anwendungsplattform',
-  'auth.marketingTitleFirst': 'Lassen Sie KI frei bauen.',
-  'auth.marketingTitleSecond': 'NocoBase macht es',
-  'auth.marketingTitleThird': 'zuverlässig.',
+  // The template's brand line (its zh-CN keeps it in English too).
+  'auth.marketingTitleFirst': 'AI + NocoBase',
+  'auth.marketingTitleSecond': 'Build reliable business systems',
   'auth.marketingDescription':
     'Geben Sie der KI ein flexibles Frontend-Framework, um jedes Erlebnis zu gestalten, während NocoBase die Daten, Berechtigungen und Governance darunter absichert.',
   'auth.frontend': 'KI-natives Frontend',
@@ -197,15 +218,25 @@ const deDE: AppResource = {
   'status.denied': 'Zugriff verweigert',
   'status.pageFailed': 'Seite konnte nicht geladen werden',
   'status.retry': 'Erneut versuchen',
+  'status.refreshing': 'Wird aktualisiert',
+  'status.reloadPage': 'Seite neu laden',
+  'status.retryFailedDescription':
+    'Sie konnte weiterhin nicht geladen werden. Ein Neuladen der ganzen Seite kann helfen; nicht gespeicherte Änderungen auf dieser Seite gehen dabei möglicherweise verloren.',
   'navigation.brandHome': 'NocoCRM-Startseite',
   'navigation.brandApps': 'NocoBase-Anwendungen',
   'routeOverlay.close': 'Schließen',
+  'routeOverlay.discardTitle': 'Änderungen verwerfen?',
+  'routeOverlay.discardDescription':
+    'Ihre Änderungen wurden nicht gespeichert und gehen verloren.',
+  'routeOverlay.keepEditing': 'Weiter bearbeiten',
+  'routeOverlay.discard': 'Verwerfen',
   'status.deniedDescription': 'Sie haben keine Berechtigung für {{label}}.',
   'status.routeFailedDescription':
     'Route {{label}} aus {{packageName}} konnte nicht geladen werden.',
+  // The template's brand line, which its own zh-CN keeps in English too.
   shell: {
-    buildFreely: 'KI baut frei.',
-    reliability: '<brand>NocoBase</brand> macht es zuverlässig.',
+    brandPartnership: 'AI + <brand>NocoBase</brand>',
+    buildReliableSystems: 'Build reliable business systems',
   },
   home: {
     platform: 'NocoBase · KI-native Anwendungsplattform',
@@ -463,6 +494,7 @@ const deDE: AppResource = {
   },
   navigation: {
     home: 'Übersicht',
+    resources: 'Ressourcen',
     open: 'Navigation öffnen',
     close: 'Navigation schließen',
     expand: 'Navigation ausklappen',
@@ -473,11 +505,17 @@ const deDE: AppResource = {
     breadcrumb: 'Brotkrumennavigation',
     breadcrumbMore: 'Zwischenebenen anzeigen',
     back: 'Zurück',
+    backTo: 'Zurück zu {{label}}',
   },
   dataTable: {
     noResults: 'Keine Ergebnisse.',
     sortAscending: 'Aufsteigend',
     sortDescending: 'Absteigend',
+    sort: 'Sortieren',
+    sortBy: 'Sortieren nach',
+    filters: 'Filter',
+    filtersApplied: 'Filter · {{count}}',
+    selectPage: 'Alle auf dieser Seite auswählen',
     hideColumn: 'Ausblenden',
     view: 'Ansicht',
     toggleColumns: 'Spalten ein-/ausblenden',
@@ -492,19 +530,8 @@ const deDE: AppResource = {
   datePicker: {
     placeholder: 'Datum auswählen',
     rangePlaceholder: 'Zeitraum auswählen',
+    clear: 'Löschen',
   },
-  'Lead follow-up': 'Lead nachfassen',
-  'Review everything a lead has now (the lead itself, its tasks, comments and related records in the CRM) and recommend the next step — keep following up, nurture, convert or invalid — with the reasons; when following up, say clearly how to follow up and what exactly to do. Use when a new lead comes in, when the user asks to follow up a lead or follow it up again, or asks "what should I do next with this lead".':
-    'Prüft alles, was zu einem Lead aktuell vorliegt (den Lead selbst, seine Aufgaben, Kommentare und zugehörige Datensätze im CRM), und empfiehlt mit Begründung den nächsten Schritt – weiter nachfassen, in Pflege nehmen, konvertieren oder ungültig; beim Nachfassen wird klar gesagt, wie nachgefasst wird und was genau zu tun ist. Verwenden, wenn ein neuer Lead eingeht, wenn der Benutzer darum bittet, einen Lead nachzufassen oder erneut nachzufassen, oder fragt: „Was soll ich als Nächstes mit diesem Lead tun?“',
-  'Opportunity follow-up': 'Verkaufschance nachfassen',
-  'Reviews everything about an opportunity as it now stands (the opportunity itself, the company, contacts and their roles, tasks, comments, approvals, the source lead) and judges whether its stage holds up and what to do next — advance to the next stage, keep at it in the current stage, pause, or mark it lost — with the reasons, risks and gaps to fill; when advancing, spells out exactly what to do. Use when a lead\'s conversion opens a new opportunity, when the outcome of an opportunity\'s task has been recorded, when the user asks for a follow-up, or when asked "what is the next step for this opportunity?".':
-    'Prüft alles zum aktuellen Stand einer Verkaufschance (die Verkaufschance selbst, das Unternehmen, Kontakte und ihre Rollen, Aufgaben, Kommentare, Genehmigungen, den Ursprungs-Lead) und beurteilt, ob ihre Phase haltbar ist und was als Nächstes zu tun ist – in die nächste Phase vorrücken, in der aktuellen Phase dranbleiben, pausieren oder als verloren markieren –, mit Begründung, Risiken und zu schließenden Lücken; beim Vorrücken wird genau beschrieben, was zu tun ist. Verwenden, wenn durch die Konvertierung eines Leads eine neue Verkaufschance entsteht, wenn das Ergebnis einer Aufgabe der Verkaufschance erfasst wurde, wenn der Benutzer um Nachfassen bittet oder wenn gefragt wird: „Was ist der nächste Schritt für diese Verkaufschance?“',
-  'Approval review': 'Genehmigungsprüfung',
-  'Helps an approver judge whether an approval request (discount, payment terms, contract terms, delivery commitment) is worth approving — how far the asked terms are from the standard, the effect on the amount and on collection, the opportunity\'s situation and the evidence supporting this concession, the other approvals submitted with it on the same opportunity, how earlier requests of the same kind were decided, the risks and what the applicant left unclear — then recommends approve, approve on conditions, reject or ask for more information, and drafts the decision comment. Use it after an approval is submitted, or when the approver asks "should this approval be approved?".':
-    'Hilft einem Genehmiger zu beurteilen, ob eine Genehmigungsanfrage (Rabatt, Zahlungsbedingungen, Vertragsbedingungen, Lieferzusage) eine Genehmigung verdient – wie weit die geforderten Bedingungen vom Standard abweichen, die Auswirkung auf Betrag und Zahlungseingang, die Lage der Verkaufschance und die Belege für dieses Zugeständnis, die anderen mit ihr für dieselbe Verkaufschance eingereichten Genehmigungen, wie frühere Anfragen derselben Art entschieden wurden, die Risiken und was der Antragsteller offengelassen hat – und empfiehlt dann Genehmigen, Genehmigen unter Auflagen, Ablehnen oder weitere Informationen anfordern und entwirft den Kommentar zur Entscheidung. Verwenden, nachdem eine Genehmigung eingereicht wurde, oder wenn der Genehmiger fragt: „Sollte diese Genehmigung erteilt werden?“',
-  'Task preparation': 'Aufgabenvorbereitung',
-  "Prepares a salesperson for a task they are about to do with a customer (a call, a meeting, a visit, a demo) — what the task should achieve, where things stand from the record's tasks, comments and mail, who is on the other side and what part each plays, the questions to ask, what to bring, the risks, and the points to cover in order. Use it on the morning of a task, or when the task's owner asks to be prepared.":
-    'Bereitet einen Vertriebsmitarbeiter auf eine anstehende Aufgabe mit einem Kunden vor (Anruf, Meeting, Besuch, Demo) – was die Aufgabe erreichen soll, wo die Dinge laut Aufgaben, Kommentaren und E-Mails des Datensatzes stehen, wer auf der Gegenseite sitzt und welche Rolle jeder spielt, welche Fragen zu stellen sind, was mitzubringen ist, die Risiken und die Punkte, die der Reihe nach zu behandeln sind. Verwenden am Morgen einer Aufgabe oder wenn der Verantwortliche der Aufgabe um Vorbereitung bittet.',
   flowDiagram: {
     controls: 'Diagrammsteuerung',
     fitView: 'Einpassen',
@@ -629,7 +656,13 @@ const deDE: AppResource = {
     },
   },
   // The template's Settings copy, translated in ./settings/.
-  settings: settingsDeDE,
+  settings: {
+    ...settingsDeDE,
+    // The Notification management module's logs tab, named as the
+    // notification-logs-ui block names it
+    // (client/pages/settings/routes.ts).
+    notificationLogs: 'Benachrichtigungsprotokolle',
+  },
   crm: crmDeDE,
 };
 

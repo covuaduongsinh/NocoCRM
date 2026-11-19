@@ -1,21 +1,39 @@
 import fileUi from '../extensions/nocobase-file-component-ui/locales/ru-RU.js';
+import notificationLogsUi from '../extensions/nocobase-notification-logs-ui/locales/ru-RU.js';
 import type { AppResource } from './en-US.js';
 import { crmRuRU } from './crm/ru-RU.js';
 import settingsRuRU from './settings/ru-RU.js';
+import databaseExplorer from './database-explorer/ru-RU.js';
 
-// The pages in ru-RU: the template's copy (./system/), the AI skills'
-// display text and the CRM's own (./crm/ru-RU.ts), with the same keys as
-// ./en-US.ts. The template ships no ru-RU, so its copy is translated
-// here; a template upgrade that adds keys fails the type check until they
-// are translated.
+// The pages in ru-RU: the template's copy (./system/) and the CRM's own
+// (./crm/ru-RU.ts), with the same keys as ./en-US.ts. The template ships no
+// ru-RU, so its copy is translated here; a template upgrade that adds keys
+// fails the type check until they are translated.
 const ruRU: AppResource = {
   ...fileUi,
+  ...notificationLogsUi,
   'auth.passwordResetSuccess': 'Ваш пароль сброшен. Войдите с новым паролем.',
   'auth.requestNewResetLink': 'Запросить новую ссылку для сброса',
   'auth.preparingSession': 'Подготовка сеанса…',
   'auth.connectionFailed': 'Не удалось подключиться',
   'auth.connectionFailedDescription':
     'Не удалось установить соединение в реальном времени. Повторите попытку, чтобы войти в приложение, или выйдите из системы.',
+  // The template's Database Explorer copy, translated in ./database-explorer/.
+  databaseExplorer,
+  taskProgress: {
+    queued: 'Ожидает запуска',
+    running: 'Выполняется',
+    completed: 'Завершено',
+    failed: 'Ошибка',
+    canceled: 'Отменено',
+    count: '{{processed}} из {{total}}',
+    processed: 'Обработано: {{processed}}',
+    background: 'Работа продолжится, если вы покинете эту страницу.',
+  },
+  pendingFeedback: {
+    working: 'Выполняется…',
+    longWait: 'Это занимает больше времени, чем обычно. Можно подождать ещё.',
+  },
   listFeedback: {
     loading: 'Загрузка',
     empty: 'Данных пока нет',
@@ -131,6 +149,9 @@ const ruRU: AppResource = {
     'Войдите с именем пользователя или эл. почтой и паролем.',
   'auth.registerTitle': 'Создание учётной записи',
   'auth.registerDescription': 'Создайте учётную запись, чтобы начать работу.',
+  'auth.registrationAccepted': 'Запрос на регистрацию отправлен',
+  'auth.registrationGuidance':
+    'Попробуйте войти с отправленными именем пользователя и паролем. Если для этого адреса уже есть учётная запись, новые данные не вступят в силу. Войдите в исходную учётную запись или восстановите пароль. Перед входом выполните инструкции по подтверждению, которые даёт приложение.',
   'auth.forgotTitle': 'Забыли пароль',
   'auth.forgotDescription':
     'Введите адрес эл. почты, и мы отправим ссылку для сброса, если такая учётная запись существует.',
@@ -175,9 +196,9 @@ const ruRU: AppResource = {
   'auth.continueWith': 'Продолжить через {provider}',
   'auth.about': 'Об этом приложении',
   'auth.platform': 'ИИ-нативная платформа приложений',
-  'auth.marketingTitleFirst': 'Пусть ИИ создаёт свободно.',
-  'auth.marketingTitleSecond': 'NocoBase обеспечивает',
-  'auth.marketingTitleThird': 'надёжность.',
+  // The template's brand line (its zh-CN keeps it in English too).
+  'auth.marketingTitleFirst': 'AI + NocoBase',
+  'auth.marketingTitleSecond': 'Build reliable business systems',
   'auth.marketingDescription':
     'Дайте ИИ гибкий фронтенд-фреймворк, чтобы формировать любой интерфейс, а NocoBase защитит данные, разрешения и управление под ним.',
   'auth.frontend': 'ИИ-нативный фронтенд',
@@ -192,15 +213,24 @@ const ruRU: AppResource = {
   'status.denied': 'Доступ запрещён',
   'status.pageFailed': 'Не удалось загрузить страницу',
   'status.retry': 'Повторить',
+  'status.refreshing': 'Обновление',
+  'status.reloadPage': 'Перезагрузить страницу',
+  'status.retryFailedDescription':
+    'Загрузить по-прежнему не удаётся. Может помочь перезагрузка всей страницы; несохранённые изменения на этой странице могут быть потеряны.',
   'navigation.brandHome': 'Главная NocoCRM',
   'navigation.brandApps': 'Приложения NocoBase',
   'routeOverlay.close': 'Закрыть',
+  'routeOverlay.discardTitle': 'Отменить изменения?',
+  'routeOverlay.discardDescription': 'Изменения не сохранены и будут потеряны.',
+  'routeOverlay.keepEditing': 'Продолжить редактирование',
+  'routeOverlay.discard': 'Отменить',
   'status.deniedDescription': 'У вас нет разрешения на доступ: {{label}}.',
   'status.routeFailedDescription':
     'Не удалось загрузить маршрут {{label}} из {{packageName}}.',
+  // The template's brand line, which its own zh-CN keeps in English too.
   shell: {
-    buildFreely: 'ИИ создаёт свободно.',
-    reliability: '<brand>NocoBase</brand> обеспечивает надёжность.',
+    brandPartnership: 'AI + <brand>NocoBase</brand>',
+    buildReliableSystems: 'Build reliable business systems',
   },
   home: {
     platform: 'NocoBase · ИИ-нативная платформа приложений',
@@ -457,6 +487,7 @@ const ruRU: AppResource = {
   },
   navigation: {
     home: 'Обзор',
+    resources: 'Ресурсы',
     open: 'Открыть навигацию',
     close: 'Закрыть навигацию',
     expand: 'Развернуть навигацию',
@@ -467,11 +498,17 @@ const ruRU: AppResource = {
     breadcrumb: 'Навигационная цепочка',
     breadcrumbMore: 'Показать промежуточные уровни',
     back: 'Назад',
+    backTo: 'Назад: {{label}}',
   },
   dataTable: {
     noResults: 'Нет результатов.',
     sortAscending: 'По возрастанию',
     sortDescending: 'По убыванию',
+    sort: 'Сортировка',
+    sortBy: 'Сортировать по',
+    filters: 'Фильтры',
+    filtersApplied: 'Фильтры · {{count}}',
+    selectPage: 'Выбрать всё на этой странице',
     hideColumn: 'Скрыть',
     view: 'Вид',
     toggleColumns: 'Показать или скрыть столбцы',
@@ -486,19 +523,8 @@ const ruRU: AppResource = {
   datePicker: {
     placeholder: 'Выберите дату',
     rangePlaceholder: 'Выберите период',
+    clear: 'Очистить',
   },
-  'Lead follow-up': 'Сопровождение лида',
-  'Review everything a lead has now (the lead itself, its tasks, comments and related records in the CRM) and recommend the next step — keep following up, nurture, convert or invalid — with the reasons; when following up, say clearly how to follow up and what exactly to do. Use when a new lead comes in, when the user asks to follow up a lead or follow it up again, or asks "what should I do next with this lead".':
-    'Изучает всё, что сейчас есть по лиду (сам лид, его задачи, комментарии и связанные записи в CRM), и рекомендует следующий шаг — продолжить работу, отправить на прогрев, конвертировать или признать недействительным — с обоснованием; при продолжении работы чётко говорит, как продолжать и что именно сделать. Используется, когда поступает новый лид, когда пользователь просит выполнить или повторить сопровождение лида или спрашивает «что делать дальше с этим лидом».',
-  'Opportunity follow-up': 'Сопровождение сделки',
-  'Reviews everything about an opportunity as it now stands (the opportunity itself, the company, contacts and their roles, tasks, comments, approvals, the source lead) and judges whether its stage holds up and what to do next — advance to the next stage, keep at it in the current stage, pause, or mark it lost — with the reasons, risks and gaps to fill; when advancing, spells out exactly what to do. Use when a lead\'s conversion opens a new opportunity, when the outcome of an opportunity\'s task has been recorded, when the user asks for a follow-up, or when asked "what is the next step for this opportunity?".':
-    'Изучает текущее состояние сделки (саму сделку, компанию, контакты и их роли, задачи, комментарии, согласования, исходный лид) и оценивает, обоснован ли её этап и что делать дальше — перейти на следующий этап, продолжить на текущем, приостановить или признать проигранной — с обоснованием, рисками и пробелами, которые нужно заполнить; при продвижении точно описывает, что сделать. Используется, когда конвертация лида открывает новую сделку, когда записан результат задачи по сделке, когда пользователь просит о сопровождении или спрашивает «какой следующий шаг по этой сделке?».',
-  'Approval review': 'Проверка согласования',
-  'Helps an approver judge whether an approval request (discount, payment terms, contract terms, delivery commitment) is worth approving — how far the asked terms are from the standard, the effect on the amount and on collection, the opportunity\'s situation and the evidence supporting this concession, the other approvals submitted with it on the same opportunity, how earlier requests of the same kind were decided, the risks and what the applicant left unclear — then recommends approve, approve on conditions, reject or ask for more information, and drafts the decision comment. Use it after an approval is submitted, or when the approver asks "should this approval be approved?".':
-    'Помогает согласующему оценить, стоит ли одобрять запрос на согласование (скидка, условия оплаты, условия договора, обязательства по поставке): насколько запрошенные условия отличаются от стандарта, как они влияют на сумму и поступление оплаты, в каком состоянии сделка и какие доводы подкрепляют эту уступку, какие ещё запросы отправлены вместе с ним по той же сделке, какие решения принимались по прежним запросам того же рода, какие есть риски и что заявитель оставил неясным, — затем рекомендует одобрить, одобрить с условиями, отклонить или запросить больше информации и готовит черновик комментария к решению. Используется после отправки запроса на согласование или когда согласующий спрашивает «стоит ли одобрить этот запрос?».',
-  'Task preparation': 'Подготовка к задаче',
-  "Prepares a salesperson for a task they are about to do with a customer (a call, a meeting, a visit, a demo) — what the task should achieve, where things stand from the record's tasks, comments and mail, who is on the other side and what part each plays, the questions to ask, what to bring, the risks, and the points to cover in order. Use it on the morning of a task, or when the task's owner asks to be prepared.":
-    'Готовит менеджера по продажам к предстоящей задаче с клиентом (звонку, встрече, визиту, демонстрации): какого результата нужно достичь, как обстоят дела по задачам, комментариям и почте записи, кто на другой стороне и какую роль играет каждый, какие вопросы задать, что взять с собой, какие риски и какие пункты обсудить по порядку. Используется утром в день задачи или когда ответственный за задачу просит подготовить его.',
   flowDiagram: {
     controls: 'Управление схемой',
     fitView: 'Вписать в экран',
@@ -621,7 +647,13 @@ const ruRU: AppResource = {
     },
   },
   // The template's Settings copy, translated in ./settings/.
-  settings: settingsRuRU,
+  settings: {
+    ...settingsRuRU,
+    // The Notification management module's logs tab, named as the
+    // notification-logs-ui block names it
+    // (client/pages/settings/routes.ts).
+    notificationLogs: 'Журнал уведомлений',
+  },
   crm: crmRuRU,
 };
 
