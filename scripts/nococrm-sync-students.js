@@ -67,7 +67,7 @@ function runSync() {
   const wonOpps = crmDb.prepare(`
     SELECT o.id, o.student_name, o.chess_level, o.contacts, o.owner_id, o.created_at
     FROM crm_opportunities o
-    WHERE o.stage = 'closed_won' AND o.student_name IS NOT NULL AND TRIM(o.student_name) != ''
+    WHERE o.stage IN ('won', 'closed_won') AND o.student_name IS NOT NULL AND TRIM(o.student_name) != ''
   `).all();
 
   const insertStudentStmt = crmDb.prepare(`

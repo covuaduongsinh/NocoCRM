@@ -361,7 +361,7 @@ function EntityList({ entity }: { entity: Entity }): ReactElement {
     ? offered('chessLevel', ['beginner', 'elementary', 'intermediate', 'advanced', 'master'])
     : '';
   const pipelineType = hasField('pipelineType')
-    ? offered('pipelineType', ['tuition', 'merchandise', 'b2b_school'])
+    ? offered('pipelineType', ['tuition', 'b2b_school'])
     : '';
   const filtering = Boolean(
     search ||
@@ -915,7 +915,6 @@ function EntityList({ entity }: { entity: Entity }): ReactElement {
             label: toText(text('fields.pipelineType')),
             options: [
               { value: 'tuition', label: toText(text('options.tuition')) },
-              { value: 'merchandise', label: toText(text('options.merchandise')) },
               { value: 'b2b_school', label: toText(text('options.b2b_school')) },
             ],
             value: pipelineType || null,

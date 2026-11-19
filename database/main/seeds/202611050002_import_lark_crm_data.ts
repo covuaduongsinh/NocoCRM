@@ -13,6 +13,29 @@ async function batchInsert(query: any, table: string, items: any[], chunkSize = 
   }
 }
 
+// The export holds Lark Base's own values where the CRM has fixed ones; a
+// fresh installation is given the CRM's, as migration
+// 202611190001_crm_academy_values gave the installations this seed had
+// already filled: a branch's code for its name, the CRM's stage and status,
+// and what a tuition deal sold, read from its name ("Học phí khóa 10 buổi").
+const BRANCH_CODES: Record<string, string> = {
+  'Kim Liên': 'cs1',
+  'Vĩnh Phúc': 'cs2',
+};
+const branchCode = (name: unknown): unknown =>
+  typeof name === 'string' ? (BRANCH_CODES[name] ?? name) : name;
+const SESSION_PACKAGES: Record<string, string> = {
+  '10': 'course10',
+  '20': 'course20',
+  '40': 'course40',
+};
+function tuitionBusinessType(name: unknown): string | null {
+  const sessions = /^Học phí khóa (\d+) buổi/u.exec(
+    typeof name === 'string' ? name : '',
+  )?.[1];
+  return sessions ? (SESSION_PACKAGES[sessions] ?? 'chessCourse') : null;
+}
+
 const seed: SeedDefinition = defineSeed({
   name: '202611050002_import_lark_crm_data',
   transaction: true,
@@ -57,7 +80,7 @@ const seed: SeedDefinition = defineSeed({
         phone: c.phone,
         email: c.email,
         customerType: c.customerType || 'individual',
-        preferredBranch: c.preferredBranch,
+        preferredBranch: branchCode(c.preferredBranch),
         studentName: c.studentName,
         trialNotes: c.notes,
         employed: true,
@@ -102,12 +125,13 @@ const seed: SeedDefinition = defineSeed({
         name: ld.name,
         ownerId: ld.ownerId,
         createdById: ld.createdById,
-        status: ld.status || 'Đang chăm sóc',
+        // "Đang chăm sóc", which every lead of the export is: being worked.
+        status: 'working',
         source: ld.source || 'LarkBase',
         phone: ld.phone,
         customerType: ld.customerType || 'individual',
         studentName: ld.studentName,
-        preferredBranch: ld.preferredBranch,
+        preferredBranch: branchCode(ld.preferredBranch),
         trialDate: ld.trialDate ? new Date(ld.trialDate) : null,
         trialNotes: ld.trialNotes,
         message: ld.description,
@@ -151,12 +175,14 @@ const seed: SeedDefinition = defineSeed({
         companyId: op.accountId,
         ownerId: op.ownerId,
         createdById: op.createdById,
-        stage: op.stage,
+        stage: op.stage === 'closed_won' ? 'won' : op.stage,
+        businessType:
+          op.pipelineType === 'tuition' ? tuitionBusinessType(op.name) : null,
         amount: op.amount,
         currency: op.currency,
         source: op.source,
         pipelineType: op.pipelineType,
-        preferredBranch: op.preferredBranch,
+        preferredBranch: branchCode(op.preferredBranch),
         contacts: op.contacts,
         closedAt: new Date(op.closedAt),
         createdAt: new Date(op.createdAt),

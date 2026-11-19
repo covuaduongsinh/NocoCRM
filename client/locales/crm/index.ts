@@ -3285,6 +3285,28 @@ const wording = {
     nurtureReviewDays: ['Nurture review after (days)', '培育复查间隔（天）'],
     companyType: ['Company type', '公司类型'],
   },
+  // A tuition package's terms under the choice of it on an opportunity
+  // (server/providers/crm/tuition.ts, form.tsx).
+  tuition: {
+    sessions: [
+      '{{sessions}} sessions: {{amount}}',
+      '{{sessions}} 课时：{{amount}}',
+    ],
+    books: ['Books: {{amount}}', '教材费：{{amount}}'],
+    booksWaived: [
+      'Books waived (worth {{amount}})',
+      '免教材费（价值 {{amount}}）',
+    ],
+    gift: [
+      'Gift: {{gift}} (worth {{amount}})',
+      '赠送{{gift}}（价值 {{amount}}）',
+    ],
+    saving: ['Saves {{amount}}', '节省 {{amount}}'],
+    gifts: {
+      chessSet: ['1 tournament chess set', '1 套比赛用国际象棋'],
+      chessDomino: ['1 chess domino set', '1 套国际象棋多米诺'],
+    },
+  },
   options: {
     individual: ['Individual / Parent', '个人 / 家长'],
     organization: ['School / Organization', '学校 / 机构'],
@@ -3293,8 +3315,8 @@ const wording = {
     L2: ['L2 - Basic Tactics', 'L2 - 基础战术'],
     L3: ['L3 - Intermediate', 'L3 - 中级提高'],
     L4: ['L4 - Advanced / Team', 'L4 - 高级梯队'],
-    cs1: ['Campus 1 (Hoang Mai)', '1号校区 (黄梅)'],
-    cs2: ['Campus 2 (Cau Giay)', '2号校区 (纸桥)'],
+    cs1: ['Campus 1 - Kim Lien', '1号校区 - Kim Liên'],
+    cs2: ['Campus 2 - Vinh Phuc', '2号校区 - Vĩnh Phúc'],
     online: ['Online Interactive Class', '线上互动班'],
     schoolPartner: ['School / Club Partnership', '学校 / 俱乐部合作'],
     eventTournament: ['Chess Tournament / Event', '赛事与体验活动'],
@@ -3304,20 +3326,40 @@ const wording = {
     advanced: ['Advanced', '高级 / 参赛优胜'],
     master: ['Master', '大师 / 梯队'],
     tuition: ['Tuition / Course', '学费 / 培训课程'],
-    merchandise: ['Books & Equipment', '图书器材销售'],
+    // No longer offered (the bookshop application sells them); kept for the
+    // records that hold it.
+    merchandise: [
+      'Books & Equipment (moved to NocoBookshop)',
+      '图书器材销售（已转至 NocoBookshop）',
+    ],
     b2b_school: ['School Partnership', '校园合作培训'],
-    course12: ['12-session Basic Course', '12课时基础班'],
-    course24: ['24-session Standard Course', '24课时标准班'],
-    course48: ['48-session Advanced / Annual Course', '48课时进阶班 / 全年'],
+    course10: ['10-session package', '10 课时套餐'],
+    course20: ['20-session package (chess set gift)', '20 课时套餐（赠棋具）'],
+    course40: ['40-session package (discounted)', '40 课时套餐（优惠）'],
+    // The package names from before the fee notice: no longer offered, kept
+    // for the records that hold them.
+    course12: ['12-session course (former)', '12课时班（旧）'],
+    course24: ['24-session course (former)', '24课时班（旧）'],
+    course48: ['48-session course (former)', '48课时班（旧）'],
     course1on1: ['1-on-1 VIP Coaching', '1对1大师私教课'],
-    chessCourse: ['Chess Course', '国际象棋培训课程'],
-    chessBook: ['Chess Book', '国际象棋教材图书'],
-    chessEquipment: ['Chess Equipment', '棋具 / 电子棋钟'],
+    chessCourse: [
+      'Chess course (other length)',
+      '国际象棋培训课程（其他课时）',
+    ],
+    chessBook: [
+      'Chess Book (moved to NocoBookshop)',
+      '国际象棋教材图书（已转至 NocoBookshop）',
+    ],
+    chessEquipment: [
+      'Chess Equipment (moved to NocoBookshop)',
+      '棋具 / 电子棋钟（已转至 NocoBookshop）',
+    ],
     chessTournament: ['Tournament / Event', '赛事活动'],
     b2bSchool: ['School Training', '校本课程合作'],
     zalo: ['Zalo', 'Zalo'],
     facebook: ['Facebook', 'Facebook'],
     walkIn: ['Walk-in', '到店 / 线下咨询'],
+    bookshop: ['Bookshop (NocoBookshop)', '书店（NocoBookshop）'],
     manufacturing: ['Manufacturing', '制造业'],
     technology: ['Technology / software', '科技 / 软件'],
     telecommunications: ['Telecommunications', '通信'],

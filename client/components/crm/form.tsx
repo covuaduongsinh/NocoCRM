@@ -2,13 +2,18 @@ import {
   LONG_TEXT_LIMIT,
   lengthLimit,
 } from '../../../server/providers/crm/limits.js';
+import {
+  TUITION_CURRENCY,
+  tuitionPackage,
+  tuitionTotal,
+} from '../../../server/providers/crm/tuition.js';
 import { LengthHint } from './length-hint.js';
 import { DateTimeInput } from './datetime-input.js';
 import { RecordMultiPicker, RecordPicker } from './record-picker.js';
 import { FileDropZone } from './attachments.js';
 import { CommentFiles } from './comment-files.js';
 import { ConfirmDialog } from './confirm-dialog.js';
-import { editsAll, fieldLabelKey, toText } from './api.js';
+import { editsAll, fieldLabelKey, money, toText } from './api.js';
 import { approverChoices } from './approver-choices.js';
 import { CountryChoice, SubdivisionChoice } from './geography.js';
 import {
@@ -451,7 +456,14 @@ export function RecordForm({
               : {}),
     ...initial,
   }));
-  const set = (key: string, value: unknown): void =>
+  const set = (key: string, value: unknown): void => {
+    // A tuition package (server/providers/crm/tuition.ts) sets what the
+    // parent pays for it, its sessions and its books, which the person can
+    // still change: a discount agreed, a part paid.
+    const chosen =
+      entity === 'opportunities' && key === 'businessType'
+        ? tuitionPackage(value)
+        : undefined;
     setInput((current) => ({
       ...current,
       [key]: value,
@@ -468,7 +480,11 @@ export function RecordForm({
               : {}),
           }
         : {}),
+      ...(chosen
+        ? { amount: tuitionTotal(chosen), currency: TUITION_CURRENCY }
+        : {}),
     }));
+  };
   // The embedding page keeps the values: every change is reported to it,
   // through whichever callback the page passed last.
   const report = useEffectEvent((next: Data) => embedded?.onChange(next));
@@ -684,10 +700,61 @@ export function RecordForm({
       field.key === 'type' && entity === 'companies'
         ? 'companyType'
         : field.key;
-    return (meta?.settings.options[key] ?? field.options ?? []).map((v) => ({
+    const offered = meta?.settings.options[key] ?? field.options ?? [];
+    // A value no longer offered (books and equipment, which went to the
+    // bookshop application; the course names from before the fee notice)
+    // stays on the record that holds it, so it is listed for that record
+    // alone: the server accepts a retired value only where it is unchanged.
+    const held = input[field.key];
+    const kept =
+      field.type === 'select' &&
+      typeof held === 'string' &&
+      held &&
+      !offered.includes(held)
+        ? [held]
+        : [];
+    return [...offered, ...kept].map((v) => ({
       value: v,
       label: text(`options.${toText(v)}`, { defaultValue: v }),
     }));
+  };
+  // A tuition package's terms, under the choice of it: what the sessions
+  // and the books cost, and what is given with it, so whoever takes the
+  // payment hands over the right things.
+  const packageTerms = (field: Field): ReactElement | null => {
+    const chosen =
+      entity === 'opportunities' && field.key === 'businessType'
+        ? tuitionPackage(input.businessType)
+        : undefined;
+    if (!chosen) return null;
+    const amount = (value: number): string =>
+      money(value, TUITION_CURRENCY, language);
+    return (
+      <p className='text-xs text-muted-foreground'>
+        {[
+          text('tuition.sessions', {
+            sessions: chosen.sessions,
+            amount: amount(chosen.tuition),
+          }),
+          chosen.bookFee
+            ? text('tuition.books', { amount: amount(chosen.bookFee) })
+            : text('tuition.booksWaived', {
+                amount: amount(chosen.bookWaiver),
+              }),
+          ...(chosen.gift
+            ? [
+                text('tuition.gift', {
+                  gift: text(`tuition.gifts.${chosen.gift.key}`),
+                  amount: amount(chosen.gift.value),
+                }),
+              ]
+            : []),
+          ...(chosen.saving
+            ? [text('tuition.saving', { amount: amount(chosen.saving) })]
+            : []),
+        ].join(' · ')}
+      </p>
+    );
   };
   const fieldInput = (field: Field): ReactElement => {
     const value = input[field.key];
@@ -1144,6 +1211,7 @@ export function RecordForm({
                   ) : (
                     fieldInput(f)
                   )}
+                  {packageTerms(f)}
                   {f.type === 'relation' &&
                     Boolean(input[f.key]) &&
                     names[toText(input[f.key])] && (

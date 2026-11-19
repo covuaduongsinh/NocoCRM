@@ -197,6 +197,68 @@ describe('CRM forms and file interchange', () => {
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
+  // The academy's fee notice (server/providers/crm/tuition.ts): a package
+  // chosen as the business type sets what the parent pays, sessions and
+  // books, and its terms stand under the choice.
+  it('fills the amount from a tuition package and shows its terms', async () => {
+    render(<RecordForm entity='opportunities' onClose={vi.fn()} />);
+    if (!screen.queryByRole('combobox', { name: 'Business type' }))
+      await userEvent.click(screen.getByRole('button', { name: /^More:/ }));
+    await userEvent.click(
+      screen.getByRole('combobox', { name: 'Business type' }),
+    );
+    await userEvent.click(
+      await screen.findByRole('option', {
+        name: '20-session package (chess set gift)',
+      }),
+    );
+    const digits = (): string =>
+      String(
+        (screen.getByLabelText('Amount') as HTMLInputElement).value,
+      ).replace(/\D/g, '');
+    // 3,000,000 for the sessions and 200,000 for the books.
+    await waitFor(() => expect(digits()).toBe('3200000'));
+    expect(
+      screen.getByRole('combobox', { name: 'Currency' }),
+    ).toHaveTextContent('VND');
+    expect(screen.getByText(/Books:.*Gift:/)).toBeInTheDocument();
+    // Another kind of deal has no terms, and keeps the amount typed.
+    await userEvent.click(
+      screen.getByRole('combobox', { name: 'Business type' }),
+    );
+    await userEvent.click(
+      await screen.findByRole('option', { name: '1-on-1 VIP Coaching' }),
+    );
+    expect(screen.queryByText(/Books:/)).toBeNull();
+    expect(digits()).toBe('3200000');
+  });
+  // Books and equipment went to the bookshop application: a deal that holds
+  // one keeps it, and no other deal is offered it.
+  it('lists a retired business type only for the record that holds it', async () => {
+    const { unmount } = render(
+      <RecordForm
+        entity='opportunities'
+        initial={{ businessType: 'chessBook' }}
+        onClose={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole('combobox', { name: 'Business type' }),
+    ).toHaveTextContent('Chess Book (moved to NocoBookshop)');
+    unmount();
+    render(<RecordForm entity='opportunities' onClose={vi.fn()} />);
+    if (!screen.queryByRole('combobox', { name: 'Business type' }))
+      await userEvent.click(screen.getByRole('button', { name: /^More:/ }));
+    await userEvent.click(
+      screen.getByRole('combobox', { name: 'Business type' }),
+    );
+    await screen.findByRole('option', { name: '10-session package' });
+    expect(
+      screen.queryByRole('option', {
+        name: 'Chess Book (moved to NocoBookshop)',
+      }),
+    ).toBeNull();
+  });
   it("puts a contact's yes / no fields side by side in one cell", () => {
     render(<RecordForm entity='contacts' onClose={vi.fn()} />);
     const employed = screen.getByRole('checkbox', { name: /^Employed/ });

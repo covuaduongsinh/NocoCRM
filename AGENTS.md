@@ -152,6 +152,7 @@ Standard Repository writes require an operation key through the registered submi
 | [.agents/rules/crm-demo.md](.agents/rules/crm-demo.md)                             | The demo dataset, its mail, import and removal, the demo banner                                                                             |
 | [.agents/rules/crm-signals.md](.agents/rules/crm-signals.md)                       | Company signals: the web search, the daily check, the Signals tab, signal notices and timeline lines                                        |
 | [.agents/rules/crm-whatsapp.md](.agents/rules/crm-whatsapp.md)                     | WhatsApp: the webhook, conversations, a record's WhatsApp tab and timeline lines, what follow-ups read, its settings                        |
+| [.agents/rules/crm-academy.md](.agents/rules/crm-academy.md)                       | The chess academy: scope against the bookshop and operations applications, tuition packages, branches, the Lark import, bookshop leads      |
 
 ## Visible and manageable role assignments
 

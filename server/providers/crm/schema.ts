@@ -69,6 +69,8 @@ export const sources: string[] = [
   'customerReferral',
   'schoolPartner',
   'eventTournament',
+  // A customer of the bookshop application who asked about lessons there.
+  'bookshop',
   'marketing',
   'exhibition',
   'search',
@@ -158,14 +160,19 @@ export const chessLevels: string[] = [
   'master',
 ];
 export const preferredBranches: string[] = ['cs1', 'cs2', 'online'];
+// What an opportunity sells. The three packages are the academy's tuition
+// packages (tuition.ts), which fill the amount; `chessCourse` is any other
+// number of sessions. Books and equipment are the bookshop application's and
+// are no longer offered: `chessBook`, `chessEquipment` and the package names
+// from before the fee notice (`course12`, `course24`, `course48`) stay on
+// the records that hold them, which keep their labels, and can no longer be
+// chosen.
 export const chessBusinessTypes: string[] = [
-  'course12',
-  'course24',
-  'course48',
+  'course10',
+  'course20',
+  'course40',
   'course1on1',
   'chessCourse',
-  'chessBook',
-  'chessEquipment',
   'chessTournament',
   'b2bSchool',
   'newBusiness',
@@ -403,11 +410,10 @@ export const definitions: Record<Entity, EntityDefinition> = {
     ],
     fields: [
       field('name', 'text', true),
-      field('pipelineType', 'select', false, [
-        'tuition',
-        'merchandise',
-        'b2b_school',
-      ]),
+      // Which business the deal belongs to. `merchandise` (books and
+      // equipment) went to the bookshop application: a record that holds
+      // it keeps it and its label, and it can no longer be chosen.
+      field('pipelineType', 'select', false, ['tuition', 'b2b_school']),
       field('studentName', 'text', false),
       field('chessLevel', 'select', false, chessLevels),
       field('preferredBranch', 'select', false, preferredBranches),
