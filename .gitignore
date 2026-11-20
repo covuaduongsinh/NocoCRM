@@ -45,3 +45,6 @@ database/*/collections/
 # Local research reports, kept beside the checkout and never committed.
 /reports/
 /research_notes/
+
+# oh-my-claudecode runtime state (session state, project memory); local only.
+/.omc/
