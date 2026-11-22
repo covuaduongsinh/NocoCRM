@@ -202,7 +202,7 @@ export function deletionChecks(entity: Entity): [Entity, string][] {
 }
 
 // The roles that may own records; see save().
-const sellerRoles = ['sales-representative', 'sales-manager'];
+const sellerRoles = ['sales-representative', 'sales-manager', 'system-administrator'];
 
 // A comment's stored changes: its text and, when it has any, the colleagues it
 // mentions and the files attached to it (ids of `crmFiles`).

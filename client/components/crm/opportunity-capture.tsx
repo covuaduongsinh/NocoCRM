@@ -59,7 +59,11 @@ interface CapturedDeal {
 }
 const rowsOf = (value: unknown): Data[] =>
   Array.isArray(value) ? (value as Data[]) : [];
-const SELLER_ROLES = ['sales-representative', 'sales-manager'];
+const SELLER_ROLES = [
+  'sales-representative',
+  'sales-manager',
+  'system-administrator',
+];
 // What the form keeps of the opportunity; the rest of what the AI returns
 // is for the review.
 const FIELDS = [

@@ -390,7 +390,11 @@ export function InlineField({
                 (field.key !== 'ownerId' ||
                   entity === 'approvals' ||
                   u.roles.some((r) =>
-                    ['sales-representative', 'sales-manager'].includes(r),
+                    [
+                      'sales-representative',
+                      'sales-manager',
+                      'system-administrator',
+                    ].includes(r),
                   )),
             )
             .map((u) => ({ value: u.id, label: u.name }))

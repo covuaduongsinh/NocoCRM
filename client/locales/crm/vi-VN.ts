@@ -2568,7 +2568,7 @@ export const crmViVN: CrmWording = {
     leads: 'Đăng ký mới & Leads',
     companies: 'Trường học & Tổ chức',
     contacts: 'Phụ huynh & Khách hàng',
-    opportunities: 'Phễu Tuyển sinh & Đơn hàng',
+    opportunities: 'Cơ hội & Tái tục',
     tasks: 'Công việc',
     approvals: 'Phê duyệt',
   },

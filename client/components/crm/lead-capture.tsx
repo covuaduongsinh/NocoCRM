@@ -79,7 +79,11 @@ const AI_FIELDS = [
   'source',
   'ownerId',
 ];
-const SELLER_ROLES = ['sales-representative', 'sales-manager'];
+const SELLER_ROLES = [
+  'sales-representative',
+  'sales-manager',
+  'system-administrator',
+];
 
 // The lead form's labels, for AI organise to name its fields by.
 const leadLabels = (

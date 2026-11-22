@@ -422,16 +422,23 @@ export function RecordForm({
   // No default for source: it is required, and a silent "other" would let
   // it pass unchosen and pollute the source statistics.
   const [input, setInput] = useState<Data>(() => ({
-    // The current user, when they sell; an administrator picks an owner.
-    ownerId: meta?.users.some(
-      (u) =>
-        u.id === meta.userId &&
-        u.roles.some((r) =>
-          ['sales-representative', 'sales-manager'].includes(r),
-        ),
-    )
-      ? meta.userId
-      : undefined,
+    // The current user, when they sell or administer.
+    ownerId:
+      meta?.userId &&
+      (meta.users.some(
+        (u) =>
+          u.id === meta.userId &&
+          u.roles.some((r) =>
+            [
+              'sales-representative',
+              'sales-manager',
+              'system-administrator',
+            ].includes(r),
+          ),
+      ) ||
+        meta.users.length > 0)
+        ? meta.userId
+        : undefined,
     ...(entity === 'leads'
       ? { status: 'new', customerType: 'individual' }
       : entity === 'companies'
@@ -692,7 +699,11 @@ export function RecordForm({
             (field.key !== 'ownerId' ||
               entity === 'approvals' ||
               u.roles.some((r) =>
-                ['sales-representative', 'sales-manager'].includes(r),
+                [
+                  'sales-representative',
+                  'sales-manager',
+                  'system-administrator',
+                ].includes(r),
               )),
         )
         .map((u) => ({ value: u.id, label: u.name }));

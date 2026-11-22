@@ -59,7 +59,11 @@ interface Profile {
   sources: { title: string; url: string; site: string }[];
   duplicates: { id: string; name: string }[];
 }
-const SELLER_ROLES = ['sales-representative', 'sales-manager'];
+const SELLER_ROLES = [
+  'sales-representative',
+  'sales-manager',
+  'system-administrator',
+];
 // What the form keeps of the company.
 const FIELDS = [
   'name',

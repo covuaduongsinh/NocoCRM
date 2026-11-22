@@ -217,7 +217,7 @@ const attachments: Field = field('attachments', 'files');
 const company: Field = field(
   'companyId',
   'relation',
-  true,
+  false,
   undefined,
   'companies',
 );
