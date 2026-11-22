@@ -1,4 +1,4 @@
-import { generateVietQrUrl } from '../../../client/components/crm/TuitionNoticeCard.js';
+import { generateVietQrUrl } from './tuition.js';
 
 export interface TuitionEmailOptions {
   studentName: string;
@@ -6,7 +6,6 @@ export interface TuitionEmailOptions {
   sessionsRemaining: number;
   totalAttended?: number;
   attendanceDates?: string[] | null;
-  tuitionPackage?: string | null;
   paymentCode?: string | null;
   amount?: number | null;
 }
@@ -17,7 +16,6 @@ export function buildTuitionNoticeEmailHtml({
   sessionsRemaining,
   totalAttended = 0,
   attendanceDates = [],
-  tuitionPackage = 'course20',
   paymentCode = 'DSC-HP-000000',
   amount = 3200000,
 }: TuitionEmailOptions): string {

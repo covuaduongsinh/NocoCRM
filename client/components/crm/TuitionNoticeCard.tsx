@@ -1,4 +1,7 @@
 import React from 'react';
+import { generateVietQrUrl, type VietQrOptions } from '../../../server/providers/crm/tuition.js';
+
+export { generateVietQrUrl, type VietQrOptions };
 
 export interface TuitionNoticeProps {
   studentName: string;
@@ -9,25 +12,6 @@ export interface TuitionNoticeProps {
   tuitionPackage?: string | null;
   paymentCode?: string | null;
   amount?: number | null;
-}
-
-export interface VietQrOptions {
-  bankBin?: string;
-  accountNumber?: string;
-  accountName?: string;
-  amount?: number;
-  paymentCode?: string;
-}
-
-export function generateVietQrUrl({
-  bankBin = '970422', // MBBank
-  accountNumber = '0866888666',
-  accountName = 'CONG TY CP CO VUA DUONG SINH',
-  amount = 1700000,
-  paymentCode = 'DSC-HP-123456',
-}: VietQrOptions): string {
-  const cleanCode = paymentCode.replace(/\s+/g, '');
-  return `https://img.vietqr.io/image/${bankBin}-${accountNumber}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(cleanCode)}&accountName=${encodeURIComponent(accountName)}`;
 }
 
 export function TuitionNoticeCard({

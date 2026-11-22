@@ -59,7 +59,6 @@ export async function scanAndGenerateRenewals({
         }
 
         // Check for existing open renewal opportunity
-        const studentContactPattern = `%"${student.contact_id}"%`;
         const studentContactPlain = student.contact_id ? `%${student.contact_id}%` : '';
 
         const existingOpp = crmDb.prepare(`

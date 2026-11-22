@@ -68,3 +68,23 @@ export function tuitionPackage(key: unknown): TuitionPackage | undefined {
 export function tuitionTotal(item: TuitionPackage): number {
   return item.tuition + item.bookFee;
 }
+
+export interface VietQrOptions {
+  bankBin?: string;
+  accountNumber?: string;
+  accountName?: string;
+  amount?: number;
+  paymentCode?: string;
+}
+
+export function generateVietQrUrl({
+  bankBin = '970422', // MBBank
+  accountNumber = '0866888666',
+  accountName = 'CONG TY CP CO VUA DUONG SINH',
+  amount = 1700000,
+  paymentCode = 'DSC-HP-123456',
+}: VietQrOptions): string {
+  const cleanCode = paymentCode.replace(/\s+/g, '');
+  return `https://img.vietqr.io/image/${bankBin}-${accountNumber}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(cleanCode)}&accountName=${encodeURIComponent(accountName)}`;
+}
+
