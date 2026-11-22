@@ -2813,7 +2813,7 @@ export const crmViVN: CrmWording = {
     newBusiness: 'Kinh doanh mới',
     expansion: 'Mở rộng',
     crossSell: 'Bán chéo',
-    renewal: 'Gia hạn',
+    renewal: 'Chăm sóc Tái tục / Gia hạn',
     tender: 'Đấu thầu',
     decisionMaker: 'Người ra quyết định',
     champion: 'Người ủng hộ',
